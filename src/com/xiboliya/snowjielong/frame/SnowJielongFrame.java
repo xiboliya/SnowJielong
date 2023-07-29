@@ -74,7 +74,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 十一曜：太阳、太阴、荧惑、辰星、岁星、太白、镇星、罗睺、计都、紫炁、月孛。
  * 百宝箱：砗磲、珍珠、珊瑚、琥珀、水晶、玛瑙、翡翠、猫眼、欧泊、钻石、红宝石、蓝宝石、祖母绿、碧玺、
  * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
- * 添加提示功能（提示功能不加分）。
  * 添加积分兑换商城。
  * 添加正确率显示。（答对次数/总答题次数）
  * 题目显示时位置随机。
@@ -117,6 +116,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JPanel pnlCenter = new JPanel(this.gridLayout);
   private JPanel pnlOption = new JPanel(this.optionLayout);
   private JLabel lblOption = new JLabel("选项：");
+  private JButton btnHint = new JButton("提示一下");
   private JButton btnStart = new JButton("开始闯关");
   private JButton btnCancel = new JButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
@@ -144,25 +144,27 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   // 当前难度等级的题目列表
   private ArrayList<String> idiomList = new ArrayList<String>();
   // 当前难度等级
-  private int topicLevel = 0;
+  private int currentTopicLevel = 0;
   // 当前头衔等级
-  private int rankLevel = 0;
+  private int currentRankLevel = 0;
   // 当前关卡
-  private int barrier = 0;
+  private int currentBarrier = 0;
   // 当前关卡闯关失败的次数
-  private int barrierFailTimes = 0;
+  private int currentBarrierFailTimes = 0;
   // 当前关卡是否通过
-  private boolean isBarrierPassed = false;
+  private boolean isCurrentBarrierPassed = false;
   // 累计分数
-  private int score = 0;
+  private int totalScore = 0;
   // 当前剩余作答时间，单位：秒
   private int countdown = 0;
   // 当前关卡答题次数
   private int answerTimes = 0;
   // 累计用时，单位：秒
-  private int time = 0;
+  private int usedTime = 0;
   // 累计通过关卡数
   private int passedBarrierCount = 0;
+  // 可用的提示次数
+  private int hintCount = 0;
   // 计时器
   private Timer timer = null;
   // 计时器执行的任务
@@ -195,7 +197,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 初始化当前难度等级的题目列表
    */
   private void initIdiomList() {
-    URL url = ClassLoader.getSystemResource("res/idiom/level" + this.topicLevel + ".txt");
+    URL url = ClassLoader.getSystemResource("res/idiom/level" + this.currentTopicLevel + ".txt");
     if (url == null) {
       return;
     }
@@ -229,13 +231,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void loadIdiomCache() {
     IdiomCache idiomCache = this.setting.idiomCache;
-    this.topicLevel = idiomCache.getTopicLevel();
-    this.barrier = idiomCache.getBarrier();
-    this.barrierFailTimes = idiomCache.getBarrierFailTimes();
-    this.isBarrierPassed = idiomCache.isBarrierPassed();
-    this.score = idiomCache.getScore();
-    this.time = idiomCache.getTime();
+    this.currentTopicLevel = idiomCache.getCurrentTopicLevel();
+    this.currentBarrier = idiomCache.getCurrentBarrier();
+    this.currentBarrierFailTimes = idiomCache.getCurrentBarrierFailTimes();
+    this.isCurrentBarrierPassed = idiomCache.isCurrentBarrierPassed();
+    this.totalScore = idiomCache.getTotalScore();
+    this.usedTime = idiomCache.getUsedTime();
     this.passedBarrierCount = idiomCache.getPassedBarrierCount();
+    this.hintCount = idiomCache.getHintCount();
   }
 
   /**
@@ -287,25 +290,30 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlOption.setBounds(140, 460, 400, 80);
     this.pnlMain.add(this.lblOption);
     this.pnlMain.add(this.pnlOption);
+    this.btnHint.setBounds(10, 560, 100, Util.BUTTON_HEIGHT);
     this.btnStart.setBounds(200, 560, 100, Util.BUTTON_HEIGHT);
     this.btnCancel.setBounds(390, 560, 100, Util.BUTTON_HEIGHT);
+    this.pnlMain.add(this.btnHint);
     this.pnlMain.add(this.btnStart);
     this.pnlMain.add(this.btnCancel);
+    this.btnHint.setFocusable(false);
     this.btnStart.setFocusable(false);
     this.btnCancel.setFocusable(false);
+    this.btnHint.setEnabled(false);
+    this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
   }
 
   /**
    * 初始化界面显示
    */
   private void initView() {
-    this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.topicLevel]);
-    this.lblBarrier.setText("关卡：第" + (this.barrier + 1) + "/" + this.idiomList.size() + "关");
+    this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
+    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + this.idiomList.size() + "关");
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
-    this.lblScore.setText("累计分数：" + this.score + "分");
-    this.lblTime.setText("累计用时：" + this.time + "秒");
+    this.lblScore.setText("累计分数：" + this.totalScore + "分");
+    this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.initRankLevel();
-    this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.rankLevel]);
+    this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.currentRankLevel]);
     this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
   }
 
@@ -345,14 +353,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void initRankLevel() {
     int size = RANK_LEVEL_SCORE.length;
-    if (this.score <= 0) {
-      this.rankLevel = 0;
-    } else if (this.score >= RANK_LEVEL_SCORE[size - 1]) {
-      this.rankLevel = size - 1;
+    if (this.totalScore <= 0) {
+      this.currentRankLevel = 0;
+    } else if (this.totalScore >= RANK_LEVEL_SCORE[size - 1]) {
+      this.currentRankLevel = size - 1;
     } else {
       for (int i = 0; i < size - 1; i++) {
-        if (this.score >= RANK_LEVEL_SCORE[i] && this.score < RANK_LEVEL_SCORE[i + 1]) {
-          this.rankLevel = i;
+        if (this.totalScore >= RANK_LEVEL_SCORE[i] && this.totalScore < RANK_LEVEL_SCORE[i + 1]) {
+          this.currentRankLevel = i;
           break;
         }
       }
@@ -364,11 +372,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @return 闯关速度
    */
   private String getSpeed() {
-    if (this.time <= 0 || this.passedBarrierCount <= 0) {
+    if (this.usedTime <= 0 || this.passedBarrierCount <= 0) {
       return "--";
     }
     try {
-      BigDecimal number1 = new BigDecimal(this.time);
+      BigDecimal number1 = new BigDecimal(this.usedTime);
       BigDecimal number2 = new BigDecimal(this.passedBarrierCount);
       BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
       return number.toString();
@@ -414,14 +422,16 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void refreshElements() {
     int idiomCount = this.idiomList.size();
-    if (this.barrierFailTimes < 0 && this.barrier >= (idiomCount - 1)) {
+    if (this.currentBarrierFailTimes < 0 && this.currentBarrier >= (idiomCount - 1)) {
       this.btnStart.setEnabled(false);
+      this.btnHint.setEnabled(false);
       return;
     } else {
       this.btnStart.setEnabled(true);
+      this.btnHint.setEnabled(this.hintCount > 0);
     }
-    this.isBarrierPassed = false;
-    this.setting.idiomCache.setBarrierPassed(this.isBarrierPassed);
+    this.isCurrentBarrierPassed = false;
+    this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
     this.clearElementsText();
     this.charCellIndexList.clear();
     this.answerCellIndexList.clear();
@@ -430,8 +440,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.charOptionCellList.clear();
     this.idiomCellsList.clear();
     this.answerTimes = 0;
-    this.lblBarrier.setText("关卡：第" + (this.barrier + 1) + "/" + idiomCount + "关");
-    String item = this.idiomList.get(this.barrier);
+    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + idiomCount + "关");
+    String item = this.idiomList.get(this.currentBarrier);
     String[] itemSplit = item.split("#");
     // 成语数组
     String[] idiomArray = itemSplit[0].split("，");
@@ -625,11 +635,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void countdown() {
     this.countdown--;
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
-    this.time++;
-    this.setting.idiomCache.setTime(this.time);
+    this.usedTime++;
+    this.setting.idiomCache.setUsedTime(this.usedTime);
     if (this.countdown <= 0) {
       this.stopTimer();
-      this.lblTime.setText("累计用时：" + this.time + "秒");
+      this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.outOfTime();
     }
   }
@@ -638,7 +648,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 开始闯关计时器
    */
   private void startTimer() {
-    this.countdown = TOPIC_LEVEL_TIME[this.topicLevel];
+    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
     this.timer = new Timer();
     this.task = new TimerTask() {
@@ -745,6 +755,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 添加事件监听器
    */
   private void addListeners() {
+    this.btnHint.addActionListener(this);
     this.btnStart.addActionListener(this);
     this.btnCancel.addActionListener(this);
     this.itemRestart.addActionListener(this);
@@ -775,7 +786,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @param lblAnswer 当前获得焦点的答题区的格子
    */
   private void cancelAnswer(BaseLabel lblAnswer) {
-    if (this.countdown <= 0 || this.isBarrierPassed) {
+    if (this.countdown <= 0 || this.isCurrentBarrierPassed) {
       return;
     }
     String text = lblAnswer.getText();
@@ -797,7 +808,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void checkAnswer(BaseLabel lblOption) {
     String optionText = lblOption.getText();
-    if (this.countdown <= 0 || this.isBarrierPassed || Util.isTextEmpty(optionText)) {
+    if (this.countdown <= 0 || this.isCurrentBarrierPassed || Util.isTextEmpty(optionText)) {
       return;
     }
     BaseLabel lblAnswer = null;
@@ -821,40 +832,42 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       }
       this.stopTimer();
       int currentScore = this.getCurrentScore();
-      this.score += currentScore;
-      this.setting.idiomCache.setScore(this.score);
-      this.isBarrierPassed = true;
-      this.setting.idiomCache.setBarrierPassed(this.isBarrierPassed);
+      this.totalScore += currentScore;
+      this.setting.idiomCache.setTotalScore(this.totalScore);
+      this.isCurrentBarrierPassed = true;
+      this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
       this.passedBarrierCount++;
       this.setting.idiomCache.setPassedBarrierCount(this.passedBarrierCount);
-      this.barrierFailTimes = 0;
+      this.currentBarrierFailTimes = 0;
       this.countdown = 0;
       this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
-      this.lblScore.setText("累计分数：" + this.score + "分");
-      this.lblTime.setText("累计用时：" + this.time + "秒");
+      this.lblScore.setText("累计分数：" + this.totalScore + "分");
+      this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
+      this.btnHint.setEnabled(false);
       TipsWindow.show(this, "回答正确，加" + currentScore + "分！");
       this.refreshRankLevel();
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
           JOptionPane.showMessageDialog(this, "恭喜通关！你可以进入下一等级了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
         } else {
-          this.barrierFailTimes = -1;
+          this.currentBarrierFailTimes = -1;
           this.btnStart.setEnabled(false);
           JOptionPane.showMessageDialog(this, "恭喜通关！已没有更多成语可以挑战了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
         }
       }
-      this.setting.idiomCache.setBarrierFailTimes(this.barrierFailTimes);
+      this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
     } else if (this.answerTimes >= this.answerCellList.size() * 2) {
-        // 作答次数最多为空格子个数乘以2，如1个空格子则作答次数最多为2次
+        // 作答次数最多为空格子个数乘以2，如有1个空格子则作答次数最多为2次
         this.stopTimer();
-        this.lblTime.setText("累计用时：" + this.time + "秒");
-        this.barrierFailTimes++;
+        this.lblTime.setText("累计用时：" + this.usedTime + "秒");
+        this.currentBarrierFailTimes++;
         this.countdown = 0;
         this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
-        this.setting.idiomCache.setBarrierFailTimes(this.barrierFailTimes);
+        this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
         TipsWindow.show(this, "已超过作答次数，闯关失败！");
         this.btnStart.setText("重新闯关");
+        this.btnHint.setEnabled(false);
     } else {
       TipsWindow.show(this, "回答错误！");
     }
@@ -883,10 +896,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private int getCurrentScore() {
     int currentScore = 0;
     // 当前关卡闯关失败超过1次，则得分为0
-    if (this.barrierFailTimes > 0) {
+    if (this.currentBarrierFailTimes > 0) {
       return currentScore;
     }
-    int totalTime = TOPIC_LEVEL_TIME[this.topicLevel];
+    int totalTime = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     int useTime = totalTime - this.countdown;
     currentScore = totalTime / 5 - useTime / 5;
     // 本轮每答错1次则扣1分
@@ -943,23 +956,23 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新头衔等级显示
    */
   private void refreshRankLevel() {
-    int oldRankLevel = this.rankLevel;
+    int oldRankLevel = this.currentRankLevel;
     int size = RANK_LEVEL_SCORE.length;
-    if (this.score <= 0) {
-      this.rankLevel = 0;
-    } else if (this.score >= RANK_LEVEL_SCORE[size - 1]) {
-      this.rankLevel = size - 1;
+    if (this.totalScore <= 0) {
+      this.currentRankLevel = 0;
+    } else if (this.totalScore >= RANK_LEVEL_SCORE[size - 1]) {
+      this.currentRankLevel = size - 1;
     } else {
       for (int i = 0; i < size - 1; i++) {
-        if (this.score >= RANK_LEVEL_SCORE[i] && this.score < RANK_LEVEL_SCORE[i + 1]) {
-          this.rankLevel = i;
+        if (this.totalScore >= RANK_LEVEL_SCORE[i] && this.totalScore < RANK_LEVEL_SCORE[i + 1]) {
+          this.currentRankLevel = i;
           break;
         }
       }
     }
-    String rankLevelName = RANK_LEVEL_NAME[this.rankLevel];
+    String rankLevelName = RANK_LEVEL_NAME[this.currentRankLevel];
     this.lblRankLevel.setText("头衔：" + rankLevelName);
-    if (this.rankLevel > oldRankLevel) {
+    if (this.currentRankLevel > oldRankLevel) {
       JOptionPane.showMessageDialog(this, "恭喜头衔升级为：" + rankLevelName + "！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
     }
   }
@@ -970,6 +983,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void outOfTime() {
     TipsWindow.show(this, "作答时间已到，闯关失败！");
     this.btnStart.setText("重新闯关");
+    this.btnHint.setEnabled(false);
   }
 
   /**
@@ -977,7 +991,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @return 是否通过当前难度等级的所有关卡
    */
   private boolean isPassedAllBarrier() {
-    return (this.barrier + 1) >= this.idiomList.size();
+    return (this.currentBarrier + 1) >= this.idiomList.size();
   }
 
   /**
@@ -985,7 +999,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @return 是否存在下一难度等级的关卡
    */
   private boolean hasNextTopicLevel() {
-    URL url = ClassLoader.getSystemResource("res/idiom/level" + (this.topicLevel + 1) + ".txt");
+    URL url = ClassLoader.getSystemResource("res/idiom/level" + (this.currentTopicLevel + 1) + ".txt");
     return url != null;
   }
 
@@ -999,20 +1013,20 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       return;
     }
     this.stopTimer();
-    this.topicLevel = 0;
-    this.rankLevel = 0;
-    this.barrier = 0;
-    this.barrierFailTimes = 0;
-    this.isBarrierPassed = false;
-    this.score = 0;
-    this.countdown = TOPIC_LEVEL_TIME[this.topicLevel];
+    this.currentTopicLevel = 0;
+    this.currentRankLevel = 0;
+    this.currentBarrier = 0;
+    this.currentBarrierFailTimes = 0;
+    this.isCurrentBarrierPassed = false;
+    this.totalScore = 0;
+    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.answerTimes = 0;
-    this.time = 0;
+    this.usedTime = 0;
     this.passedBarrierCount = 0;
     this.setting.idiomCache = new IdiomCache();
     this.refreshElements();
-    this.lblScore.setText("累计分数：" + this.score + "分");
-    this.lblTime.setText("累计用时：" + this.time + "秒");
+    this.lblScore.setText("累计分数：" + this.totalScore + "分");
+    this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
   }
 
@@ -1044,7 +1058,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   @Override
   public void actionPerformed(ActionEvent e) {
     Object source = e.getSource();
-    if (this.btnStart.equals(source)) {
+    if (this.btnHint.equals(source)) {
+      this.hint();
+    } else if (this.btnStart.equals(source)) {
       this.start();
     } else if (this.btnCancel.equals(source)) {
       this.exit();
@@ -1060,25 +1076,63 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
+   * 提示一下
+   */
+  private void hint() {
+    if (this.countdown <= 0) {
+      return;
+    }
+    BaseLabel lblAnswer = this.getFocusedAnswerCell();
+    if (lblAnswer == null) {
+      return;
+    }
+    IdiomTag tag = (IdiomTag)lblAnswer.getTag();
+    String text = tag.getContent();
+    for (BaseLabel lblOption : this.charOptionCellList) {
+      if (text.equals(lblOption.getTag())) {
+        lblOption.setBackground(Color.PINK);
+        this.hintCount--;
+        this.setting.idiomCache.setHintCount(this.hintCount);
+        this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
+        break;
+      }
+    }
+  }
+
+  /**
+   * 获取当前选中的空格子
+   * @return 当前选中的空格子
+   */
+  private BaseLabel getFocusedAnswerCell() {
+    for (BaseLabel lblCell : this.answerCellList) {
+      IdiomTag idiomTag = (IdiomTag)lblCell.getTag();
+      if (idiomTag.isFocused()) {
+        return lblCell;
+      }
+    }
+    return null;
+  }
+
+  /**
    * 开始闯关
    */
-  public void start() {
-    if (this.isBarrierPassed) {
+  private void start() {
+    if (this.isCurrentBarrierPassed) {
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
-          this.topicLevel++;
-          this.setting.idiomCache.setTopicLevel(this.topicLevel);
+          this.currentTopicLevel++;
+          this.setting.idiomCache.setCurrentTopicLevel(this.currentTopicLevel);
           this.initIdiomList();
-          this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.topicLevel]);
-          this.barrier = 0;
-          this.setting.idiomCache.setBarrier(this.barrier);
+          this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
+          this.currentBarrier = 0;
+          this.setting.idiomCache.setCurrentBarrier(this.currentBarrier);
           this.refreshElements();
         } else {
           TipsWindow.show(this, "您已通关，没有成语可以挑战了！");
         }
       } else {
-        this.barrier++;
-        this.setting.idiomCache.setBarrier(this.barrier);
+        this.currentBarrier++;
+        this.setting.idiomCache.setCurrentBarrier(this.currentBarrier);
         this.refreshElements();
       }
     } else if (this.countdown <= 0) {
@@ -1092,7 +1146,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   /**
    * 退出
    */
-  public void exit() {
+  private void exit() {
     if (this.countdown > 0) {
       int result = JOptionPane.showConfirmDialog(this, "当前正在闯关中，如果退出会导致本轮闯关失败。\n是否继续退出？", 
         Util.SOFTWARE, JOptionPane.YES_NO_CANCEL_OPTION);
@@ -1111,7 +1165,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   @Override
   public void focusGained(FocusEvent e) {
     BaseLabel lblElement = (BaseLabel) e.getSource();
-    if (this.answerCellList.contains(lblElement) && !this.isBarrierPassed) {
+    if (this.answerCellList.contains(lblElement) && !this.isCurrentBarrierPassed) {
       for (BaseLabel lblAnswer : this.answerCellList) {
         IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
         if (lblAnswer.equals(lblElement)) {

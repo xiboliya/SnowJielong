@@ -25,27 +25,38 @@ package com.xiboliya.snowjielong.common;
  */
 public class IdiomCache {
   // 当前难度等级
-  private int topicLevel;
+  private int currentTopicLevel;
   // 当前关卡
-  private int barrier;
+  private int currentBarrier;
   // 当前关卡闯关失败的次数
-  private int barrierFailTimes;
+  private int currentBarrierFailTimes;
   // 当前关卡是否通过
-  private boolean isBarrierPassed;
+  private boolean isCurrentBarrierPassed;
   // 累计得分
-  private int score;
+  private int totalScore;
   // 累计用时，单位：秒
-  private int time;
+  private int usedTime;
   // 累计通过关卡数
   private int passedBarrierCount;
+  // 可用的提示次数，默认为3次
+  private int hintCount = 3;
 
   /**
    * 获取当前难度等级
    * 
    * @return 当前难度等级
    */
-  public int getTopicLevel() {
-    return this.topicLevel;
+  public int getCurrentTopicLevel() {
+    return this.currentTopicLevel;
+  }
+
+  /**
+   * 设置当前难度等级
+   * 
+   * @param currentTopicLevel 当前难度等级
+   */
+  public void setCurrentTopicLevel(int currentTopicLevel) {
+    this.currentTopicLevel = currentTopicLevel;
   }
 
   /**
@@ -53,8 +64,17 @@ public class IdiomCache {
    * 
    * @return 当前关卡
    */
-  public int getBarrier() {
-    return this.barrier;
+  public int getCurrentBarrier() {
+    return this.currentBarrier;
+  }
+
+  /**
+   * 设置当前关卡
+   * 
+   * @param currentBarrier 当前关卡
+   */
+  public void setCurrentBarrier(int currentBarrier) {
+    this.currentBarrier = currentBarrier;
   }
 
   /**
@@ -62,8 +82,17 @@ public class IdiomCache {
    * 
    * @return 当前关卡闯关失败的次数
    */
-  public int getBarrierFailTimes() {
-    return this.barrierFailTimes;
+  public int getCurrentBarrierFailTimes() {
+    return this.currentBarrierFailTimes;
+  }
+
+  /**
+   * 设置当前关卡闯关失败的次数
+   * 
+   * @param currentBarrierFailTimes 当前关卡闯关失败的次数
+   */
+  public void setCurrentBarrierFailTimes(int currentBarrierFailTimes) {
+    this.currentBarrierFailTimes = currentBarrierFailTimes;
   }
 
   /**
@@ -71,8 +100,17 @@ public class IdiomCache {
    * 
    * @return 当前关卡是否通过
    */
-  public boolean isBarrierPassed() {
-    return this.isBarrierPassed;
+  public boolean isCurrentBarrierPassed() {
+    return this.isCurrentBarrierPassed;
+  }
+
+  /**
+   * 设置当前关卡是否通过
+   * 
+   * @param isCurrentBarrierPassed 当前关卡是否通过
+   */
+  public void setCurrentBarrierPassed(boolean isCurrentBarrierPassed) {
+    this.isCurrentBarrierPassed = isCurrentBarrierPassed;
   }
 
   /**
@@ -80,8 +118,17 @@ public class IdiomCache {
    * 
    * @return 累计得分
    */
-  public int getScore() {
-    return this.score;
+  public int getTotalScore() {
+    return this.totalScore;
+  }
+
+  /**
+   * 设置累计得分
+   * 
+   * @param totalScore 累计得分
+   */
+  public void setTotalScore(int totalScore) {
+    this.totalScore = totalScore;
   }
 
   /**
@@ -89,8 +136,17 @@ public class IdiomCache {
    * 
    * @return 累计用时
    */
-  public int getTime() {
-    return this.time;
+  public int getUsedTime() {
+    return this.usedTime;
+  }
+
+  /**
+   * 设置累计用时
+   * 
+   * @param usedTime 累计用时
+   */
+  public void setUsedTime(int usedTime) {
+    this.usedTime = usedTime;
   }
 
   /**
@@ -103,65 +159,29 @@ public class IdiomCache {
   }
 
   /**
-   * 设置当前难度等级
-   * 
-   * @param topicLevel 当前难度等级
-   */
-  public void setTopicLevel(int topicLevel) {
-    this.topicLevel = topicLevel;
-  }
-
-  /**
-   * 设置当前关卡
-   * 
-   * @param barrier 当前关卡
-   */
-  public void setBarrier(int barrier) {
-    this.barrier = barrier;
-  }
-
-  /**
-   * 设置当前关卡闯关失败的次数
-   * 
-   * @param barrier 当前关卡闯关失败的次数
-   */
-  public void setBarrierFailTimes(int barrierFailTimes) {
-    this.barrierFailTimes = barrierFailTimes;
-  }
-
-  /**
-   * 设置当前关卡是否通过
-   * 
-   * @param barrier 当前关卡是否通过
-   */
-  public void setBarrierPassed(boolean isBarrierPassed) {
-    this.isBarrierPassed = isBarrierPassed;
-  }
-
-  /**
-   * 设置累计得分
-   * 
-   * @param score 累计得分
-   */
-  public void setScore(int score) {
-    this.score = score;
-  }
-
-  /**
-   * 设置累计用时
-   * 
-   * @param time 累计用时
-   */
-  public void setTime(int time) {
-    this.time = time;
-  }
-
-  /**
    * 设置累计通过关卡数
    * 
    * @param passedBarrierCount 累计通过关卡数
    */
   public void setPassedBarrierCount(int passedBarrierCount) {
     this.passedBarrierCount = passedBarrierCount;
+  }
+
+  /**
+   * 获取可用的提示次数
+   * 
+   * @return 可用的提示次数
+   */
+  public int getHintCount() {
+    return this.hintCount;
+  }
+
+  /**
+   * 设置可用的提示次数
+   * 
+   * @param hintCount 可用的提示次数
+   */
+  public void setHintCount(int hintCount) {
+    this.hintCount = hintCount;
   }
 }

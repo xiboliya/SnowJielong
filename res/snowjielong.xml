@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Setting note="软件设置">
   <Idiom note="成语接龙游戏的进度存档">
-    <topicLevel note="当前难度等级">0</topicLevel>
-    <barrier note="当前关卡">0</barrier>
-    <barrierFailTimes note="当前关卡闯关失败的次数">0</barrierFailTimes>
-    <isBarrierPassed note="当前关卡是否通过">false</isBarrierPassed>
-    <score note="累计得分">0</score>
-    <time note="累计用时">0</time>
+    <currentTopicLevel note="当前难度等级">0</currentTopicLevel>
+    <currentBarrier note="当前关卡">0</currentBarrier>
+    <currentBarrierFailTimes note="当前关卡闯关失败的次数">0</currentBarrierFailTimes>
+    <isCurrentBarrierPassed note="当前关卡是否通过">false</isCurrentBarrierPassed>
+    <totalScore note="累计得分">0</totalScore>
+    <usedTime note="累计用时">0</usedTime>
     <passedBarrierCount note="累计通过关卡数">0</passedBarrierCount>
+    <hintCount note="可用的提示次数">3</hintCount>
   </Idiom>
 </Setting>
