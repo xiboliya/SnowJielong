@@ -91,6 +91,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private static final String[] TOPIC_LEVEL_NAME = new String[] { "初级", "中级", "高级", "特级", "顶级" };
   // 各难度等级下每轮答题时间，单位：秒
   private static final int[] TOPIC_LEVEL_TIME = new int[] { 20, 30, 40, 50, 60 };
+  // 各难度等级下每轮闯关速度，获得随机奖励的几率所需的参数，单位：秒/关
+  private static final int[] TOPIC_LEVEL_SPEED = new int[] { 3, 4, 5, 6, 7 };
   // 头衔等级名称数组
   private static final String[] RANK_LEVEL_NAME = new String[] { "童生", "秀才", "附生", "增生", "廪生", "举人", "解元", "贡士", "会元", "进士", "探花", "榜眼", "状元" };
   // 头衔等级分数数组
@@ -163,6 +165,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private int usedTime = 0;
   // 累计通过关卡数
   private int passedBarrierCount = 0;
+  // 闯关速度
+  private float speed = -1;
   // 可用的提示次数
   private int hintCount = 0;
   // 计时器
@@ -314,7 +318,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.initRankLevel();
     this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.currentRankLevel]);
-    this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
+    this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
   }
 
   /**
@@ -368,22 +372,34 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
-   * 获取闯关速度
-   * @return 闯关速度
+   * 获取闯关速度字符形式
+   * @return 闯关速度字符形式
    */
-  private String getSpeed() {
+  private String getSpeedText() {
     if (this.usedTime <= 0 || this.passedBarrierCount <= 0) {
       return "--";
     }
+    this.speed = this.getSpeed();
+    if (this.speed > 0) {
+      return String.valueOf(this.speed);
+    }
+    return "--";
+  }
+
+  /**
+   * 获取闯关速度
+   * @return 闯关速度
+   */
+  private float getSpeed() {
     try {
       BigDecimal number1 = new BigDecimal(this.usedTime);
       BigDecimal number2 = new BigDecimal(this.passedBarrierCount);
       BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
-      return number.toString();
+      return number.floatValue();
     } catch (Exception x) {
       // x.printStackTrace();
     }
-    return "--";
+    return -1;
   }
 
   /**
@@ -843,7 +859,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
       this.lblScore.setText("累计分数：" + this.totalScore + "分");
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
-      this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
+      this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
       this.btnHint.setEnabled(false);
       TipsWindow.show(this, "回答正确，加" + currentScore + "分！");
       this.refreshRankLevel();
@@ -857,6 +873,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         }
       }
       this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
+      this.reward();
     } else if (this.answerTimes >= this.answerCellList.size() * 2) {
         // 作答次数最多为空格子个数乘以2，如有1个空格子则作答次数最多为2次
         this.stopTimer();
@@ -1004,6 +1021,44 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
+   * 获得随机奖励
+   */
+  private void reward() {
+    int levelSpeed = TOPIC_LEVEL_SPEED[this.currentTopicLevel];
+    String currentTimeMillis = String.valueOf(System.currentTimeMillis());
+    if (this.speed <= levelSpeed) {
+      // 获得奖励的概率为1/10
+      if (currentTimeMillis.endsWith("1")) {
+        this.obtainHint();
+      }
+    } else if (this.speed <= levelSpeed * 2) {
+      // 获得奖励的概率为1/50
+      if (currentTimeMillis.endsWith("11") || currentTimeMillis.endsWith("55")) {
+        this.obtainHint();
+      }
+    } else if (this.speed <= levelSpeed * 3) {
+      // 获得奖励的概率为1/100
+      if (currentTimeMillis.endsWith("11")) {
+        this.obtainHint();
+      }
+    } else {
+      // 获得奖励的概率为1/500
+      if (currentTimeMillis.endsWith("111") || currentTimeMillis.endsWith("555")) {
+        this.obtainHint();
+      }
+    }
+  }
+
+  /**
+   * 获得一次提示机会
+   */
+  private void obtainHint() {
+    this.hintCount++;
+    this.refreshHint();
+    TipsWindow.show(this, "恭喜：获得一次提示机会！");
+  }
+
+  /**
    * 从头开始闯关
    */
   private void restart() {
@@ -1027,7 +1082,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.refreshElements();
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
-    this.lblSpeed.setText("闯关速度：" + this.getSpeed() + "秒/关");
+    this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
   }
 
   /**
@@ -1092,11 +1147,18 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       if (text.equals(lblOption.getTag())) {
         lblOption.setBackground(Color.PINK);
         this.hintCount--;
-        this.setting.idiomCache.setHintCount(this.hintCount);
-        this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
+        this.refreshHint();
         break;
       }
     }
+  }
+
+  /**
+   * 刷新提示功能
+   */
+  private void refreshHint() {
+    this.setting.idiomCache.setHintCount(this.hintCount);
+    this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
   }
 
   /**
