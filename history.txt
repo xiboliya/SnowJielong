@@ -34,3 +34,8 @@ src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 2023-08-01
 1.每关闯关成功后，增加随机获得一次提示机会的功能。累计闯关速度越快，获得几率越大。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2023-08-13
+1.扩展TipsWindow提示窗口，增加背景颜色、显示时长、显示大小的参数，并调整部分提示窗口的入参。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/window/TipsWindow.java
