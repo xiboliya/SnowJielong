@@ -39,3 +39,8 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 1.扩展TipsWindow提示窗口，增加背景颜色、显示时长、显示大小的参数，并调整部分提示窗口的入参。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/window/TipsWindow.java
+2.添加“正确率”显示。
+res/snowjielong.xml
+src/com/xiboliya/snowjielong/common/IdiomCache.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
