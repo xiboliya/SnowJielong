@@ -136,6 +136,10 @@ public final class SettingAdapter {
             this.setting.idiomCache.setUsedTime(number);
           } else if (key.equalsIgnoreCase("passedBarrierCount")) {
             this.setting.idiomCache.setPassedBarrierCount(number);
+          } else if (key.equalsIgnoreCase("totalSubmitCount")) {
+            this.setting.idiomCache.setTotalSubmitCount(number);
+          } else if (key.equalsIgnoreCase("totalRightCount")) {
+            this.setting.idiomCache.setTotalRightCount(number);
           } else if (key.equalsIgnoreCase("hintCount")) {
             this.setting.idiomCache.setHintCount(number);
           } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
@@ -199,6 +203,10 @@ public final class SettingAdapter {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getUsedTime()));
         } else if (key.equalsIgnoreCase("passedBarrierCount")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getPassedBarrierCount()));
+        } else if (key.equalsIgnoreCase("totalSubmitCount")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalSubmitCount()));
+        } else if (key.equalsIgnoreCase("totalRightCount")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalRightCount()));
         } else if (key.equalsIgnoreCase("hintCount")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getHintCount()));
         } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {

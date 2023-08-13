@@ -75,7 +75,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 百宝箱：砗磲、珍珠、珊瑚、琥珀、水晶、玛瑙、翡翠、猫眼、欧泊、钻石、红宝石、蓝宝石、祖母绿、碧玺、
  * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
  * 添加积分兑换商城。
- * 添加正确率显示。（答对次数/总答题次数）
  * 题目显示时位置随机。
  * 关卡顺序在第一关时随机产生：默认、反序、升序、降序。
  * 添加用户注册和登录功能，各用户数据分别存储。
@@ -113,6 +112,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JLabel lblTime = new JLabel();
   private JLabel lblRankLevel = new JLabel();
   private JLabel lblSpeed = new JLabel();
+  private JLabel lblAccuracy = new JLabel();
   private GridLayout gridLayout = new GridLayout(10, 10, 0, 0);
   private GridLayout optionLayout = new GridLayout(2, 10, 0, 0);
   private JPanel pnlCenter = new JPanel(this.gridLayout);
@@ -165,6 +165,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private int usedTime = 0;
   // 累计通过关卡数
   private int passedBarrierCount = 0;
+  // 累计备选答题次数
+  private int totalSubmitCount;
+  // 累计备选答对次数
+  private int totalRightCount;
+  // 正确率
+  private float accuracy = -1;
   // 闯关速度
   private float speed = -1;
   // 可用的提示次数
@@ -242,6 +248,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.totalScore = idiomCache.getTotalScore();
     this.usedTime = idiomCache.getUsedTime();
     this.passedBarrierCount = idiomCache.getPassedBarrierCount();
+    this.totalSubmitCount = idiomCache.getTotalSubmitCount();
+    this.totalRightCount = idiomCache.getTotalRightCount();
     this.hintCount = idiomCache.getHintCount();
   }
 
@@ -280,6 +288,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblTime.setBounds(5, 190, 135, Util.VIEW_HEIGHT);
     this.lblRankLevel.setBounds(5, 230, 135, Util.VIEW_HEIGHT);
     this.lblSpeed.setBounds(5, 270, 135, Util.VIEW_HEIGHT);
+    this.lblAccuracy.setBounds(5, 310, 135, Util.VIEW_HEIGHT);
     this.pnlCenter.setBounds(140, 30, 400, 400);
     this.pnlMain.add(this.lblTopicLevel);
     this.pnlMain.add(this.lblBarrier);
@@ -288,6 +297,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlMain.add(this.lblTime);
     this.pnlMain.add(this.lblRankLevel);
     this.pnlMain.add(this.lblSpeed);
+    this.pnlMain.add(this.lblAccuracy);
     this.pnlMain.add(this.lblTopic);
     this.pnlMain.add(this.pnlCenter);
     this.lblOption.setBounds(145, 435, 100, Util.VIEW_HEIGHT);
@@ -319,6 +329,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.initRankLevel();
     this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.currentRankLevel]);
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
+    this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
   }
 
   /**
@@ -394,6 +405,37 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     try {
       BigDecimal number1 = new BigDecimal(this.usedTime);
       BigDecimal number2 = new BigDecimal(this.passedBarrierCount);
+      BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
+      return number.floatValue();
+    } catch (Exception x) {
+      // x.printStackTrace();
+    }
+    return -1;
+  }
+
+  /**
+   * 获取正确率字符形式
+   * @return 正确率字符形式
+   */
+  private String getAccuracyText() {
+    if (this.totalRightCount <= 0 || this.totalSubmitCount <= 0) {
+      return "--";
+    }
+    this.accuracy = this.getAccuracy();
+    if (this.accuracy > 0) {
+      return String.valueOf(this.accuracy);
+    }
+    return "--";
+  }
+
+  /**
+   * 获取正确率
+   * @return 正确率
+   */
+  private float getAccuracy() {
+    try {
+      BigDecimal number1 = new BigDecimal(this.totalRightCount * 100);
+      BigDecimal number2 = new BigDecimal(this.totalSubmitCount);
       BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
       return number.floatValue();
     } catch (Exception x) {
@@ -839,9 +881,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.refreshOptionCellText(lblOption, lblAnswer.getText());
     lblAnswer.setText(optionText);
     this.answerTimes++;
+    this.totalSubmitCount++;
+    this.setting.idiomCache.setTotalSubmitCount(this.totalSubmitCount);
     IdiomTag IdiomTag = (IdiomTag)lblAnswer.getTag();
     String content = IdiomTag.getContent();
     if (optionText.equals(content)) {
+      this.totalRightCount++;
+      this.setting.idiomCache.setTotalRightCount(this.totalRightCount);
+      this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
       this.refreshCharCellList(lblAnswer);
       if (!this.isAllAnswerRight()) {
         return;
@@ -874,7 +921,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       }
       this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
       this.reward();
-    } else if (this.answerTimes >= this.answerCellList.size() * 2) {
+    } else {
+      this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
+      if (this.answerTimes >= this.answerCellList.size() * 2) {
         // 作答次数最多为空格子个数乘以2，如有1个空格子则作答次数最多为2次
         this.stopTimer();
         this.lblTime.setText("累计用时：" + this.usedTime + "秒");
@@ -885,8 +934,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         TipsWindow.show(this, "已超过作答次数，闯关失败！", TipsWindow.Background.PINK);
         this.btnStart.setText("重新闯关");
         this.btnHint.setEnabled(false);
-    } else {
-      TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
+      } else {
+        TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
+      }
     }
   }
 
@@ -1078,11 +1128,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.answerTimes = 0;
     this.usedTime = 0;
     this.passedBarrierCount = 0;
+    this.totalSubmitCount = 0;
+    this.totalRightCount = 0;
     this.setting.idiomCache = new IdiomCache();
     this.refreshElements();
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
+    this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
   }
 
   /**

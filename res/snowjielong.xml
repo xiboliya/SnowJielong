@@ -8,6 +8,8 @@
     <totalScore note="累计得分">0</totalScore>
     <usedTime note="累计用时">0</usedTime>
     <passedBarrierCount note="累计通过关卡数">0</passedBarrierCount>
+    <totalSubmitCount note="累计备选答题次数">0</totalSubmitCount>
+    <totalRightCount note="累计备选答对次数">0</totalRightCount>
     <hintCount note="可用的提示次数">3</hintCount>
   </Idiom>
 </Setting>

@@ -38,6 +38,10 @@ public class IdiomCache {
   private int usedTime;
   // 累计通过关卡数
   private int passedBarrierCount;
+  // 累计备选答题次数
+  private int totalSubmitCount;
+  // 累计备选答对次数
+  private int totalRightCount;
   // 可用的提示次数，默认为3次
   private int hintCount = 3;
 
@@ -165,6 +169,42 @@ public class IdiomCache {
    */
   public void setPassedBarrierCount(int passedBarrierCount) {
     this.passedBarrierCount = passedBarrierCount;
+  }
+
+  /**
+   * 获取累计备选答题次数
+   * 
+   * @return 累计备选答题次数
+   */
+  public int getTotalSubmitCount() {
+    return this.totalSubmitCount;
+  }
+
+  /**
+   * 设置累计备选答题次数
+   * 
+   * @param totalSubmitCount 累计备选答题次数
+   */
+  public void setTotalSubmitCount(int totalSubmitCount) {
+    this.totalSubmitCount = totalSubmitCount;
+  }
+
+  /**
+   * 获取累计备选答对次数
+   * 
+   * @return 累计备选答对次数
+   */
+  public int getTotalRightCount() {
+    return this.totalRightCount;
+  }
+
+  /**
+   * 设置累计备选答对次数
+   * 
+   * @param totalSubmitCount 累计备选答对次数
+   */
+  public void setTotalRightCount(int totalRightCount) {
+    this.totalRightCount = totalRightCount;
   }
 
   /**
