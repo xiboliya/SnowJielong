@@ -861,7 +861,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
       this.btnHint.setEnabled(false);
-      TipsWindow.show(this, "回答正确，加" + currentScore + "分！");
+      TipsWindow.show(this, "回答正确，加" + currentScore + "分！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.SMALL);
       this.refreshRankLevel();
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
@@ -882,11 +882,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.countdown = 0;
         this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
         this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
-        TipsWindow.show(this, "已超过作答次数，闯关失败！");
+        TipsWindow.show(this, "已超过作答次数，闯关失败！", TipsWindow.Background.PINK);
         this.btnStart.setText("重新闯关");
         this.btnHint.setEnabled(false);
     } else {
-      TipsWindow.show(this, "回答错误！");
+      TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
     }
   }
 
@@ -998,7 +998,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 作答超时
    */
   private void outOfTime() {
-    TipsWindow.show(this, "作答时间已到，闯关失败！");
+    TipsWindow.show(this, "作答时间已到，闯关失败！", TipsWindow.Background.PINK);
     this.btnStart.setText("重新闯关");
     this.btnHint.setEnabled(false);
   }
@@ -1055,7 +1055,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void obtainHint() {
     this.hintCount++;
     this.refreshHint();
-    TipsWindow.show(this, "恭喜：获得一次提示机会！");
+    TipsWindow.show(this, "恭喜：获得一次提示机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1190,7 +1190,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
           this.setting.idiomCache.setCurrentBarrier(this.currentBarrier);
           this.refreshElements();
         } else {
-          TipsWindow.show(this, "您已通关，没有成语可以挑战了！");
+          TipsWindow.show(this, "您已通关，没有成语可以挑战了！", TipsWindow.Background.GREEN);
         }
       } else {
         this.currentBarrier++;
@@ -1201,7 +1201,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.btnStart.setText("下一关");
       this.refreshElements();
     } else {
-      TipsWindow.show(this, "通过当前关卡，才能进入下一关！");
+      TipsWindow.show(this, "通过当前关卡，才能进入下一关！", TipsWindow.Background.PINK);
     }
   }
 
