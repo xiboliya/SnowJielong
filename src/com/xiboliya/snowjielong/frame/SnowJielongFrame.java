@@ -96,6 +96,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private static final String[] RANK_LEVEL_NAME = new String[] { "童生", "秀才", "附生", "增生", "廪生", "举人", "解元", "贡士", "会元", "进士", "探花", "榜眼", "状元" };
   // 头衔等级分数数组
   private static final int[] RANK_LEVEL_SCORE = new int[] { 0, 60, 180, 360, 600, 900, 1260, 1680, 2160, 2700, 3300, 3960, 4680 };
+  // 当前题目显示的默认起始索引数组
+  private static final int[] START_INDEX = new int[] { 31, 32, 33, 34, 35, 41, 42, 43, 44, 45, 51, 52, 53, 54, 55, 61, 62, 63, 64, 65 };
   private JMenuBar menuBar = new JMenuBar();
   private JMenu menuGame = new JMenu("游戏(G)");
   private JMenuItem itemRestart = new JMenuItem("从头开始(R)", 'R');
@@ -523,7 +525,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private int getStartIndex(String[] idiomArray, String[] ruleArray) {
     int size = ruleArray.length;
-    int startIndex = 43;
+    int startIndex = this.getRandomStartIndex();
     int tempStartIndex = startIndex;
     LinkedList<Integer> answerCellIndexList = new LinkedList<Integer>();
     int moveCount = 0;
@@ -562,6 +564,16 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       }
     } while (moveCount != 0);
     return startIndex;
+  }
+
+  /**
+   * 随机获取当前题目显示的默认起始索引
+   * @return 当前题目显示的默认起始索引
+   */
+  private int getRandomStartIndex() {
+    Random random = new Random();
+    int randomIndex = random.nextInt(START_INDEX.length);
+    return START_INDEX[randomIndex];
   }
 
   /**
