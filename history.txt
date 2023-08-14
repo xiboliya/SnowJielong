@@ -44,3 +44,7 @@ res/snowjielong.xml
 src/com/xiboliya/snowjielong/common/IdiomCache.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+
+2023-08-14
+1.每次闯关时，成语的起始索引位置随机产生。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
