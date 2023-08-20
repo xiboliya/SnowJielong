@@ -92,6 +92,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private static final int[] TOPIC_LEVEL_TIME = new int[] { 20, 30, 40, 50, 60 };
   // 各难度等级下每轮闯关速度，获得随机奖励的几率所需的参数，单位：秒/关
   private static final int[] TOPIC_LEVEL_SPEED = new int[] { 3, 4, 5, 6, 7 };
+  // 各难度等级下每轮答题正确率，获得随机奖励的几率所需的参数，单位：%
+  private static final int[] TOPIC_LEVEL_ACCURACY = new int[] { 90, 80, 70, 60, 50 };
   // 头衔等级名称数组
   private static final String[] RANK_LEVEL_NAME = new String[] { "童生", "秀才", "附生", "增生", "廪生", "举人", "解元", "贡士", "会元", "进士", "探花", "榜眼", "状元" };
   // 头衔等级分数数组
@@ -1087,18 +1089,19 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void reward() {
     int levelSpeed = TOPIC_LEVEL_SPEED[this.currentTopicLevel];
+    int LevelAccuracy = TOPIC_LEVEL_ACCURACY[this.currentTopicLevel];
     String currentTimeMillis = String.valueOf(System.currentTimeMillis());
-    if (this.speed <= levelSpeed) {
+    if (this.speed <= levelSpeed || this.accuracy >= LevelAccuracy) {
       // 获得奖励的概率为1/10
       if (currentTimeMillis.endsWith("1")) {
         this.obtainHint();
       }
-    } else if (this.speed <= levelSpeed * 2) {
+    } else if (this.speed <= levelSpeed * 2 || this.accuracy >= LevelAccuracy - 10) {
       // 获得奖励的概率为1/50
       if (currentTimeMillis.endsWith("11") || currentTimeMillis.endsWith("55")) {
         this.obtainHint();
       }
-    } else if (this.speed <= levelSpeed * 3) {
+    } else if (this.speed <= levelSpeed * 3 || this.accuracy >= LevelAccuracy - 20) {
       // 获得奖励的概率为1/100
       if (currentTimeMillis.endsWith("11")) {
         this.obtainHint();
