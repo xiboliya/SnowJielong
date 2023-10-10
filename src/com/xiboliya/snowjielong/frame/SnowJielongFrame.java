@@ -52,11 +52,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 
 import com.xiboliya.snowjielong.base.BaseDialog;
-import com.xiboliya.snowjielong.base.BaseLabel;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
+import com.xiboliya.snowjielong.base.BaseLabel;
 import com.xiboliya.snowjielong.common.IdiomCache;
 import com.xiboliya.snowjielong.common.IdiomTag;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
+import com.xiboliya.snowjielong.dialog.DepositoryDialog;
 import com.xiboliya.snowjielong.dialog.RulesDialog;
 import com.xiboliya.snowjielong.setting.Setting;
 import com.xiboliya.snowjielong.setting.SettingAdapter;
@@ -76,6 +77,9 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
  * 添加积分兑换商城。
  * 题目显示时位置随机。
+ * 添加暂停功能，暂停后隐藏答题区和备选区。
+ * 闯关失败后，隐藏答题区和备选区。
+ * 添加延时卡功能，每张卡可以延时10秒，同步显示在仓库里。
  * 关卡顺序在第一关时随机产生：默认、反序、升序、降序。
  * 添加用户注册和登录功能，各用户数据分别存储。
  * 添加成语的解释，存放在单独的文件里。在每关通过之后，可以点击查看。
@@ -103,6 +107,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JMenuBar menuBar = new JMenuBar();
   private JMenu menuGame = new JMenu("游戏(G)");
   private JMenuItem itemRestart = new JMenuItem("从头开始(R)", 'R');
+  private JMenuItem itemDepository = new JMenuItem("仓库(D)...", 'D');
   private JMenuItem itemExit = new JMenuItem("退出(X)", 'X');
   private JMenu menuHelp = new JMenu("帮助(H)");
   private JMenuItem itemHelp = new JMenuItem("游戏规则(H)", 'H');
@@ -127,6 +132,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JButton btnCancel = new JButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
   private MouseAdapter mouseAdapter = null;
+  // 仓库对话框
+  private DepositoryDialog depositoryDialog = null;
   // 游戏规则对话框
   private RulesDialog rulesDialog = null;
   // 关于对话框
@@ -343,6 +350,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.setJMenuBar(this.menuBar);
     this.menuBar.add(this.menuGame);
     this.menuGame.add(this.itemRestart);
+    this.menuGame.add(this.itemDepository);
     this.menuGame.add(this.itemExit);
     this.menuBar.add(this.menuHelp);
     this.menuHelp.add(this.itemHelp);
@@ -362,6 +370,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   public void setMenuAccelerator() {
     this.itemRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
+    this.itemDepository.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
     this.itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
     this.itemHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
     this.itemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
@@ -831,6 +840,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnStart.addActionListener(this);
     this.btnCancel.addActionListener(this);
     this.itemRestart.addActionListener(this);
+    this.itemDepository.addActionListener(this);
     this.itemExit.addActionListener(this);
     this.itemHelp.addActionListener(this);
     this.itemAbout.addActionListener(this);
@@ -1154,6 +1164,17 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
+   * 打开仓库对话框
+   */
+  private void openDepositoryDialog() {
+    if (this.depositoryDialog == null) {
+      this.depositoryDialog = new DepositoryDialog(this, true, this.setting);
+    } else {
+      this.depositoryDialog.setVisible(true);
+    }
+  }
+
+  /**
    * 打开游戏规则对话框
    */
   private void openIdiomRulesDialog() {
@@ -1189,6 +1210,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.exit();
     } else if (this.itemRestart.equals(source)) {
       this.restart();
+    } else if (this.itemDepository.equals(source)) {
+      this.openDepositoryDialog();
     } else if (this.itemExit.equals(source)) {
       this.exit();
     } else if (this.itemHelp.equals(source)) {
