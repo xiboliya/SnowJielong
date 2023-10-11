@@ -39,7 +39,6 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -51,6 +50,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.border.EtchedBorder;
 
+import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseLabel;
@@ -127,9 +127,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JPanel pnlCenter = new JPanel(this.gridLayout);
   private JPanel pnlOption = new JPanel(this.optionLayout);
   private JLabel lblOption = new JLabel("选项：");
-  private JButton btnHint = new JButton("提示一下");
-  private JButton btnStart = new JButton("开始闯关");
-  private JButton btnCancel = new JButton("退出");
+  private BaseButton btnHint = new BaseButton("提示一下");
+  private BaseButton btnStart = new BaseButton("开始闯关");
+  private BaseButton btnCancel = new BaseButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
   private MouseAdapter mouseAdapter = null;
   // 仓库对话框

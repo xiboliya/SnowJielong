@@ -26,11 +26,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.util.Util;
@@ -54,7 +54,7 @@ public class AboutDialog extends BaseDialog implements ActionListener {
   private JLabel lblWest = new JLabel(" ");
   private JLabel lblNorth = new JLabel();
   private JLabel lblEast = new JLabel(" ");
-  private JButton btnOk = new JButton(" 确定 ");
+  private BaseButton btnOk = new BaseButton(" 确定 ");
   private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
   private LinkedList<JLabel> labelList = new LinkedList<JLabel>(); // 存放显示标签的链表
 

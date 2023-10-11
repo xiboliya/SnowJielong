@@ -20,12 +20,12 @@ package com.xiboliya.snowjielong.dialog;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 
@@ -38,7 +38,7 @@ public class RulesDialog extends BaseDialog implements ActionListener {
   private static final long serialVersionUID = 1L;
   private JPanel pnlMain = (JPanel) this.getContentPane();
   private JTextArea txaMain = new JTextArea();
-  private JButton btnOk = new JButton("确定");
+  private BaseButton btnOk = new BaseButton("确定");
   private BaseKeyAdapter keyAdapter = new BaseKeyAdapter(this);
   private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
 
@@ -125,6 +125,6 @@ public class RulesDialog extends BaseDialog implements ActionListener {
    */
   @Override
   public void onCancel() {
-    
+    this.dispose();
   }
 }
