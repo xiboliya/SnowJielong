@@ -58,3 +58,11 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 res/hint.png（添加）
 src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java（添加）
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2023-10-11
+1.添加按钮的父类：BaseButton，并将程序中所有的JButton按钮都改用此父类。用于统一设置默认边距，解决某些外观下部分按钮显示不全的问题。
+src/com/xiboliya/snowjielong/base/BaseButton.java（添加）
+src/com/xiboliya/snowjielong/dialog/AboutDialog.java
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+src/com/xiboliya/snowjielong/dialog/RulesDialog.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
