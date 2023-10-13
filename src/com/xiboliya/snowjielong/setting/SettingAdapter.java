@@ -142,6 +142,8 @@ public final class SettingAdapter {
             this.setting.idiomCache.setTotalRightCount(number);
           } else if (key.equalsIgnoreCase("hintCount")) {
             this.setting.idiomCache.setHintCount(number);
+          } else if (key.equalsIgnoreCase("pauseCount")) {
+            this.setting.idiomCache.setPauseCount(number);
           } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
             boolean logic = false;
             if (value.equalsIgnoreCase("true")) {
@@ -209,6 +211,8 @@ public final class SettingAdapter {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalRightCount()));
         } else if (key.equalsIgnoreCase("hintCount")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getHintCount()));
+        } else if (key.equalsIgnoreCase("pauseCount")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getPauseCount()));
         } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.isCurrentBarrierPassed()));
         }

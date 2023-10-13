@@ -76,8 +76,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 百宝箱：砗磲、珍珠、珊瑚、琥珀、水晶、玛瑙、翡翠、猫眼、欧泊、钻石、红宝石、蓝宝石、祖母绿、碧玺、
  * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
  * 添加积分兑换商城。
- * 题目显示时位置随机。
- * 添加暂停功能，暂停后隐藏答题区和备选区。
  * 闯关失败后，隐藏答题区和备选区。
  * 添加延时卡功能，每张卡可以延时10秒，同步显示在仓库里。
  * 关卡顺序在第一关时随机产生：默认、反序、升序、降序。
@@ -127,7 +125,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JPanel pnlCenter = new JPanel(this.gridLayout);
   private JPanel pnlOption = new JPanel(this.optionLayout);
   private JLabel lblOption = new JLabel("选项：");
-  private BaseButton btnHint = new BaseButton("提示一下");
+  private BaseButton btnHint = new BaseButton("提示", Util.ICON_HINT_SMALL);
+  private BaseButton btnPause = new BaseButton("暂停", Util.ICON_PAUSE_SMALL);
   private BaseButton btnStart = new BaseButton("开始闯关");
   private BaseButton btnCancel = new BaseButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
@@ -186,6 +185,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private float speed = -1;
   // 可用的提示次数
   private int hintCount = 0;
+  // 可用的暂停次数
+  private int pauseCount = 0;
   // 计时器
   private Timer timer = null;
   // 计时器执行的任务
@@ -262,6 +263,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.totalSubmitCount = idiomCache.getTotalSubmitCount();
     this.totalRightCount = idiomCache.getTotalRightCount();
     this.hintCount = idiomCache.getHintCount();
+    this.pauseCount = idiomCache.getPauseCount();
   }
 
   /**
@@ -269,7 +271,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void setIcon() {
     try {
-      this.setIconImage(Util.SW_ICON.getImage());
+      this.setIconImage(Util.ICON_SW.getImage());
     } catch (Exception x) {
       // x.printStackTrace();
     }
@@ -315,17 +317,22 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlOption.setBounds(140, 460, 400, 80);
     this.pnlMain.add(this.lblOption);
     this.pnlMain.add(this.pnlOption);
-    this.btnHint.setBounds(10, 560, 100, Util.BUTTON_HEIGHT);
+    this.btnHint.setBounds(20, 470, 80, Util.ICON_BUTTON_HEIGHT);
+    this.btnPause.setBounds(20, 510, 80, Util.ICON_BUTTON_HEIGHT);
     this.btnStart.setBounds(200, 560, 100, Util.BUTTON_HEIGHT);
     this.btnCancel.setBounds(390, 560, 100, Util.BUTTON_HEIGHT);
     this.pnlMain.add(this.btnHint);
+    this.pnlMain.add(this.btnPause);
     this.pnlMain.add(this.btnStart);
     this.pnlMain.add(this.btnCancel);
     this.btnHint.setFocusable(false);
+    this.btnPause.setFocusable(false);
     this.btnStart.setFocusable(false);
     this.btnCancel.setFocusable(false);
     this.btnHint.setEnabled(false);
-    this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
+    this.btnPause.setEnabled(false);
+    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
+    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
   }
 
   /**
@@ -496,10 +503,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     if (this.currentBarrierFailTimes < 0 && this.currentBarrier >= (idiomCount - 1)) {
       this.btnStart.setEnabled(false);
       this.btnHint.setEnabled(false);
+      this.btnPause.setEnabled(false);
       return;
     } else {
       this.btnStart.setEnabled(true);
       this.btnHint.setEnabled(this.hintCount > 0);
+      this.btnPause.setEnabled(this.pauseCount > 0);
     }
     this.isCurrentBarrierPassed = false;
     this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
@@ -525,7 +534,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.refreshOptionCell(option);
     this.refreshElementsBackground();
     this.refreshOptionElementsBackground();
-    this.startTimer();
+    this.startTimer(false);
   }
 
   /**
@@ -728,8 +737,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   /**
    * 开始闯关计时器
    */
-  private void startTimer() {
-    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
+  private void startTimer(boolean isContinue) {
+    if (!isContinue) {
+      this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
+    }
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
     this.timer = new Timer();
     this.task = new TimerTask() {
@@ -837,6 +848,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void addListeners() {
     this.btnHint.addActionListener(this);
+    this.btnPause.addActionListener(this);
     this.btnStart.addActionListener(this);
     this.btnCancel.addActionListener(this);
     this.itemRestart.addActionListener(this);
@@ -932,6 +944,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
       this.btnHint.setEnabled(false);
+      this.btnPause.setEnabled(false);
       TipsWindow.show(this, "回答正确，加" + currentScore + "分！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.SMALL);
       this.refreshRankLevel();
       if (this.isPassedAllBarrier()) {
@@ -958,6 +971,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         TipsWindow.show(this, "已超过作答次数，闯关失败！", TipsWindow.Background.PINK);
         this.btnStart.setText("重新闯关");
         this.btnHint.setEnabled(false);
+        this.btnPause.setEnabled(false);
       } else {
         TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
       }
@@ -1075,6 +1089,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     TipsWindow.show(this, "作答时间已到，闯关失败！", TipsWindow.Background.PINK);
     this.btnStart.setText("重新闯关");
     this.btnHint.setEnabled(false);
+    this.btnPause.setEnabled(false);
   }
 
   /**
@@ -1100,26 +1115,35 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void reward() {
     int levelSpeed = TOPIC_LEVEL_SPEED[this.currentTopicLevel];
     int LevelAccuracy = TOPIC_LEVEL_ACCURACY[this.currentTopicLevel];
-    String currentTimeMillis = String.valueOf(System.currentTimeMillis());
+    Random random = new Random();
+    String strRandomNumber = String.valueOf(random.nextInt(1000) + 1000);
     if (this.speed <= levelSpeed || this.accuracy >= LevelAccuracy) {
-      // 获得奖励的概率为1/10
-      if (currentTimeMillis.endsWith("1")) {
+      // 获得每类奖励的概率均为1/10
+      if (strRandomNumber.endsWith("1")) {
         this.obtainHint();
+      } else if (strRandomNumber.endsWith("2")) {
+        this.obtainPause();
       }
     } else if (this.speed <= levelSpeed * 2 || this.accuracy >= LevelAccuracy - 10) {
-      // 获得奖励的概率为1/50
-      if (currentTimeMillis.endsWith("11") || currentTimeMillis.endsWith("55")) {
+      // 获得每类奖励的概率均为1/50
+      if (strRandomNumber.endsWith("01") || strRandomNumber.endsWith("02")) {
         this.obtainHint();
+      } else if (strRandomNumber.endsWith("03") || strRandomNumber.endsWith("04")) {
+        this.obtainPause();
       }
     } else if (this.speed <= levelSpeed * 3 || this.accuracy >= LevelAccuracy - 20) {
-      // 获得奖励的概率为1/100
-      if (currentTimeMillis.endsWith("11")) {
+      // 获得每类奖励的概率均为1/100
+      if (strRandomNumber.endsWith("01")) {
         this.obtainHint();
+      } else if (strRandomNumber.endsWith("02")) {
+        this.obtainPause();
       }
     } else {
-      // 获得奖励的概率为1/500
-      if (currentTimeMillis.endsWith("111") || currentTimeMillis.endsWith("555")) {
+      // 获得每类奖励的概率均为1/500
+      if (strRandomNumber.endsWith("001") || strRandomNumber.endsWith("002")) {
         this.obtainHint();
+      } else if (strRandomNumber.endsWith("003") || strRandomNumber.endsWith("004")) {
+        this.obtainPause();
       }
     }
   }
@@ -1131,6 +1155,15 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.hintCount++;
     this.refreshHint();
     TipsWindow.show(this, "恭喜：获得一次提示机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+  }
+
+  /**
+   * 获得一次暂停机会
+   */
+  private void obtainPause() {
+    this.pauseCount++;
+    this.refreshPause();
+    TipsWindow.show(this, "恭喜：获得一次暂停机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1204,6 +1237,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     Object source = e.getSource();
     if (this.btnHint.equals(source)) {
       this.hint();
+    } else if (this.btnPause.equals(source)) {
+      this.pause();
     } else if (this.btnStart.equals(source)) {
       this.start();
     } else if (this.btnCancel.equals(source)) {
@@ -1222,7 +1257,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
-   * 提示一下
+   * 提示
    */
   private void hint() {
     if (this.countdown <= 0) {
@@ -1249,7 +1284,51 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void refreshHint() {
     this.setting.idiomCache.setHintCount(this.hintCount);
-    this.btnHint.setToolTipText("剩余提示次数：" + this.hintCount);
+    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
+  }
+
+  /**
+   * 暂停
+   */
+  private void pause() {
+    if (this.countdown <= 0) {
+      return;
+    }
+    if ("恢复".equals(this.btnPause.getText())) {
+      this.setCellsVisible(true);
+      this.btnPause.setText("暂停");
+      this.startTimer(true);
+    } else {
+      this.setCellsVisible(false);
+      this.btnPause.setText("恢复");
+      this.stopTimer();
+      this.pauseCount--;
+      this.refreshPause();
+   }
+  }
+
+  /**
+   * 设置显示或隐藏答题区和备选区的非空格子
+   * @param visible 显示或隐藏答题区和备选区的非空格子，显示为true，反之为false
+   */
+  private void setCellsVisible(boolean visible) {
+    for (BaseLabel lblElement : this.charCellList) {
+      lblElement.setVisible(visible);
+    }
+    for (BaseLabel lblElement : this.answerCellList) {
+      lblElement.setVisible(visible);
+    }
+    for (BaseLabel lblElement : this.charOptionCellList) {
+      lblElement.setVisible(visible);
+    }
+  }
+
+  /**
+   * 刷新暂停功能
+   */
+  private void refreshPause() {
+    this.setting.idiomCache.setPauseCount(this.pauseCount);
+    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
   }
 
   /**

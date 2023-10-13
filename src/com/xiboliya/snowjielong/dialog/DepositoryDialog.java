@@ -43,6 +43,7 @@ import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseLabel;
 import com.xiboliya.snowjielong.common.IdiomCache;
 import com.xiboliya.snowjielong.setting.Setting;
+import com.xiboliya.snowjielong.util.Util;
 
 /**
  * "仓库"对话框
@@ -64,7 +65,6 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   private BaseKeyAdapter keyAdapter = new BaseKeyAdapter(this);
   private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
   private MouseAdapter mouseAdapter = null;
-  private ImageIcon iconHint = new ImageIcon(ClassLoader.getSystemResource("res/hint.png")); // 提示卡图标
   private ArrayList<BaseLabel> toolLabelList = new ArrayList<BaseLabel>();
   private ArrayList<BaseLabel> starLabelList = new ArrayList<BaseLabel>();
   private ArrayList<BaseLabel> treasureLabelList = new ArrayList<BaseLabel>();
@@ -156,17 +156,29 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   private void updateCurrentPanel() {
     if (this.tpnMain.getSelectedIndex() == 0) {
       IdiomCache idiomCache = this.setting.idiomCache;
-      int hintCount = idiomCache.getHintCount();
       // 提示卡
-      BaseLabel lblElement = this.toolLabelList.get(0);
+      int hintCount = idiomCache.getHintCount();
+      BaseLabel lblCellHint = this.toolLabelList.get(0);
       if (hintCount > 0) {
-        lblElement.setIcon(this.iconHint);
-        lblElement.setFocusable(true); // 设置标签可以获得焦点
-        lblElement.setToolTipText("提示卡：" + hintCount);
+        lblCellHint.setIcon(Util.ICON_HINT);
+        lblCellHint.setFocusable(true); // 设置标签可以获得焦点
+        lblCellHint.setToolTipText("提示卡：" + hintCount);
       } else {
-        lblElement.setIcon(null);
-        lblElement.setFocusable(false); // 设置标签不可以获得焦点
-        lblElement.setToolTipText(null);
+        lblCellHint.setIcon(null);
+        lblCellHint.setFocusable(false); // 设置标签不可以获得焦点
+        lblCellHint.setToolTipText(null);
+      }
+      // 暂停卡
+      int pauseCount = idiomCache.getPauseCount();
+      BaseLabel lblCellPause = this.toolLabelList.get(1);
+      if (pauseCount > 0) {
+        lblCellPause.setIcon(Util.ICON_PAUSE);
+        lblCellPause.setFocusable(true); // 设置标签可以获得焦点
+        lblCellPause.setToolTipText("暂停卡：" + pauseCount);
+      } else {
+        lblCellPause.setIcon(null);
+        lblCellPause.setFocusable(false); // 设置标签不可以获得焦点
+        lblCellPause.setToolTipText(null);
       }
     }
   }
@@ -206,7 +218,14 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   public void focusGained(FocusEvent e) {
     BaseLabel lblElement = (BaseLabel) e.getSource();
     if (this.toolLabelList.contains(lblElement)) {
-      lblElement.setBackground(Color.PINK);
+      for (int i = 0; i < 2; i++) {
+        BaseLabel lblTool = this.toolLabelList.get(i);
+        if (lblTool.equals(lblElement)) {
+          lblTool.setBackground(Color.PINK);
+        } else {
+          lblTool.setBackground(Color.WHITE);
+        }
+      }
     }
   }
 
@@ -215,10 +234,6 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
    */
   @Override
   public void focusLost(FocusEvent e) {
-    BaseLabel lblElement = (BaseLabel) e.getSource();
-    if (this.toolLabelList.contains(lblElement)) {
-      lblElement.setBackground(Color.WHITE);
-    }
   }
 
   /**

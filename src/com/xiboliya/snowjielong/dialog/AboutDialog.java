@@ -81,7 +81,7 @@ public class AboutDialog extends BaseDialog implements ActionListener {
     this.pnlCenter.setLayout(this.layout);
     this.initLabelList();
     this.pnlMain.add(this.pnlCenter, BorderLayout.CENTER);
-    this.lblNorth.setIcon(Util.SW_ICON);
+    this.lblNorth.setIcon(Util.ICON_SW);
   }
 
   /**

@@ -47,23 +47,22 @@ public final class Util {
   public static final String OS_NAME = System.getProperty("os.name", "Windows"); // 当前操作系统的名称
   public static final String FILE_SEPARATOR = System.getProperty("file.separator", "/"); // 当前操作系统的文件分隔符
   public static final String SETTING_XML = "snowjielong.xml"; // 用来保存软件设置的配置文件名
-  public static final int DEFAULT_FRAME_WIDTH = 600; // 窗口默认宽度
-  public static final int DEFAULT_FRAME_HEIGHT = 500; // 窗口默认高度
-  public static final int DEFAULT_CARET_INDEX = 0; // 文本域默认插入点位置
+  public static final int DEFAULT_FRAME_WIDTH = 570; // 窗口默认宽度
+  public static final int DEFAULT_FRAME_HEIGHT = 650; // 窗口默认高度
   public static final int INPUT_HEIGHT = 22; // 单行输入框的高度
   public static final int VIEW_HEIGHT = 18; // 标签、单选按钮、复选框的高度
   public static final int BUTTON_HEIGHT = 23; // 按钮的高度
+  public static final int ICON_BUTTON_HEIGHT = 30; // 图标按钮的高度
   public static final int BUFFER_LENGTH = 1024; // 缓冲区的大小
   public static final int MIN_FONT_SIZE = 8; // 字体最小值
   public static final int MAX_FONT_SIZE = 100; // 字体最大值
-  public static final int MIN_TABSIZE = 1; // Tab字符最小值
-  public static final int MAX_TABSIZE = 99; // Tab字符最大值
-  public static final int DEFAULT_TABSIZE = 4; // Tab字符默认值
-  public static final int DEFAULT_UNDO_INDEX = 0; // 撤销标识符的默认值
-  public static final int DEFAULT_BACK_FORWARD_INDEX = 0; // 光标历史位置的默认值
   public static final int MSG_LINE_SIZE = 60; // 提示框中每行字符串显示的最大字数
   public static final Font TEXT_FONT = new Font("宋体", Font.PLAIN, 14); // 文本域的默认字体
-  public static final ImageIcon SW_ICON = new ImageIcon(ClassLoader.getSystemResource("res/icon.gif")); // 主程序图标
+  public static final ImageIcon ICON_SW = new ImageIcon(ClassLoader.getSystemResource("res/icon.gif")); // 主程序图标
+  public static final ImageIcon ICON_HINT = new ImageIcon(ClassLoader.getSystemResource("res/hint.png")); // 提示卡图标
+  public static final ImageIcon ICON_PAUSE = new ImageIcon(ClassLoader.getSystemResource("res/pause.png")); // 暂停卡图标
+  public static final ImageIcon ICON_HINT_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/hint_small.png")); // 提示卡小图标
+  public static final ImageIcon ICON_PAUSE_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/pause_small.png")); // 暂停卡小图标
 
   /**
    * 由于此类为工具类，故将构造方法私有化
