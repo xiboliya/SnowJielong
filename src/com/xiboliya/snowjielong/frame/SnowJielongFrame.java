@@ -510,6 +510,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.btnHint.setEnabled(this.hintCount > 0);
       this.btnPause.setEnabled(this.pauseCount > 0);
     }
+    this.setCellsVisible(true);
     this.isCurrentBarrierPassed = false;
     this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
     this.clearElementsText();
@@ -972,6 +973,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.btnStart.setText("重新闯关");
         this.btnHint.setEnabled(false);
         this.btnPause.setEnabled(false);
+        this.setCellsVisible(false);
       } else {
         TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
       }
@@ -1090,6 +1092,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnStart.setText("重新闯关");
     this.btnHint.setEnabled(false);
     this.btnPause.setEnabled(false);
+    this.setCellsVisible(false);
   }
 
   /**
