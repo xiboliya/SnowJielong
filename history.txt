@@ -80,3 +80,7 @@ src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 src/com/xiboliya/snowjielong/util/Util.java
 2.补充初级成语。
 res/idiom/level0.txt
+
+2023-10-16
+1.闯关失败后，隐藏答题区和备选区。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
