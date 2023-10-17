@@ -84,3 +84,14 @@ res/idiom/level0.txt
 2023-10-16
 1.闯关失败后，隐藏答题区和备选区。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2023-10-17
+1.添加“延时”功能，每次延时10秒，默认可用3次。同步显示在仓库页面中。
+res/delay.png（添加）
+res/delay_small.png（添加）
+res/snowjielong.xml
+src/com/xiboliya/snowjielong/common/IdiomCache.java
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+src/com/xiboliya/snowjielong/util/Util.java
