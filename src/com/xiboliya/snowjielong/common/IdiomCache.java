@@ -46,6 +46,8 @@ public class IdiomCache {
   private int hintCount = 3;
   // 可用的暂停次数，默认为3次
   private int pauseCount = 3;
+  // 可用的延时次数，默认为3次
+  private int delayCount = 3;
 
   /**
    * 获取当前难度等级
@@ -243,5 +245,23 @@ public class IdiomCache {
    */
   public void setPauseCount(int pauseCount) {
     this.pauseCount = pauseCount;
+  }
+
+  /**
+   * 获取可用的延时次数
+   * 
+   * @return 可用的延时次数
+   */
+  public int getDelayCount() {
+    return this.delayCount;
+  }
+
+  /**
+   * 设置可用的延时次数
+   * 
+   * @param delayCount 可用的延时次数
+   */
+  public void setDelayCount(int delayCount) {
+    this.delayCount = delayCount;
   }
 }

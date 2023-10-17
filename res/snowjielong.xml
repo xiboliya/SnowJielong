@@ -11,5 +11,7 @@
     <totalSubmitCount note="累计备选答题次数">0</totalSubmitCount>
     <totalRightCount note="累计备选答对次数">0</totalRightCount>
     <hintCount note="可用的提示次数">3</hintCount>
+    <pauseCount note="可用的暂停次数">3</pauseCount>
+    <delayCount note="可用的延时次数">3</delayCount>
   </Idiom>
 </Setting>
