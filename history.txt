@@ -95,3 +95,11 @@ src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 src/com/xiboliya/snowjielong/util/Util.java
+
+2023-10-21
+1.当前难度等级的关卡顺序，在读取配置文件的时候随机产生。
+res/snowjielong.xml
+src/com/xiboliya/snowjielong/common/BarrierOrder.java（添加）
+src/com/xiboliya/snowjielong/common/IdiomCache.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
