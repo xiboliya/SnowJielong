@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.xiboliya.snowjielong.common.BarrierOrder;
 import com.xiboliya.snowjielong.util.Util;
 
 /**
@@ -152,6 +153,8 @@ public final class SettingAdapter {
               logic = true;
             }
             this.setting.idiomCache.setCurrentBarrierPassed(logic);
+          } else if (key.equalsIgnoreCase("currentBarrierOrder")) {
+            this.setting.idiomCache.setCurrentBarrierOrder(BarrierOrder.getItemByName(value));
           }
         }
       }
@@ -197,6 +200,8 @@ public final class SettingAdapter {
         String key = node.getParentNode().getNodeName();
         if (key.equalsIgnoreCase("currentTopicLevel")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentTopicLevel()));
+        } else if (key.equalsIgnoreCase("currentBarrierOrder")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentBarrierOrder()));
         } else if (key.equalsIgnoreCase("currentBarrier")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentBarrier()));
         } else if (key.equalsIgnoreCase("currentBarrierFailTimes")) {

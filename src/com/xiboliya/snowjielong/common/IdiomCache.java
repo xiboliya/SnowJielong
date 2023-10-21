@@ -26,6 +26,8 @@ package com.xiboliya.snowjielong.common;
 public class IdiomCache {
   // 当前难度等级
   private int currentTopicLevel;
+  // 当前难度等级的关卡顺序
+  private BarrierOrder currentBarrierOrder;
   // 当前关卡
   private int currentBarrier;
   // 当前关卡闯关失败的次数
@@ -65,6 +67,24 @@ public class IdiomCache {
    */
   public void setCurrentTopicLevel(int currentTopicLevel) {
     this.currentTopicLevel = currentTopicLevel;
+  }
+
+  /**
+   * 获取当前难度等级的关卡顺序
+   * 
+   * @return 当前难度等级的关卡顺序
+   */
+  public BarrierOrder getCurrentBarrierOrder() {
+    return this.currentBarrierOrder;
+  }
+
+  /**
+   * 设置当前难度等级的关卡顺序
+   * 
+   * @param currentBarrierOrder 当前难度等级的关卡顺序
+   */
+  public void setCurrentBarrierOrder(BarrierOrder currentBarrierOrder) {
+    this.currentBarrierOrder = currentBarrierOrder;
   }
 
   /**

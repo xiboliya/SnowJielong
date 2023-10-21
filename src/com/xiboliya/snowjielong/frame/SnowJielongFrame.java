@@ -31,10 +31,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
@@ -54,6 +55,7 @@ import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseLabel;
+import com.xiboliya.snowjielong.common.BarrierOrder;
 import com.xiboliya.snowjielong.common.IdiomCache;
 import com.xiboliya.snowjielong.common.IdiomTag;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
@@ -76,7 +78,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 百宝箱：砗磲、珍珠、珊瑚、琥珀、水晶、玛瑙、翡翠、猫眼、欧泊、钻石、红宝石、蓝宝石、祖母绿、碧玺、
  * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
  * 添加积分兑换商城。
- * 关卡顺序在第一关时随机产生：默认、反序、升序、降序。
  * 添加用户注册和登录功能，各用户数据分别存储。
  * 添加成语的解释，存放在单独的文件里。在每关通过之后，可以点击查看。
  */
@@ -156,6 +157,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private ArrayList<String> idiomList = new ArrayList<String>();
   // 当前难度等级
   private int currentTopicLevel = 0;
+  // 当前难度等级的关卡顺序
+  private BarrierOrder currentBarrierOrder = null;
   // 当前头衔等级
   private int currentRankLevel = 0;
   // 当前关卡
@@ -243,9 +246,110 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     } finally {
       try {
         reader.close();
-      } catch (IOException x) {
+      } catch (Exception x) {
         // x.printStackTrace();
       }
+    }
+    if (this.currentBarrierOrder == null) {
+      this.refreshCurrentBarrierOrder();
+    }
+    this.setting.idiomCache.setCurrentBarrierOrder(this.currentBarrierOrder);
+    this.sortIdiomList();
+  }
+
+  /**
+   * 随机获取关卡顺序
+   */
+  private void refreshCurrentBarrierOrder() {
+    Random random = new Random();
+    int randomIndex = random.nextInt(8);
+    this.currentBarrierOrder = BarrierOrder.getItemByIndex(randomIndex);
+  }
+
+  /**
+   * 对当前难度等级的关卡进行顺序
+   */
+  private void sortIdiomList() {
+    switch (this.currentBarrierOrder) {
+      case NATURAL_DESCEND:
+        Collections.reverse(this.idiomList);
+        break;
+      case WHOLE_STRING_ASCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            return str1.compareTo(str2);
+          }
+        });
+        break;
+      case WHOLE_STRING_DESCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            return str2.compareTo(str1);
+          }
+        });
+        break;
+      case CHARS_NUMBER_ASCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            char[] array1 = str1.toCharArray();
+            char[] array2 = str2.toCharArray();
+            int number1 = 0;
+            for (char c : array1) {
+              number1 += c;
+            }
+            int number2 = 0;
+            for (char c : array2) {
+              number2 += c;
+            }
+            return number1 - number2;
+          }
+        });
+        break;
+      case CHARS_NUMBER_DESCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            char[] array1 = str1.toCharArray();
+            char[] array2 = str2.toCharArray();
+            int number1 = 0;
+            for (char c : array1) {
+              number1 += c;
+            }
+            int number2 = 0;
+            for (char c : array2) {
+              number2 += c;
+            }
+            return number2 - number1;
+          }
+        });
+        break;
+      case WHOLE_STRING_REVERSE_ASCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            StringBuilder stb1 = new StringBuilder(str1);
+            StringBuilder stb2 = new StringBuilder(str2);
+            stb1.reverse();
+            stb2.reverse();
+            return stb1.toString().compareTo(stb2.toString());
+          }
+        });
+        break;
+      case WHOLE_STRING_REVERSE_DESCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            StringBuilder stb1 = new StringBuilder(str1);
+            StringBuilder stb2 = new StringBuilder(str2);
+            stb1.reverse();
+            stb2.reverse();
+            return stb2.toString().compareTo(stb1.toString());
+          }
+        });
+        break;
     }
   }
 
@@ -255,6 +359,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void loadIdiomCache() {
     IdiomCache idiomCache = this.setting.idiomCache;
     this.currentTopicLevel = idiomCache.getCurrentTopicLevel();
+    this.currentBarrierOrder = idiomCache.getCurrentBarrierOrder();
     this.currentBarrier = idiomCache.getCurrentBarrier();
     this.currentBarrierFailTimes = idiomCache.getCurrentBarrierFailTimes();
     this.isCurrentBarrierPassed = idiomCache.isCurrentBarrierPassed();
@@ -513,12 +618,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.btnPause.setEnabled(false);
       this.btnDelay.setEnabled(false);
       return;
-    } else {
-      this.btnStart.setEnabled(true);
-      this.btnHint.setEnabled(this.hintCount > 0);
-      this.btnPause.setEnabled(this.pauseCount > 0);
-      this.btnDelay.setEnabled(this.delayCount > 0);
     }
+    this.btnStart.setEnabled(true);
+    this.btnHint.setEnabled(this.hintCount > 0);
+    this.btnPause.setEnabled(this.pauseCount > 0);
+    this.btnDelay.setEnabled(this.delayCount > 0);
     this.setCellsVisible(true);
     this.isCurrentBarrierPassed = false;
     this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
@@ -1204,30 +1308,39 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 从头开始闯关
    */
   private void restart() {
-    int result = JOptionPane.showConfirmDialog(this, "此操作将清空所有的等级、分数和头衔，从头开始闯关！\n是否继续？",
+    int result = JOptionPane.showConfirmDialog(this, "此操作将清空所有的等级、分数、奖励和头衔，从头开始闯关！\n是否继续？",
         Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
     if (result != JOptionPane.YES_OPTION) {
       return;
     }
     this.stopTimer();
-    this.currentTopicLevel = 0;
     this.currentRankLevel = 0;
-    this.currentBarrier = 0;
-    this.currentBarrierFailTimes = 0;
-    this.isCurrentBarrierPassed = false;
-    this.totalScore = 0;
-    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.answerTimes = 0;
-    this.usedTime = 0;
-    this.passedBarrierCount = 0;
-    this.totalSubmitCount = 0;
-    this.totalRightCount = 0;
     this.setting.idiomCache = new IdiomCache();
+    this.currentTopicLevel = this.setting.idiomCache.getCurrentTopicLevel();
+    this.currentBarrierOrder = this.setting.idiomCache.getCurrentBarrierOrder();
+    this.currentBarrier = this.setting.idiomCache.getCurrentBarrier();
+    this.currentBarrierFailTimes = this.setting.idiomCache.getCurrentBarrierFailTimes();
+    this.isCurrentBarrierPassed = this.setting.idiomCache.isCurrentBarrierPassed();
+    this.totalScore = this.setting.idiomCache.getTotalScore();
+    this.usedTime = this.setting.idiomCache.getUsedTime();
+    this.passedBarrierCount = this.setting.idiomCache.getPassedBarrierCount();
+    this.totalSubmitCount = this.setting.idiomCache.getTotalSubmitCount();
+    this.totalRightCount = this.setting.idiomCache.getTotalRightCount();
+    this.hintCount = this.setting.idiomCache.getHintCount();
+    this.pauseCount = this.setting.idiomCache.getPauseCount();
+    this.delayCount = this.setting.idiomCache.getDelayCount();
+    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
+    this.initIdiomList();
     this.refreshElements();
+    this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
     this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
+    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
+    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
+    this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
   }
 
   /**
@@ -1261,35 +1374,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.aboutDialog.pack(); // 自动调整窗口大小，以适应各组件
     }
     this.aboutDialog.setVisible(true);
-  }
-
-  /**
-   * 为各组件添加事件的处理方法
-   */
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    Object source = e.getSource();
-    if (this.btnHint.equals(source)) {
-      this.hint();
-    } else if (this.btnPause.equals(source)) {
-      this.pause();
-    } else if (this.btnDelay.equals(source)) {
-      this.delay();
-    } else if (this.btnStart.equals(source)) {
-      this.start();
-    } else if (this.btnCancel.equals(source)) {
-      this.exit();
-    } else if (this.itemRestart.equals(source)) {
-      this.restart();
-    } else if (this.itemDepository.equals(source)) {
-      this.openDepositoryDialog();
-    } else if (this.itemExit.equals(source)) {
-      this.exit();
-    } else if (this.itemHelp.equals(source)) {
-      this.openIdiomRulesDialog();
-    } else if (this.itemAbout.equals(source)) {
-      this.showAbout();
-    }
   }
 
   /**
@@ -1415,6 +1499,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         if (this.hasNextTopicLevel()) {
           this.currentTopicLevel++;
           this.setting.idiomCache.setCurrentTopicLevel(this.currentTopicLevel);
+          this.currentBarrierOrder = null;
           this.initIdiomList();
           this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
           this.currentBarrier = 0;
@@ -1450,6 +1535,35 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.stopTimer();
     this.settingAdapter.save();
     System.exit(0);
+  }
+
+  /**
+   * 为各组件添加事件的处理方法
+   */
+  @Override
+  public void actionPerformed(ActionEvent e) {
+    Object source = e.getSource();
+    if (this.btnHint.equals(source)) {
+      this.hint();
+    } else if (this.btnPause.equals(source)) {
+      this.pause();
+    } else if (this.btnDelay.equals(source)) {
+      this.delay();
+    } else if (this.btnStart.equals(source)) {
+      this.start();
+    } else if (this.btnCancel.equals(source)) {
+      this.exit();
+    } else if (this.itemRestart.equals(source)) {
+      this.restart();
+    } else if (this.itemDepository.equals(source)) {
+      this.openDepositoryDialog();
+    } else if (this.itemExit.equals(source)) {
+      this.exit();
+    } else if (this.itemHelp.equals(source)) {
+      this.openIdiomRulesDialog();
+    } else if (this.itemAbout.equals(source)) {
+      this.showAbout();
+    }
   }
 
   /**

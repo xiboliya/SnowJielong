@@ -2,6 +2,7 @@
 <Setting note="软件设置">
   <Idiom note="成语接龙游戏的进度存档">
     <currentTopicLevel note="当前难度等级">0</currentTopicLevel>
+    <currentBarrierOrder note="当前难度等级的关卡顺序">NATURAL_ASCEND</currentBarrierOrder>
     <currentBarrier note="当前关卡">0</currentBarrier>
     <currentBarrierFailTimes note="当前关卡闯关失败的次数">0</currentBarrierFailTimes>
     <isCurrentBarrierPassed note="当前关卡是否通过">false</isCurrentBarrierPassed>
