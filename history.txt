@@ -103,3 +103,7 @@ src/com/xiboliya/snowjielong/common/BarrierOrder.java（添加）
 src/com/xiboliya/snowjielong/common/IdiomCache.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+
+2023-10-30
+1.设置答题区和备选区背景颜色，以使闯关失败或暂停时，界面更加美观。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
