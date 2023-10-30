@@ -71,7 +71,7 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 
  * @author 冰原
  * 显示当前难度等级（5个等级：初级、中级、高级、特级、顶级），成语数分别为：2/3/4/5/6，备选数分别为：4/6/9/12/15，总分数分别为：4/6/8/10/12，各等级200关。
- * 每关用时越少、得分越高，获得随机天星、提示卡、百宝箱的几率越大。
+ * 增加体力，默认100，每闯1关减1，为0时不能继续闯关；第二天恢复100。
  * 天星：北斗、十一曜、天罡、地煞。
  * 北斗：天枢、天璇、天玑、天权、玉衡、开阳、摇光。
  * 十一曜：太阳、太阴、荧惑、辰星、岁星、太白、镇星、罗睺、计都、紫炁、月孛。
@@ -422,6 +422,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlMain.add(this.pnlCenter);
     this.lblOption.setBounds(145, 435, 100, Util.VIEW_HEIGHT);
     this.pnlOption.setBounds(140, 460, 400, 80);
+    this.pnlCenter.setOpaque(true); // 设置组件可以绘制背景
+    this.pnlOption.setOpaque(true); // 设置组件可以绘制背景
+    this.pnlCenter.setBackground(Color.LIGHT_GRAY);
+    this.pnlOption.setBackground(Color.LIGHT_GRAY);
     this.pnlMain.add(this.lblOption);
     this.pnlMain.add(this.pnlOption);
     this.btnHint.setBounds(20, 430, 80, Util.ICON_BUTTON_HEIGHT);
