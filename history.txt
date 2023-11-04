@@ -114,3 +114,5 @@ res/snowjielong.xml
 src/com/xiboliya/snowjielong/common/IdiomCache.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+2.调整TipsWindow提示窗口的各种背景颜色RGB色值，以改善视觉效果。
+src/com/xiboliya/snowjielong/window/TipsWindow.java
