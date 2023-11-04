@@ -50,6 +50,10 @@ public class IdiomCache {
   private int pauseCount = 3;
   // 可用的延时次数，默认为3次
   private int delayCount = 3;
+  // 可用的体力，默认为100
+  private int energy = 100;
+  // 一天内第一次闯关的时间戳
+  private long startTimeMillis;
 
   /**
    * 获取当前难度等级
@@ -283,5 +287,41 @@ public class IdiomCache {
    */
   public void setDelayCount(int delayCount) {
     this.delayCount = delayCount;
+  }
+
+  /**
+   * 获取可用的体力
+   * 
+   * @return 可用的体力
+   */
+  public int getEnergy() {
+    return this.energy;
+  }
+
+  /**
+   * 设置可用的体力
+   * 
+   * @param energy 可用的体力
+   */
+  public void setEnergy(int energy) {
+    this.energy = energy;
+  }
+
+  /**
+   * 获取一天内第一次闯关的时间戳
+   * 
+   * @return 一天内第一次闯关的时间戳
+   */
+  public long getStartTimeMillis() {
+    return this.startTimeMillis;
+  }
+
+  /**
+   * 设置一天内第一次闯关的时间戳
+   * 
+   * @param startTimeMillis 一天内第一次闯关的时间戳
+   */
+  public void setStartTimeMillis(long startTimeMillis) {
+    this.startTimeMillis = startTimeMillis;
   }
 }

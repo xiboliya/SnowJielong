@@ -147,6 +147,16 @@ public final class SettingAdapter {
             this.setting.idiomCache.setPauseCount(number);
           } else if (key.equalsIgnoreCase("delayCount")) {
             this.setting.idiomCache.setDelayCount(number);
+          } else if (key.equalsIgnoreCase("energy")) {
+            this.setting.idiomCache.setEnergy(number);
+          } else if (key.equalsIgnoreCase("startTimeMillis")) {
+            long longNumber = 0L;
+            try {
+              longNumber = Long.parseLong(value);
+            } catch (NumberFormatException x) {
+              // x.printStackTrace();
+            }
+            this.setting.idiomCache.setStartTimeMillis(longNumber);
           } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
             boolean logic = false;
             if (value.equalsIgnoreCase("true")) {
@@ -222,6 +232,10 @@ public final class SettingAdapter {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getPauseCount()));
         } else if (key.equalsIgnoreCase("delayCount")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getDelayCount()));
+        } else if (key.equalsIgnoreCase("energy")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getEnergy()));
+        } else if (key.equalsIgnoreCase("startTimeMillis")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getStartTimeMillis()));
         } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.isCurrentBarrierPassed()));
         }

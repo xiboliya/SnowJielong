@@ -14,5 +14,7 @@
     <hintCount note="可用的提示次数">3</hintCount>
     <pauseCount note="可用的暂停次数">3</pauseCount>
     <delayCount note="可用的延时次数">3</delayCount>
+    <energy note="可用的体力">100</energy>
+    <startTimeMillis note="一天内第一次闯关的时间戳">0</startTimeMillis>
   </Idiom>
 </Setting>

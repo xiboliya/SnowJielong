@@ -33,9 +33,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
@@ -119,6 +121,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JLabel lblRankLevel = new JLabel();
   private JLabel lblSpeed = new JLabel();
   private JLabel lblAccuracy = new JLabel();
+  private JLabel lblEnergy = new JLabel();
   private GridLayout gridLayout = new GridLayout(10, 10, 0, 0);
   private GridLayout optionLayout = new GridLayout(2, 10, 0, 0);
   private JPanel pnlCenter = new JPanel(this.gridLayout);
@@ -131,6 +134,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private BaseButton btnCancel = new BaseButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
   private MouseAdapter mouseAdapter = null;
+  private SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
   // 仓库对话框
   private DepositoryDialog depositoryDialog = null;
   // 游戏规则对话框
@@ -191,6 +195,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private int pauseCount = 0;
   // 可用的延时次数
   private int delayCount = 0;
+  // 可用的体力
+  private int energy = 0;
+  // 一天内第一次闯关的时间戳
+  private long startTimeMillis;
   // 计时器
   private Timer timer = null;
   // 计时器执行的任务
@@ -371,6 +379,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.hintCount = idiomCache.getHintCount();
     this.pauseCount = idiomCache.getPauseCount();
     this.delayCount = idiomCache.getDelayCount();
+    this.energy = idiomCache.getEnergy();
+    this.startTimeMillis = idiomCache.getStartTimeMillis();
   }
 
   /**
@@ -389,6 +399,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void init() {
     this.setTitle("成语接龙");
+    this.simpleDateFormat.applyPattern("yyyy-MM-dd");
     this.initPanel();
     this.initMenuBar();
     this.setMenuMnemonic();
@@ -409,6 +420,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblRankLevel.setBounds(5, 230, 135, Util.VIEW_HEIGHT);
     this.lblSpeed.setBounds(5, 270, 135, Util.VIEW_HEIGHT);
     this.lblAccuracy.setBounds(5, 310, 135, Util.VIEW_HEIGHT);
+    this.lblEnergy.setBounds(5, 350, 135, Util.VIEW_HEIGHT);
     this.pnlCenter.setBounds(140, 30, 400, 400);
     this.pnlMain.add(this.lblTopicLevel);
     this.pnlMain.add(this.lblBarrier);
@@ -418,6 +430,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlMain.add(this.lblRankLevel);
     this.pnlMain.add(this.lblSpeed);
     this.pnlMain.add(this.lblAccuracy);
+    this.pnlMain.add(this.lblEnergy);
     this.pnlMain.add(this.lblTopic);
     this.pnlMain.add(this.pnlCenter);
     this.lblOption.setBounds(145, 435, 100, Util.VIEW_HEIGHT);
@@ -464,6 +477,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.currentRankLevel]);
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
     this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
+    this.lblEnergy.setText("体力：" + this.energy);
   }
 
   /**
@@ -617,13 +631,38 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void refreshElements() {
     int idiomCount = this.idiomList.size();
     if (this.currentBarrierFailTimes < 0 && this.currentBarrier >= (idiomCount - 1)) {
+      // 已通关
       this.btnStart.setEnabled(false);
       this.btnHint.setEnabled(false);
       this.btnPause.setEnabled(false);
       this.btnDelay.setEnabled(false);
       return;
     }
-    this.btnStart.setEnabled(true);
+    long currentTimeMillis = System.currentTimeMillis();
+    if (this.startTimeMillis <= 0) {
+      // 第一次闯关，记录时间戳
+      this.startTimeMillis = currentTimeMillis;
+      this.setting.idiomCache.setStartTimeMillis(this.startTimeMillis);
+    } else {
+      String dateCurrent = this.simpleDateFormat.format(new Date(currentTimeMillis));
+      String dateStart = this.simpleDateFormat.format(new Date(this.startTimeMillis));
+      if (!dateCurrent.equals(dateStart)) {
+        // 不是同一天，重新记录时间戳，体力恢复为100
+        this.startTimeMillis = currentTimeMillis;
+        this.setting.idiomCache.setStartTimeMillis(this.startTimeMillis);
+        this.energy = 100;
+        this.setting.idiomCache.setEnergy(this.energy);
+      }
+    }
+    if (this.energy <= 0) {
+      TipsWindow.show(this, "当前体力不足，不能继续闯关，请明天再来！", TipsWindow.WindowSize.BIGGER);
+      return;
+    }
+    this.energy--;
+    this.setting.idiomCache.setEnergy(this.energy);
+    this.lblEnergy.setText("体力：" + this.energy);
+    this.btnStart.setText("下一关");
+    this.btnStart.setEnabled(false);
     this.btnHint.setEnabled(this.hintCount > 0);
     this.btnPause.setEnabled(this.pauseCount > 0);
     this.btnDelay.setEnabled(this.delayCount > 0);
@@ -1063,6 +1102,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.lblScore.setText("累计分数：" + this.totalScore + "分");
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
+      this.btnStart.setEnabled(true);
       this.btnHint.setEnabled(false);
       this.btnPause.setEnabled(false);
       this.btnDelay.setEnabled(false);
@@ -1089,8 +1129,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.countdown = 0;
         this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
         this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
-        TipsWindow.show(this, "已超过作答次数，闯关失败！", TipsWindow.Background.PINK);
+        TipsWindow.show(this, "已超过作答次数，闯关失败！");
         this.btnStart.setText("重新闯关");
+        this.btnStart.setEnabled(true);
         this.btnHint.setEnabled(false);
         this.btnPause.setEnabled(false);
         this.btnDelay.setEnabled(false);
@@ -1209,8 +1250,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 作答超时
    */
   private void outOfTime() {
-    TipsWindow.show(this, "作答时间已到，闯关失败！", TipsWindow.Background.PINK);
+    TipsWindow.show(this, "作答时间已到，闯关失败！");
     this.btnStart.setText("重新闯关");
+    this.btnStart.setEnabled(true);
     this.btnHint.setEnabled(false);
     this.btnPause.setEnabled(false);
     this.btnDelay.setEnabled(false);
@@ -1334,6 +1376,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.hintCount = this.setting.idiomCache.getHintCount();
     this.pauseCount = this.setting.idiomCache.getPauseCount();
     this.delayCount = this.setting.idiomCache.getDelayCount();
+    this.energy = this.setting.idiomCache.getEnergy();
+    this.startTimeMillis = this.setting.idiomCache.getStartTimeMillis();
     this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.initIdiomList();
     this.refreshElements();
@@ -1342,6 +1386,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
     this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
+    this.lblEnergy.setText("体力：" + this.energy);
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
     this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
@@ -1518,10 +1563,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.refreshElements();
       }
     } else if (this.countdown <= 0) {
-      this.btnStart.setText("下一关");
       this.refreshElements();
     } else {
-      TipsWindow.show(this, "通过当前关卡，才能进入下一关！", TipsWindow.Background.PINK);
+      TipsWindow.show(this, "通过当前关卡，才能进入下一关！");
     }
   }
 
