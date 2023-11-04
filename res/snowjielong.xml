@@ -11,9 +11,10 @@
     <passedBarrierCount note="累计通过关卡数">0</passedBarrierCount>
     <totalSubmitCount note="累计备选答题次数">0</totalSubmitCount>
     <totalRightCount note="累计备选答对次数">0</totalRightCount>
-    <hintCount note="可用的提示次数">3</hintCount>
-    <pauseCount note="可用的暂停次数">3</pauseCount>
-    <delayCount note="可用的延时次数">3</delayCount>
+    <hintCount note="可用的提示卡数量">3</hintCount>
+    <pauseCount note="可用的暂停卡数量">3</pauseCount>
+    <delayCount note="可用的延时卡数量">3</delayCount>
+    <energyCount note="可用的体力卡数量">3</energyCount>
     <energy note="可用的体力">100</energy>
     <startTimeMillis note="一天内第一次闯关的时间戳">0</startTimeMillis>
   </Idiom>

@@ -73,7 +73,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 
  * @author 冰原
  * 显示当前难度等级（5个等级：初级、中级、高级、特级、顶级），成语数分别为：2/3/4/5/6，备选数分别为：4/6/9/12/15，总分数分别为：4/6/8/10/12，各等级200关。
- * 增加体力，默认100，每闯1关减1，为0时不能继续闯关；第二天恢复100。
  * 天星：北斗、十一曜、天罡、地煞。
  * 北斗：天枢、天璇、天玑、天权、玉衡、开阳、摇光。
  * 十一曜：太阳、太阴、荧惑、辰星、岁星、太白、镇星、罗睺、计都、紫炁、月孛。
@@ -130,6 +129,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private BaseButton btnHint = new BaseButton("提示", Util.ICON_HINT_SMALL);
   private BaseButton btnPause = new BaseButton("暂停", Util.ICON_PAUSE_SMALL);
   private BaseButton btnDelay = new BaseButton("延时", Util.ICON_DELAY_SMALL);
+  private BaseButton btnEnergy = new BaseButton("体力", Util.ICON_ENERGY_SMALL);
   private BaseButton btnStart = new BaseButton("开始闯关");
   private BaseButton btnCancel = new BaseButton("退出");
   private EtchedBorder etchedBorder = new EtchedBorder();
@@ -189,12 +189,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private float accuracy = -1;
   // 闯关速度
   private float speed = -1;
-  // 可用的提示次数
+  // 可用的提示卡数量
   private int hintCount = 0;
-  // 可用的暂停次数
+  // 可用的暂停卡数量
   private int pauseCount = 0;
-  // 可用的延时次数
+  // 可用的延时卡数量
   private int delayCount = 0;
+  // 可用的体力卡数量
+  private int energyCount = 0;
   // 可用的体力
   private int energy = 0;
   // 一天内第一次闯关的时间戳
@@ -379,6 +381,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.hintCount = idiomCache.getHintCount();
     this.pauseCount = idiomCache.getPauseCount();
     this.delayCount = idiomCache.getDelayCount();
+    this.energyCount = idiomCache.getEnergyCount();
     this.energy = idiomCache.getEnergy();
     this.startTimeMillis = idiomCache.getStartTimeMillis();
   }
@@ -444,24 +447,29 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnHint.setBounds(20, 430, 80, Util.ICON_BUTTON_HEIGHT);
     this.btnPause.setBounds(20, 470, 80, Util.ICON_BUTTON_HEIGHT);
     this.btnDelay.setBounds(20, 510, 80, Util.ICON_BUTTON_HEIGHT);
+    this.btnEnergy.setBounds(20, 550, 80, Util.ICON_BUTTON_HEIGHT);
     this.btnStart.setBounds(200, 560, 100, Util.BUTTON_HEIGHT);
     this.btnCancel.setBounds(390, 560, 100, Util.BUTTON_HEIGHT);
     this.pnlMain.add(this.btnHint);
     this.pnlMain.add(this.btnPause);
     this.pnlMain.add(this.btnDelay);
+    this.pnlMain.add(this.btnEnergy);
     this.pnlMain.add(this.btnStart);
     this.pnlMain.add(this.btnCancel);
     this.btnHint.setFocusable(false);
     this.btnPause.setFocusable(false);
     this.btnDelay.setFocusable(false);
+    this.btnEnergy.setFocusable(false);
     this.btnStart.setFocusable(false);
     this.btnCancel.setFocusable(false);
     this.btnHint.setEnabled(false);
     this.btnPause.setEnabled(false);
     this.btnDelay.setEnabled(false);
+    this.btnEnergy.setEnabled(this.energyCount > 0);
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
     this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
+    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
   }
 
   /**
@@ -636,6 +644,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.btnHint.setEnabled(false);
       this.btnPause.setEnabled(false);
       this.btnDelay.setEnabled(false);
+      this.btnEnergy.setEnabled(false);
       return;
     }
     long currentTimeMillis = System.currentTimeMillis();
@@ -1008,6 +1017,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnHint.addActionListener(this);
     this.btnPause.addActionListener(this);
     this.btnDelay.addActionListener(this);
+    this.btnEnergy.addActionListener(this);
     this.btnStart.addActionListener(this);
     this.btnCancel.addActionListener(this);
     this.itemRestart.addActionListener(this);
@@ -1292,6 +1302,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.obtainPause();
       } else if (strRandomNumber.endsWith("3")) {
         this.obtainDelay();
+      } else if (strRandomNumber.endsWith("4")) {
+        this.obtainEnergy();
       }
     } else if (this.speed <= levelSpeed * 2 || this.accuracy >= LevelAccuracy - 10) {
       // 获得每类奖励的概率均为1/50
@@ -1301,6 +1313,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.obtainPause();
       } else if (strRandomNumber.endsWith("05") || strRandomNumber.endsWith("06")) {
         this.obtainDelay();
+      } else if (strRandomNumber.endsWith("07") || strRandomNumber.endsWith("08")) {
+        this.obtainEnergy();
       }
     } else if (this.speed <= levelSpeed * 3 || this.accuracy >= LevelAccuracy - 20) {
       // 获得每类奖励的概率均为1/100
@@ -1310,6 +1324,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.obtainPause();
       } else if (strRandomNumber.endsWith("03")) {
         this.obtainDelay();
+      } else if (strRandomNumber.endsWith("04")) {
+        this.obtainEnergy();
       }
     } else {
       // 获得每类奖励的概率均为1/500
@@ -1319,35 +1335,46 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.obtainPause();
       } else if (strRandomNumber.endsWith("005") || strRandomNumber.endsWith("006")) {
         this.obtainDelay();
+      } else if (strRandomNumber.endsWith("007") || strRandomNumber.endsWith("008")) {
+        this.obtainEnergy();
       }
     }
   }
 
   /**
-   * 获得一次提示机会
+   * 获得1张提示卡
    */
   private void obtainHint() {
     this.hintCount++;
     this.refreshHint();
-    TipsWindow.show(this, "恭喜：获得一次提示机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+    TipsWindow.show(this, "恭喜：获得1张提示卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
-   * 获得一次暂停机会
+   * 获得1张暂停卡
    */
   private void obtainPause() {
     this.pauseCount++;
     this.refreshPause();
-    TipsWindow.show(this, "恭喜：获得一次暂停机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+    TipsWindow.show(this, "恭喜：获得1张暂停卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
-   * 获得一次延时机会
+   * 获得1张延时卡
    */
   private void obtainDelay() {
     this.delayCount++;
     this.refreshDelay();
-    TipsWindow.show(this, "恭喜：获得一次延时机会！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+    TipsWindow.show(this, "恭喜：获得1张延时卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+  }
+
+  /**
+   * 获得1张体力卡
+   */
+  private void obtainEnergy() {
+    this.energyCount++;
+    this.refreshEnergy();
+    TipsWindow.show(this, "恭喜：获得1张体力卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1376,11 +1403,13 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.hintCount = this.setting.idiomCache.getHintCount();
     this.pauseCount = this.setting.idiomCache.getPauseCount();
     this.delayCount = this.setting.idiomCache.getDelayCount();
+    this.energyCount = this.setting.idiomCache.getEnergyCount();
     this.energy = this.setting.idiomCache.getEnergy();
     this.startTimeMillis = this.setting.idiomCache.getStartTimeMillis();
     this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.initIdiomList();
     this.refreshElements();
+    this.btnEnergy.setEnabled(this.energyCount > 0);
     this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
@@ -1390,6 +1419,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
     this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
+    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
   }
 
   /**
@@ -1526,6 +1556,27 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
+   * 体力
+   */
+  private void energy() {
+    // 使用一次体力卡，增加体力值：5
+    this.energy += 5;
+    this.setting.idiomCache.setEnergy(this.energy);
+    this.lblEnergy.setText("体力：" + this.energy);
+    this.energyCount--;
+    this.refreshEnergy();
+  }
+
+  /**
+   * 刷新体力功能
+   */
+  private void refreshEnergy() {
+    this.setting.idiomCache.setEnergyCount(this.energyCount);
+    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
+    this.btnEnergy.setEnabled(this.energyCount > 0);
+  }
+
+  /**
    * 获取当前选中的空格子
    * @return 当前选中的空格子
    */
@@ -1597,6 +1648,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.pause();
     } else if (this.btnDelay.equals(source)) {
       this.delay();
+    } else if (this.btnEnergy.equals(source)) {
+      this.energy();
     } else if (this.btnStart.equals(source)) {
       this.start();
     } else if (this.btnCancel.equals(source)) {

@@ -44,12 +44,14 @@ public class IdiomCache {
   private int totalSubmitCount;
   // 累计备选答对次数
   private int totalRightCount;
-  // 可用的提示次数，默认为3次
+  // 可用的提示卡数量，默认为3张
   private int hintCount = 3;
-  // 可用的暂停次数，默认为3次
+  // 可用的暂停卡数量，默认为3张
   private int pauseCount = 3;
-  // 可用的延时次数，默认为3次
+  // 可用的延时卡数量，默认为3张
   private int delayCount = 3;
+  // 可用的体力卡数量，默认为3张
+  private int energyCount = 3;
   // 可用的体力，默认为100
   private int energy = 100;
   // 一天内第一次闯关的时间戳
@@ -236,57 +238,75 @@ public class IdiomCache {
   }
 
   /**
-   * 获取可用的提示次数
+   * 获取可用的提示卡数量
    * 
-   * @return 可用的提示次数
+   * @return 可用的提示卡数量
    */
   public int getHintCount() {
     return this.hintCount;
   }
 
   /**
-   * 设置可用的提示次数
+   * 设置可用的提示卡数量
    * 
-   * @param hintCount 可用的提示次数
+   * @param hintCount 可用的提示卡数量
    */
   public void setHintCount(int hintCount) {
     this.hintCount = hintCount;
   }
 
   /**
-   * 获取可用的暂停次数
+   * 获取可用的暂停卡数量
    * 
-   * @return 可用的暂停次数
+   * @return 可用的暂停卡数量
    */
   public int getPauseCount() {
     return this.pauseCount;
   }
 
   /**
-   * 设置可用的暂停次数
+   * 设置可用的暂停卡数量
    * 
-   * @param pauseCount 可用的暂停次数
+   * @param pauseCount 可用的暂停卡数量
    */
   public void setPauseCount(int pauseCount) {
     this.pauseCount = pauseCount;
   }
 
   /**
-   * 获取可用的延时次数
+   * 获取可用的延时卡数量
    * 
-   * @return 可用的延时次数
+   * @return 可用的延时卡数量
    */
   public int getDelayCount() {
     return this.delayCount;
   }
 
   /**
-   * 设置可用的延时次数
+   * 设置可用的延时卡数量
    * 
-   * @param delayCount 可用的延时次数
+   * @param delayCount 可用的延时卡数量
    */
   public void setDelayCount(int delayCount) {
     this.delayCount = delayCount;
+  }
+
+  /**
+   * 获取可用的体力卡数量
+   * 
+   * @return 可用的体力卡数量
+   */
+  public int getEnergyCount() {
+    return this.energyCount;
+  }
+
+  /**
+   * 设置可用的体力卡数量
+   * 
+   * @param energyCount 可用的体力卡数量
+   */
+  public void setEnergyCount(int energyCount) {
+    this.energyCount = energyCount;
   }
 
   /**

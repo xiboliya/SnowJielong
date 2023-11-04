@@ -192,6 +192,18 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
         lblCellDelay.setFocusable(false); // 设置标签不可以获得焦点
         lblCellDelay.setToolTipText(null);
       }
+      // 体力卡
+      int energyCount = idiomCache.getEnergyCount();
+      BaseLabel lblCellEnergy = this.toolLabelList.get(3);
+      if (energyCount > 0) {
+        lblCellEnergy.setIcon(Util.ICON_ENERGY);
+        lblCellEnergy.setFocusable(true); // 设置标签可以获得焦点
+        lblCellEnergy.setToolTipText("体力卡：" + energyCount);
+      } else {
+        lblCellEnergy.setIcon(null);
+        lblCellEnergy.setFocusable(false); // 设置标签不可以获得焦点
+        lblCellEnergy.setToolTipText(null);
+      }
     }
   }
 
@@ -230,7 +242,7 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   public void focusGained(FocusEvent e) {
     BaseLabel lblElement = (BaseLabel) e.getSource();
     if (this.toolLabelList.contains(lblElement)) {
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 4; i++) {
         BaseLabel lblTool = this.toolLabelList.get(i);
         if (lblTool.equals(lblElement)) {
           lblTool.setBackground(Color.PINK);
