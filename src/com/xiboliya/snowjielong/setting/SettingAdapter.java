@@ -147,6 +147,8 @@ public final class SettingAdapter {
             this.setting.idiomCache.setPauseCount(number);
           } else if (key.equalsIgnoreCase("delayCount")) {
             this.setting.idiomCache.setDelayCount(number);
+          } else if (key.equalsIgnoreCase("energyCount")) {
+            this.setting.idiomCache.setEnergyCount(number);
           } else if (key.equalsIgnoreCase("energy")) {
             this.setting.idiomCache.setEnergy(number);
           } else if (key.equalsIgnoreCase("startTimeMillis")) {
@@ -232,6 +234,8 @@ public final class SettingAdapter {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getPauseCount()));
         } else if (key.equalsIgnoreCase("delayCount")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getDelayCount()));
+        } else if (key.equalsIgnoreCase("energyCount")) {
+          node.setTextContent(String.valueOf(this.setting.idiomCache.getEnergyCount()));
         } else if (key.equalsIgnoreCase("energy")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getEnergy()));
         } else if (key.equalsIgnoreCase("startTimeMillis")) {
