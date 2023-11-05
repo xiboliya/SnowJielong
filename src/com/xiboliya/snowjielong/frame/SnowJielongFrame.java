@@ -659,7 +659,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         // 不是同一天，重新记录时间戳，体力恢复为100
         this.startTimeMillis = currentTimeMillis;
         this.setting.idiomCache.setStartTimeMillis(this.startTimeMillis);
-        this.energy = 100;
+        if (this.energy < 100) {
+          this.energy = 100;
+        }
         this.setting.idiomCache.setEnergy(this.energy);
       }
     }
@@ -1297,47 +1299,47 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     if (this.speed <= levelSpeed || this.accuracy >= LevelAccuracy) {
       // 获得每类奖励的概率均为1/10
       if (strRandomNumber.endsWith("1")) {
-        this.obtainHint();
-      } else if (strRandomNumber.endsWith("2")) {
-        this.obtainPause();
-      } else if (strRandomNumber.endsWith("3")) {
-        this.obtainDelay();
-      } else if (strRandomNumber.endsWith("4")) {
-        this.obtainEnergy();
+        this.obtainReward();
       }
     } else if (this.speed <= levelSpeed * 2 || this.accuracy >= LevelAccuracy - 10) {
       // 获得每类奖励的概率均为1/50
       if (strRandomNumber.endsWith("01") || strRandomNumber.endsWith("02")) {
-        this.obtainHint();
-      } else if (strRandomNumber.endsWith("03") || strRandomNumber.endsWith("04")) {
-        this.obtainPause();
-      } else if (strRandomNumber.endsWith("05") || strRandomNumber.endsWith("06")) {
-        this.obtainDelay();
-      } else if (strRandomNumber.endsWith("07") || strRandomNumber.endsWith("08")) {
-        this.obtainEnergy();
+        this.obtainReward();
       }
     } else if (this.speed <= levelSpeed * 3 || this.accuracy >= LevelAccuracy - 20) {
       // 获得每类奖励的概率均为1/100
       if (strRandomNumber.endsWith("01")) {
-        this.obtainHint();
-      } else if (strRandomNumber.endsWith("02")) {
-        this.obtainPause();
-      } else if (strRandomNumber.endsWith("03")) {
-        this.obtainDelay();
-      } else if (strRandomNumber.endsWith("04")) {
-        this.obtainEnergy();
+        this.obtainReward();
       }
     } else {
       // 获得每类奖励的概率均为1/500
       if (strRandomNumber.endsWith("001") || strRandomNumber.endsWith("002")) {
-        this.obtainHint();
-      } else if (strRandomNumber.endsWith("003") || strRandomNumber.endsWith("004")) {
-        this.obtainPause();
-      } else if (strRandomNumber.endsWith("005") || strRandomNumber.endsWith("006")) {
-        this.obtainDelay();
-      } else if (strRandomNumber.endsWith("007") || strRandomNumber.endsWith("008")) {
-        this.obtainEnergy();
+        this.obtainReward();
       }
+    }
+  }
+
+  /**
+   * 随机分配获得的奖励
+   */
+  private void obtainReward() {
+    Random random = new Random();
+    int index = random.nextInt(4);
+    switch (index) {
+      case 0:
+        this.obtainHint();
+        break;
+      case 1:
+        this.obtainPause();
+        break;
+      case 2:
+        this.obtainDelay();
+        break;
+      case 3:
+        this.obtainEnergy();
+        break;
+      default:
+        break;
     }
   }
 
