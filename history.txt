@@ -128,3 +128,7 @@ src/com/xiboliya/snowjielong/util/Util.java
 2023-11-05
 1.补充初级成语完成。
 res/idiom/level0.txt
+2.解决体力卡无法保存的问题。
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+3.优化闯关成功后获得随机奖励的逻辑，以更符合概率。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
