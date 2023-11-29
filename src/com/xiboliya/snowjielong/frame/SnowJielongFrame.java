@@ -1505,6 +1505,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void refreshHint() {
     this.setting.idiomCache.setHintCount(this.hintCount);
+    this.btnHint.setEnabled(this.hintCount > 0);
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
   }
 
@@ -1521,6 +1522,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.startTimer(true);
       // 继续后可以使用提示功能，因此恢复提示按钮状态
       this.btnHint.setEnabled(this.hintCount > 0);
+      this.btnPause.setEnabled(this.pauseCount > 0);
     } else {
       this.setCellsVisible(false);
       this.btnPause.setText("继续");
@@ -1574,6 +1576,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void refreshDelay() {
     this.setting.idiomCache.setDelayCount(this.delayCount);
+    this.btnDelay.setEnabled(this.delayCount > 0);
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
   }
 
