@@ -132,3 +132,14 @@ res/idiom/level0.txt
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 3.优化闯关成功后获得随机奖励的逻辑，以更符合概率。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2023-11-29
+1.添加闯关成功后随机获得天星的逻辑，同步显示在仓库页面中。
+res/snowjielong.xml
+res/star_1.png（添加）
+res/star_2.png（添加）
+src/com/xiboliya/snowjielong/common/IdiomCache.java
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+src/com/xiboliya/snowjielong/util/Util.java
