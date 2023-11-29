@@ -27,6 +27,7 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -155,54 +156,88 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
 
   private void updateCurrentPanel() {
     if (this.tpnMain.getSelectedIndex() == 0) {
-      IdiomCache idiomCache = this.setting.idiomCache;
-      // 提示卡
-      int hintCount = idiomCache.getHintCount();
-      BaseLabel lblCellHint = this.toolLabelList.get(0);
-      if (hintCount > 0) {
-        lblCellHint.setIcon(Util.ICON_HINT);
-        lblCellHint.setFocusable(true); // 设置标签可以获得焦点
-        lblCellHint.setToolTipText("提示卡：" + hintCount);
+      this.updateToolPanel();
+    } else if (this.tpnMain.getSelectedIndex() == 1) {
+      this.updateStarPanel();
+    }
+  }
+
+  private void updateToolPanel() {
+    IdiomCache idiomCache = this.setting.idiomCache;
+    // 提示卡
+    int hintCount = idiomCache.getHintCount();
+    BaseLabel lblCellHint = this.toolLabelList.get(0);
+    lblCellHint.setBackground(Color.WHITE);
+    if (hintCount > 0) {
+      lblCellHint.setIcon(Util.ICON_HINT);
+      lblCellHint.setFocusable(true); // 设置标签可以获得焦点
+      lblCellHint.setToolTipText("提示卡：" + hintCount);
+    } else {
+      lblCellHint.setIcon(null);
+      lblCellHint.setFocusable(false); // 设置标签不可以获得焦点
+      lblCellHint.setToolTipText(null);
+    }
+    // 暂停卡
+    int pauseCount = idiomCache.getPauseCount();
+    BaseLabel lblCellPause = this.toolLabelList.get(1);
+    lblCellPause.setBackground(Color.WHITE);
+    if (pauseCount > 0) {
+      lblCellPause.setIcon(Util.ICON_PAUSE);
+      lblCellPause.setFocusable(true); // 设置标签可以获得焦点
+      lblCellPause.setToolTipText("暂停卡：" + pauseCount);
+    } else {
+      lblCellPause.setIcon(null);
+      lblCellPause.setFocusable(false); // 设置标签不可以获得焦点
+      lblCellPause.setToolTipText(null);
+    }
+    // 延时卡
+    int delayCount = idiomCache.getDelayCount();
+    BaseLabel lblCellDelay = this.toolLabelList.get(2);
+    lblCellDelay.setBackground(Color.WHITE);
+    if (delayCount > 0) {
+      lblCellDelay.setIcon(Util.ICON_DELAY);
+      lblCellDelay.setFocusable(true); // 设置标签可以获得焦点
+      lblCellDelay.setToolTipText("延时卡：" + delayCount);
+    } else {
+      lblCellDelay.setIcon(null);
+      lblCellDelay.setFocusable(false); // 设置标签不可以获得焦点
+      lblCellDelay.setToolTipText(null);
+    }
+    // 体力卡
+    int energyCount = idiomCache.getEnergyCount();
+    BaseLabel lblCellEnergy = this.toolLabelList.get(3);
+    lblCellEnergy.setBackground(Color.WHITE);
+    if (energyCount > 0) {
+      lblCellEnergy.setIcon(Util.ICON_ENERGY);
+      lblCellEnergy.setFocusable(true); // 设置标签可以获得焦点
+      lblCellEnergy.setToolTipText("体力卡：" + energyCount);
+    } else {
+      lblCellEnergy.setIcon(null);
+      lblCellEnergy.setFocusable(false); // 设置标签不可以获得焦点
+      lblCellEnergy.setToolTipText(null);
+    }
+  }
+
+  private void updateStarPanel() {
+    HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
+    int size = this.starLabelList.size();
+    for (int i = 0; i < size; i++) {
+      BaseLabel lblElement = this.starLabelList.get(i);
+      lblElement.setBackground(Color.WHITE);
+      String name = Util.STAR_NAMES[i];
+      Integer count = starMap.get(name);
+      if (count == null) {
+        lblElement.setIcon(null);
+        lblElement.setFocusable(false); // 设置标签不可以获得焦点
+        lblElement.setToolTipText(null);
       } else {
-        lblCellHint.setIcon(null);
-        lblCellHint.setFocusable(false); // 设置标签不可以获得焦点
-        lblCellHint.setToolTipText(null);
-      }
-      // 暂停卡
-      int pauseCount = idiomCache.getPauseCount();
-      BaseLabel lblCellPause = this.toolLabelList.get(1);
-      if (pauseCount > 0) {
-        lblCellPause.setIcon(Util.ICON_PAUSE);
-        lblCellPause.setFocusable(true); // 设置标签可以获得焦点
-        lblCellPause.setToolTipText("暂停卡：" + pauseCount);
-      } else {
-        lblCellPause.setIcon(null);
-        lblCellPause.setFocusable(false); // 设置标签不可以获得焦点
-        lblCellPause.setToolTipText(null);
-      }
-      // 延时卡
-      int delayCount = idiomCache.getDelayCount();
-      BaseLabel lblCellDelay = this.toolLabelList.get(2);
-      if (delayCount > 0) {
-        lblCellDelay.setIcon(Util.ICON_DELAY);
-        lblCellDelay.setFocusable(true); // 设置标签可以获得焦点
-        lblCellDelay.setToolTipText("延时卡：" + delayCount);
-      } else {
-        lblCellDelay.setIcon(null);
-        lblCellDelay.setFocusable(false); // 设置标签不可以获得焦点
-        lblCellDelay.setToolTipText(null);
-      }
-      // 体力卡
-      int energyCount = idiomCache.getEnergyCount();
-      BaseLabel lblCellEnergy = this.toolLabelList.get(3);
-      if (energyCount > 0) {
-        lblCellEnergy.setIcon(Util.ICON_ENERGY);
-        lblCellEnergy.setFocusable(true); // 设置标签可以获得焦点
-        lblCellEnergy.setToolTipText("体力卡：" + energyCount);
-      } else {
-        lblCellEnergy.setIcon(null);
-        lblCellEnergy.setFocusable(false); // 设置标签不可以获得焦点
-        lblCellEnergy.setToolTipText(null);
+        if (i < 36) {
+          lblElement.setIcon(Util.ICON_STAR_1);
+        } else {
+          lblElement.setIcon(Util.ICON_STAR_2);
+        }
+        lblElement.setFocusable(true); // 设置标签可以获得焦点
+        lblElement.setToolTipText(name + "：" + count);
       }
     }
   }
@@ -218,6 +253,23 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
         lblElement.requestFocus(); // 当鼠标单击时，获得焦点
       }
     };
+  }
+
+  /**
+   * 刷新标签背景色
+   * @param labelList 标签列表
+   * @param lblElement 当前选择的标签
+   * @param elementSize 刷新的标签数量
+   */
+  private void refreshBackground(ArrayList<BaseLabel> labelList, BaseLabel lblElement, int elementSize) {
+    for (int i = 0; i < elementSize; i++) {
+      BaseLabel lblTool = labelList.get(i);
+      if (lblTool.equals(lblElement)) {
+        lblTool.setBackground(Color.PINK);
+      } else {
+        lblTool.setBackground(Color.WHITE);
+      }
+    }
   }
 
   /**
@@ -242,14 +294,9 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   public void focusGained(FocusEvent e) {
     BaseLabel lblElement = (BaseLabel) e.getSource();
     if (this.toolLabelList.contains(lblElement)) {
-      for (int i = 0; i < 4; i++) {
-        BaseLabel lblTool = this.toolLabelList.get(i);
-        if (lblTool.equals(lblElement)) {
-          lblTool.setBackground(Color.PINK);
-        } else {
-          lblTool.setBackground(Color.WHITE);
-        }
-      }
+      this.refreshBackground(this.toolLabelList, lblElement, 4);
+    } else if (this.starLabelList.contains(lblElement)) {
+      this.refreshBackground(this.starLabelList, lblElement, 108);
     }
   }
 

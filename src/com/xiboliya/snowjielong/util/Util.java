@@ -63,10 +63,23 @@ public final class Util {
   public static final ImageIcon ICON_PAUSE = new ImageIcon(ClassLoader.getSystemResource("res/pause.png")); // 暂停卡图标
   public static final ImageIcon ICON_DELAY = new ImageIcon(ClassLoader.getSystemResource("res/delay.png")); // 延时卡图标
   public static final ImageIcon ICON_ENERGY = new ImageIcon(ClassLoader.getSystemResource("res/energy.png")); // 体力卡图标
+  public static final ImageIcon ICON_STAR_1 = new ImageIcon(ClassLoader.getSystemResource("res/star_1.png")); // 天罡星图标
+  public static final ImageIcon ICON_STAR_2 = new ImageIcon(ClassLoader.getSystemResource("res/star_2.png")); // 地煞星图标
   public static final ImageIcon ICON_HINT_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/hint_small.png")); // 提示卡小图标
   public static final ImageIcon ICON_PAUSE_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/pause_small.png")); // 暂停卡小图标
   public static final ImageIcon ICON_DELAY_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/delay_small.png")); // 延时卡小图标
   public static final ImageIcon ICON_ENERGY_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/energy_small.png")); // 体力卡小图标
+  // 群星名称，即三十六天罡、七十二地煞
+  public static final String[] STAR_NAMES = new String[] {
+    "天魁星", "天罡星", "天机星", "天闲星", "天勇星", "天雄星", "天猛星", "天威星", "天英星", "天贵星", "天富星", "天满星",
+    "天孤星", "天伤星", "天立星", "天捷星", "天暗星", "天佑星", "天空星", "天速星", "天异星", "天杀星", "天微星", "天究星",
+    "天退星", "天寿星", "天剑星", "天平星", "天罪星", "天损星", "天败星", "天牢星", "天慧星", "天暴星", "天哭星", "天巧星",
+    "地魁星", "地煞星", "地勇星", "地杰星", "地雄星", "地威星", "地英星", "地奇星", "地猛星", "地文星", "地正星", "地阔星",
+    "地阖星", "地强星", "地暗星", "地轴星", "地会星", "地佐星", "地佑星", "地灵星", "地兽星", "地微星", "地慧星", "地暴星",
+    "地然星", "地猖星", "地狂星", "地飞星", "地走星", "地巧星", "地明星", "地进星", "地退星", "地满星", "地遂星", "地周星",
+    "地隐星", "地异星", "地理星", "地俊星", "地乐星", "地捷星", "地速星", "地镇星", "地稽星", "地魔星", "地妖星", "地幽星",
+    "地伏星", "地空星", "地僻星", "地全星", "地孤星", "地角星", "地短星", "地藏星", "地囚星", "地平星", "地损星", "地奴星",
+    "地察星", "地恶星", "地丑星", "地数星", "地阴星", "地刑星", "地壮星", "地劣星", "地健星", "地耗星", "地贼星", "地狗星" };
 
   /**
    * 由于此类为工具类，故将构造方法私有化

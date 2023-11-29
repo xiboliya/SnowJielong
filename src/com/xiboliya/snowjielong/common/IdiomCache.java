@@ -17,6 +17,8 @@
 
 package com.xiboliya.snowjielong.common;
 
+import java.util.HashMap;
+
 /**
  * 成语接龙游戏的进度存档类
  * 
@@ -56,6 +58,8 @@ public class IdiomCache {
   private int energy = 100;
   // 一天内第一次闯关的时间戳
   private long startTimeMillis;
+  // 群星图
+  private HashMap<String, Integer> starMap = new HashMap<String, Integer>();
 
   /**
    * 获取当前难度等级
@@ -343,5 +347,23 @@ public class IdiomCache {
    */
   public void setStartTimeMillis(long startTimeMillis) {
     this.startTimeMillis = startTimeMillis;
+  }
+
+  /**
+   * 获取群星图
+   * 
+   * @return 群星图
+   */
+  public HashMap<String, Integer> getStarMap() {
+    return this.starMap;
+  }
+
+  /**
+   * 设置群星图
+   * 
+   * @param starMap 群星图
+   */
+  public void setStarMap(HashMap<String, Integer> starMap) {
+    this.starMap = starMap;
   }
 }

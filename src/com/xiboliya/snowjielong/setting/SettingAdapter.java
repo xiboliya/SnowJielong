@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -169,6 +170,25 @@ public final class SettingAdapter {
             this.setting.idiomCache.setCurrentBarrierOrder(BarrierOrder.getItemByName(value));
           }
         }
+      } else {
+        if (node.getNodeName().equalsIgnoreCase("starMap")) {
+          String[] aarValue = ((Element) node).getAttribute("value").replace(" ", "").split(",");
+          if (aarValue != null && aarValue.length > 0) {
+            HashMap<String, Integer> starMap = new HashMap<String, Integer>();
+            for (String value : aarValue) {
+              int index = value.indexOf(":");
+              String name = value.substring(0, index);
+              int count = 0;
+              try {
+                count = Integer.parseInt(value.substring(index + 1));
+              } catch (Exception x) {
+                x.printStackTrace();
+              }
+              starMap.put(name, count);
+            }
+            this.setting.idiomCache.setStarMap(starMap);
+          }
+        }
       }
     }
   }
@@ -242,6 +262,19 @@ public final class SettingAdapter {
           node.setTextContent(String.valueOf(this.setting.idiomCache.getStartTimeMillis()));
         } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
           node.setTextContent(String.valueOf(this.setting.idiomCache.isCurrentBarrierPassed()));
+        }
+      } else {
+        if (node.getNodeName().equalsIgnoreCase("starMap")) {
+          HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
+          StringBuilder value = new StringBuilder();
+          if (starMap != null && !starMap.isEmpty()) {
+            for (String key : starMap.keySet()) {
+              value.append(key).append(":").append(starMap.get(key)).append(",");
+            }
+            value.deleteCharAt(value.length() - 1);
+          }
+          Element element = (Element) node;
+          element.setAttribute("value", value.toString());
         }
       }
     }

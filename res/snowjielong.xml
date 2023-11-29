@@ -17,5 +17,6 @@
     <energyCount note="可用的体力卡数量">3</energyCount>
     <energy note="可用的体力">100</energy>
     <startTimeMillis note="一天内第一次闯关的时间戳">0</startTimeMillis>
+    <starMap note="群星图" value="" />
   </Idiom>
 </Setting>

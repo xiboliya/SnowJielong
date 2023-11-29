@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
@@ -1324,7 +1325,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void obtainReward() {
     Random random = new Random();
-    int index = random.nextInt(4);
+    int index = random.nextInt(5);
     switch (index) {
       case 0:
         this.obtainHint();
@@ -1337,6 +1338,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         break;
       case 3:
         this.obtainEnergy();
+        break;
+      case 4:
+        this.obtainStar();
         break;
       default:
         break;
@@ -1377,6 +1381,22 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.energyCount++;
     this.refreshEnergy();
     TipsWindow.show(this, "恭喜：获得1张体力卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+  }
+
+  /**
+   * 获得1颗星
+   */
+  private void obtainStar() {
+    Random random = new Random();
+    int index = random.nextInt(Util.STAR_NAMES.length);
+    String name = Util.STAR_NAMES[index];
+    HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
+    Integer count = starMap.get(name);
+    if (count == null) {
+      count = 0;
+    }
+    starMap.put(name, count + 1);
+    TipsWindow.show(this, "恭喜：获得1颗" + name + "！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
