@@ -58,7 +58,7 @@ public final class Util {
   public static final int MAX_FONT_SIZE = 100; // 字体最大值
   public static final int MSG_LINE_SIZE = 60; // 提示框中每行字符串显示的最大字数
   public static final Font TEXT_FONT = new Font("宋体", Font.PLAIN, 14); // 文本域的默认字体
-  public static final ImageIcon ICON_SW = new ImageIcon(ClassLoader.getSystemResource("res/icon.gif")); // 主程序图标
+  public static final ImageIcon ICON_SW = new ImageIcon(ClassLoader.getSystemResource("res/icon.png")); // 主程序图标
   public static final ImageIcon ICON_HINT = new ImageIcon(ClassLoader.getSystemResource("res/hint.png")); // 提示卡图标
   public static final ImageIcon ICON_PAUSE = new ImageIcon(ClassLoader.getSystemResource("res/pause.png")); // 暂停卡图标
   public static final ImageIcon ICON_DELAY = new ImageIcon(ClassLoader.getSystemResource("res/delay.png")); // 延时卡图标
