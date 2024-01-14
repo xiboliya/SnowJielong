@@ -151,3 +151,5 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 res/icon.gif（删除）
 res/icon.png（添加）
 src/com/xiboliya/snowjielong/util/Util.java
+2.补充中级成语。
+res/idiom/level1.txt
