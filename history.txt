@@ -145,3 +145,9 @@ src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 src/com/xiboliya/snowjielong/util/Util.java
 2.解决提示、暂停、延时功能在一关内连续使用的话，会出现次数为0时也可以继续使用的问题。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2024-01-14
+1.更新软件图标。
+res/icon.gif（删除）
+res/icon.png（添加）
+src/com/xiboliya/snowjielong/util/Util.java
