@@ -153,3 +153,7 @@ res/icon.png（添加）
 src/com/xiboliya/snowjielong/util/Util.java
 2.补充中级成语。
 res/idiom/level1.txt
+
+2024-01-19
+1.补充中级成语。
+res/idiom/level1.txt
