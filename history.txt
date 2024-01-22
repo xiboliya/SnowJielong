@@ -157,3 +157,7 @@ res/idiom/level1.txt
 2024-01-19
 1.补充中级成语。
 res/idiom/level1.txt
+
+2024-01-22
+1.补充中级成语。
+res/idiom/level1.txt
