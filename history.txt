@@ -165,3 +165,7 @@ res/idiom/level1.txt
 2024-04-03
 1.补充中级成语。
 res/idiom/level1.txt
+
+2024-04-07
+1.优化代码：将BigDecimal.divide方法的第三个参数改为官方推荐的枚举RoundingMode.HALF_UP。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
