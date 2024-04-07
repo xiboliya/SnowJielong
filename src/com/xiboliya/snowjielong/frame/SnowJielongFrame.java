@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -564,7 +565,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     try {
       BigDecimal number1 = new BigDecimal(this.usedTime);
       BigDecimal number2 = new BigDecimal(this.passedBarrierCount);
-      BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
+      BigDecimal number = number1.divide(number2, 1, RoundingMode.HALF_UP);
       return number.floatValue();
     } catch (Exception x) {
       // x.printStackTrace();
@@ -595,7 +596,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     try {
       BigDecimal number1 = new BigDecimal(this.totalRightCount * 100);
       BigDecimal number2 = new BigDecimal(this.totalSubmitCount);
-      BigDecimal number = number1.divide(number2, 1, BigDecimal.ROUND_HALF_UP);
+      BigDecimal number = number1.divide(number2, 1, RoundingMode.HALF_UP);
       return number.floatValue();
     } catch (Exception x) {
       // x.printStackTrace();
