@@ -173,3 +173,7 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2024-04-12
 1.补充中级成语。
 res/idiom/level1.txt
+
+2024-04-25
+1.补充中级成语。
+res/idiom/level1.txt
