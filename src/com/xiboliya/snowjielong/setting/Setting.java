@@ -19,10 +19,11 @@ package com.xiboliya.snowjielong.setting;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import com.xiboliya.snowjielong.common.IdiomCache;
+import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.util.Util;
 
 /**
@@ -33,5 +34,7 @@ import com.xiboliya.snowjielong.util.Util;
  */
 public class Setting {
   // 成语接龙游戏的进度存档
-  public IdiomCache idiomCache = new IdiomCache();
+  public ArrayList<User> userList = new ArrayList<User>();
+  // 当前账号的进度存档
+  public User user = null;
 }

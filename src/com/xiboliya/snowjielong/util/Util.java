@@ -35,6 +35,9 @@ import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import com.xiboliya.snowjielong.setting.Setting;
+import com.xiboliya.snowjielong.setting.SettingAdapter;
+
 /**
  * 实用工具类，包括可重用的各种属性和方法。设计为final类型，使本类不可被继承
  * 
@@ -46,7 +49,11 @@ public final class Util {
   public static final String VERSION = "V1.0"; // 软件版本号
   public static final String OS_NAME = System.getProperty("os.name", "Windows"); // 当前操作系统的名称
   public static final String FILE_SEPARATOR = System.getProperty("file.separator", "/"); // 当前操作系统的文件分隔符
-  public static final String SETTING_XML = "snowjielong.xml"; // 用来保存软件设置的配置文件名
+  public static final String SETTING_FILE_NAME = "snowjielong.cfg"; // 用来保存软件设置的配置文件名
+  public static final String SETTING_USER_SEPARATOR = "\n===\n"; // 配置文件中分隔账号的分隔符
+  public static final String CTRL_H = "Ctrl+H"; // 组合键Ctrl+H的字符串
+  public static final String CTRL_Y = "Ctrl+Y"; // 组合键Ctrl+Y的字符串
+  public static final String CTRL_Z = "Ctrl+Z"; // 组合键Ctrl+Z的字符串
   public static final int DEFAULT_FRAME_WIDTH = 570; // 窗口默认宽度
   public static final int DEFAULT_FRAME_HEIGHT = 650; // 窗口默认高度
   public static final int INPUT_HEIGHT = 22; // 单行输入框的高度
@@ -81,6 +88,8 @@ public final class Util {
     "地伏星", "地空星", "地僻星", "地全星", "地孤星", "地角星", "地短星", "地藏星", "地囚星", "地平星", "地损星", "地奴星",
     "地察星", "地恶星", "地丑星", "地数星", "地阴星", "地刑星", "地壮星", "地劣星", "地健星", "地耗星", "地贼星", "地狗星" };
 
+  public static Setting setting = new Setting(); // 软件参数配置类
+  public static SettingAdapter settingAdapter = new SettingAdapter(setting); // 用于解析和保存软件配置文件的工具类
   /**
    * 由于此类为工具类，故将构造方法私有化
    */

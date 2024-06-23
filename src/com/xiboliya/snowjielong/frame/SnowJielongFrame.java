@@ -65,8 +65,6 @@ import com.xiboliya.snowjielong.common.IdiomTag;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
 import com.xiboliya.snowjielong.dialog.DepositoryDialog;
 import com.xiboliya.snowjielong.dialog.RulesDialog;
-import com.xiboliya.snowjielong.setting.Setting;
-import com.xiboliya.snowjielong.setting.SettingAdapter;
 import com.xiboliya.snowjielong.util.Util;
 import com.xiboliya.snowjielong.window.TipsWindow;
 
@@ -86,10 +84,6 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  */
 public class SnowJielongFrame extends JFrame implements ActionListener, FocusListener {
   private static final long serialVersionUID = 1L;
-  // 软件参数配置类
-  private Setting setting = null;
-  // 用于解析和保存软件配置文件的工具类
-  private SettingAdapter settingAdapter = null;
   // 难度等级名称数组
   private static final String[] TOPIC_LEVEL_NAME = new String[] { "初级", "中级", "高级", "特级", "顶级" };
   // 各难度等级下每轮答题时间，单位：秒
@@ -114,6 +108,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JMenuItem itemAbout = new JMenuItem("关于(A)", 'A');
   private JPanel pnlMain = (JPanel) this.getContentPane();
   private JLabel lblTopic = new JLabel("题目：");
+  private JLabel lblUserName = new JLabel();
   private JLabel lblTopicLevel = new JLabel();
   private JLabel lblBarrier = new JLabel();
   private JLabel lblCountdown = new JLabel();
@@ -209,14 +204,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private TimerTask task = null;
 
   /**
-   * 带参数的构造方法，通过配置文件进行设置
-   * 
-   * @param setting 软件参数配置类
-   * @param settingAdapter 用于解析和保存软件配置文件的工具类
+   * 构造方法
    */
-  public SnowJielongFrame(Setting setting, SettingAdapter settingAdapter) {
-    this.setting = setting;
-    this.settingAdapter = settingAdapter;
+  public SnowJielongFrame() {
     this.setSize(570, 650);
     this.setLocationRelativeTo(null); // 使窗口居中显示
     this.setResizable(false);
@@ -265,7 +255,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     if (this.currentBarrierOrder == null) {
       this.refreshCurrentBarrierOrder();
     }
-    this.setting.idiomCache.setCurrentBarrierOrder(this.currentBarrierOrder);
+    Util.setting.user.idiomCache.setCurrentBarrierOrder(this.currentBarrierOrder);
     this.sortIdiomList();
   }
 
@@ -369,7 +359,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 读取游戏存档
    */
   private void loadIdiomCache() {
-    IdiomCache idiomCache = this.setting.idiomCache;
+    IdiomCache idiomCache = Util.setting.user.idiomCache;
     this.currentTopicLevel = idiomCache.getCurrentTopicLevel();
     this.currentBarrierOrder = idiomCache.getCurrentBarrierOrder();
     this.currentBarrier = idiomCache.getCurrentBarrier();
@@ -417,6 +407,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void initPanel() {
     this.pnlMain.setLayout(null);
     this.lblTopic.setBounds(145, 5, 100, Util.VIEW_HEIGHT);
+    this.lblUserName.setBounds(5, 5, 135, Util.VIEW_HEIGHT);
     this.lblTopicLevel.setBounds(5, 30, 135, Util.VIEW_HEIGHT);
     this.lblBarrier.setBounds(5, 70, 135, Util.VIEW_HEIGHT);
     this.lblCountdown.setBounds(5, 110, 135, Util.VIEW_HEIGHT);
@@ -427,6 +418,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.lblAccuracy.setBounds(5, 310, 135, Util.VIEW_HEIGHT);
     this.lblEnergy.setBounds(5, 350, 135, Util.VIEW_HEIGHT);
     this.pnlCenter.setBounds(140, 30, 400, 400);
+    this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.lblTopicLevel);
     this.pnlMain.add(this.lblBarrier);
     this.pnlMain.add(this.lblCountdown);
@@ -478,6 +470,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 初始化界面显示
    */
   private void initView() {
+    this.lblUserName.setText("账号：" + Util.setting.user.getUserName());
     this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
     this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + this.idiomList.size() + "关");
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
@@ -653,18 +646,18 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     if (this.startTimeMillis <= 0) {
       // 第一次闯关，记录时间戳
       this.startTimeMillis = currentTimeMillis;
-      this.setting.idiomCache.setStartTimeMillis(this.startTimeMillis);
+      Util.setting.user.idiomCache.setStartTimeMillis(this.startTimeMillis);
     } else {
       String dateCurrent = this.simpleDateFormat.format(new Date(currentTimeMillis));
       String dateStart = this.simpleDateFormat.format(new Date(this.startTimeMillis));
       if (!dateCurrent.equals(dateStart)) {
         // 不是同一天，重新记录时间戳，体力恢复为100
         this.startTimeMillis = currentTimeMillis;
-        this.setting.idiomCache.setStartTimeMillis(this.startTimeMillis);
+        Util.setting.user.idiomCache.setStartTimeMillis(this.startTimeMillis);
         if (this.energy < 100) {
           this.energy = 100;
         }
-        this.setting.idiomCache.setEnergy(this.energy);
+        Util.setting.user.idiomCache.setEnergy(this.energy);
       }
     }
     if (this.energy <= 0) {
@@ -672,7 +665,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       return;
     }
     this.energy--;
-    this.setting.idiomCache.setEnergy(this.energy);
+    Util.setting.user.idiomCache.setEnergy(this.energy);
     this.lblEnergy.setText("体力：" + this.energy);
     this.btnStart.setText("下一关");
     this.btnStart.setEnabled(false);
@@ -681,7 +674,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnDelay.setEnabled(this.delayCount > 0);
     this.setCellsVisible(true);
     this.isCurrentBarrierPassed = false;
-    this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
+    Util.setting.user.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
     this.clearElementsText();
     this.charCellIndexList.clear();
     this.answerCellIndexList.clear();
@@ -896,7 +889,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.countdown--;
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
     this.usedTime++;
-    this.setting.idiomCache.setUsedTime(this.usedTime);
+    Util.setting.user.idiomCache.setUsedTime(this.usedTime);
     if (this.countdown <= 0) {
       this.stopTimer();
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
@@ -1091,12 +1084,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     lblAnswer.setText(optionText);
     this.answerTimes++;
     this.totalSubmitCount++;
-    this.setting.idiomCache.setTotalSubmitCount(this.totalSubmitCount);
+    Util.setting.user.idiomCache.setTotalSubmitCount(this.totalSubmitCount);
     IdiomTag IdiomTag = (IdiomTag)lblAnswer.getTag();
     String content = IdiomTag.getContent();
     if (optionText.equals(content)) {
       this.totalRightCount++;
-      this.setting.idiomCache.setTotalRightCount(this.totalRightCount);
+      Util.setting.user.idiomCache.setTotalRightCount(this.totalRightCount);
       this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
       this.refreshCharCellList(lblAnswer);
       if (!this.isAllAnswerRight()) {
@@ -1105,11 +1098,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.stopTimer();
       int currentScore = this.getCurrentScore();
       this.totalScore += currentScore;
-      this.setting.idiomCache.setTotalScore(this.totalScore);
+      Util.setting.user.idiomCache.setTotalScore(this.totalScore);
       this.isCurrentBarrierPassed = true;
-      this.setting.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
+      Util.setting.user.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
       this.passedBarrierCount++;
-      this.setting.idiomCache.setPassedBarrierCount(this.passedBarrierCount);
+      Util.setting.user.idiomCache.setPassedBarrierCount(this.passedBarrierCount);
       this.currentBarrierFailTimes = 0;
       this.countdown = 0;
       this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
@@ -1131,7 +1124,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
           JOptionPane.showMessageDialog(this, "恭喜通关！已没有更多成语可以挑战了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
         }
       }
-      this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
+      Util.setting.user.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
       this.reward();
     } else {
       this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
@@ -1142,7 +1135,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.currentBarrierFailTimes++;
         this.countdown = 0;
         this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
-        this.setting.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
+        Util.setting.user.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
         TipsWindow.show(this, "已超过作答次数，闯关失败！");
         this.btnStart.setText("重新闯关");
         this.btnStart.setEnabled(true);
@@ -1391,7 +1384,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     Random random = new Random();
     int index = random.nextInt(Util.STAR_NAMES.length);
     String name = Util.STAR_NAMES[index];
-    HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
+    HashMap<String, Integer> starMap = Util.setting.user.idiomCache.getStarMap();
     Integer count = starMap.get(name);
     if (count == null) {
       count = 0;
@@ -1412,23 +1405,23 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.stopTimer();
     this.currentRankLevel = 0;
     this.answerTimes = 0;
-    this.setting.idiomCache = new IdiomCache();
-    this.currentTopicLevel = this.setting.idiomCache.getCurrentTopicLevel();
-    this.currentBarrierOrder = this.setting.idiomCache.getCurrentBarrierOrder();
-    this.currentBarrier = this.setting.idiomCache.getCurrentBarrier();
-    this.currentBarrierFailTimes = this.setting.idiomCache.getCurrentBarrierFailTimes();
-    this.isCurrentBarrierPassed = this.setting.idiomCache.isCurrentBarrierPassed();
-    this.totalScore = this.setting.idiomCache.getTotalScore();
-    this.usedTime = this.setting.idiomCache.getUsedTime();
-    this.passedBarrierCount = this.setting.idiomCache.getPassedBarrierCount();
-    this.totalSubmitCount = this.setting.idiomCache.getTotalSubmitCount();
-    this.totalRightCount = this.setting.idiomCache.getTotalRightCount();
-    this.hintCount = this.setting.idiomCache.getHintCount();
-    this.pauseCount = this.setting.idiomCache.getPauseCount();
-    this.delayCount = this.setting.idiomCache.getDelayCount();
-    this.energyCount = this.setting.idiomCache.getEnergyCount();
-    this.energy = this.setting.idiomCache.getEnergy();
-    this.startTimeMillis = this.setting.idiomCache.getStartTimeMillis();
+    Util.setting.user.idiomCache = new IdiomCache();
+    this.currentTopicLevel = Util.setting.user.idiomCache.getCurrentTopicLevel();
+    this.currentBarrierOrder = Util.setting.user.idiomCache.getCurrentBarrierOrder();
+    this.currentBarrier = Util.setting.user.idiomCache.getCurrentBarrier();
+    this.currentBarrierFailTimes = Util.setting.user.idiomCache.getCurrentBarrierFailTimes();
+    this.isCurrentBarrierPassed = Util.setting.user.idiomCache.isCurrentBarrierPassed();
+    this.totalScore = Util.setting.user.idiomCache.getTotalScore();
+    this.usedTime = Util.setting.user.idiomCache.getUsedTime();
+    this.passedBarrierCount = Util.setting.user.idiomCache.getPassedBarrierCount();
+    this.totalSubmitCount = Util.setting.user.idiomCache.getTotalSubmitCount();
+    this.totalRightCount = Util.setting.user.idiomCache.getTotalRightCount();
+    this.hintCount = Util.setting.user.idiomCache.getHintCount();
+    this.pauseCount = Util.setting.user.idiomCache.getPauseCount();
+    this.delayCount = Util.setting.user.idiomCache.getDelayCount();
+    this.energyCount = Util.setting.user.idiomCache.getEnergyCount();
+    this.energy = Util.setting.user.idiomCache.getEnergy();
+    this.startTimeMillis = Util.setting.user.idiomCache.getStartTimeMillis();
     this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.initIdiomList();
     this.refreshElements();
@@ -1450,7 +1443,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void openDepositoryDialog() {
     if (this.depositoryDialog == null) {
-      this.depositoryDialog = new DepositoryDialog(this, true, this.setting);
+      this.depositoryDialog = new DepositoryDialog(this, true, Util.setting);
     } else {
       this.depositoryDialog.setVisible(true);
     }
@@ -1505,7 +1498,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新提示功能
    */
   private void refreshHint() {
-    this.setting.idiomCache.setHintCount(this.hintCount);
+    Util.setting.user.idiomCache.setHintCount(this.hintCount);
     this.btnHint.setEnabled(this.hintCount > 0);
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
   }
@@ -1555,7 +1548,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新暂停功能
    */
   private void refreshPause() {
-    this.setting.idiomCache.setPauseCount(this.pauseCount);
+    Util.setting.user.idiomCache.setPauseCount(this.pauseCount);
     this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
   }
 
@@ -1576,7 +1569,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新延时功能
    */
   private void refreshDelay() {
-    this.setting.idiomCache.setDelayCount(this.delayCount);
+    Util.setting.user.idiomCache.setDelayCount(this.delayCount);
     this.btnDelay.setEnabled(this.delayCount > 0);
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
   }
@@ -1587,7 +1580,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void energy() {
     // 使用一次体力卡，增加体力值：5
     this.energy += 5;
-    this.setting.idiomCache.setEnergy(this.energy);
+    Util.setting.user.idiomCache.setEnergy(this.energy);
     this.lblEnergy.setText("体力：" + this.energy);
     this.energyCount--;
     this.refreshEnergy();
@@ -1597,7 +1590,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新体力功能
    */
   private void refreshEnergy() {
-    this.setting.idiomCache.setEnergyCount(this.energyCount);
+    Util.setting.user.idiomCache.setEnergyCount(this.energyCount);
     this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
     this.btnEnergy.setEnabled(this.energyCount > 0);
   }
@@ -1624,19 +1617,19 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
           this.currentTopicLevel++;
-          this.setting.idiomCache.setCurrentTopicLevel(this.currentTopicLevel);
+          Util.setting.user.idiomCache.setCurrentTopicLevel(this.currentTopicLevel);
           this.currentBarrierOrder = null;
           this.initIdiomList();
           this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
           this.currentBarrier = 0;
-          this.setting.idiomCache.setCurrentBarrier(this.currentBarrier);
+          Util.setting.user.idiomCache.setCurrentBarrier(this.currentBarrier);
           this.refreshElements();
         } else {
           TipsWindow.show(this, "您已通关，没有成语可以挑战了！", TipsWindow.Background.GREEN);
         }
       } else {
         this.currentBarrier++;
-        this.setting.idiomCache.setCurrentBarrier(this.currentBarrier);
+        Util.setting.user.idiomCache.setCurrentBarrier(this.currentBarrier);
         this.refreshElements();
       }
     } else if (this.countdown <= 0) {
@@ -1658,7 +1651,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       }
     }
     this.stopTimer();
-    this.settingAdapter.save();
+    Util.settingAdapter.save();
     System.exit(0);
   }
 

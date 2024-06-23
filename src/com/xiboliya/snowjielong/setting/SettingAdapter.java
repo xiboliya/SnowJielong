@@ -17,25 +17,19 @@
 
 package com.xiboliya.snowjielong.setting;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.xiboliya.snowjielong.common.BarrierOrder;
+import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.util.Util;
 
 /**
@@ -46,8 +40,8 @@ import com.xiboliya.snowjielong.util.Util;
  */
 public final class SettingAdapter {
   private Setting setting = null; // 软件参数配置类
-  private URI uri = null; // XML配置文件的URI
-  private File file = null; // XML配置文件
+  private URI uri = null; // 配置文件的URI
+  private File file = null; // 配置文件
 
   /**
    * 带参数的构造方法
@@ -61,14 +55,14 @@ public final class SettingAdapter {
   }
 
   /**
-   * 初始化XML配置文件
+   * 初始化配置文件
    */
   private void initSettingFile() {
     String dir = SettingAdapter.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     dir = new File(dir).getParent();
     dir = dir.replace(Util.FILE_SEPARATOR, "/"); // 将当前操作系统的文件分隔符统一替换为Unix/Linux风格，以避免在Windows系统下出现URI语法错误的问题。
     try {
-      this.uri = new URI("file:///" + dir + "/" + Util.SETTING_XML); // 使用URI来构建文件，避免出现由于路径中存在空格或中文所导致的错误
+      this.uri = new URI("file:///" + dir + "/" + Util.SETTING_FILE_NAME); // 使用URI来构建文件，避免出现由于路径中存在空格或中文所导致的错误
     } catch (URISyntaxException x) {
       // x.printStackTrace();
     }
@@ -86,206 +80,356 @@ public final class SettingAdapter {
   }
 
   /**
-   * 解析XML配置文件的方法
+   * 解析配置文件的方法
    */
   public void parse() {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    if (!this.file.exists()) {
+      return;
+    }
+    String content = this.toOpenFile();
+    if (!Util.isTextEmpty(content)) {
+      this.parseSetting(content);
+    }
+  }
+
+  /**
+   * 获取配置文件文本
+   * @return 配置文件文本
+   */
+  private String toOpenFile() {
+    FileInputStream fileInputStream = null;
+    InputStreamReader inputStreamReader = null;
     try {
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      if (!this.file.exists()) {
-        return;
+      fileInputStream = new FileInputStream(this.file);
+      StringBuilder stbTemp = new StringBuilder();
+      inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+      char[] chrBuf = new char[Util.BUFFER_LENGTH];
+      int len = 0;
+      while ((len = inputStreamReader.read(chrBuf)) != -1) {
+        stbTemp.append(chrBuf, 0, len);
       }
-      Document document = builder.parse(this.file);
-      Element root = document.getDocumentElement();
-      NodeList nodeList = root.getElementsByTagName("Idiom");
-      parseIdiom(nodeList);
+      String strTemp = stbTemp.toString();
+      strTemp = strTemp.replaceAll("\r\n", "\n");
+      strTemp = strTemp.replaceAll("\r", "\n");
+      return strTemp;
+    } catch (Exception x) {
+      // x.printStackTrace();
+    } finally {
+      try {
+        if (fileInputStream != null) {
+          fileInputStream.close();
+        }
+        if (inputStreamReader != null) {
+          inputStreamReader.close();
+        }
+      } catch (Exception x) {
+        // x.printStackTrace();
+      }
+    }
+    return "";
+  }
+
+  /**
+   * 解析配置文件文本
+   * @param content 配置文件文本
+   */
+  private void parseSetting(String content) {
+    String[] arrUser = content.split(Util.SETTING_USER_SEPARATOR);
+    for (String strUser : arrUser) {
+      User user = this.parseUser(strUser);
+      if (user != null) {
+        this.setting.userList.add(user);
+      }
+    }
+  }
+
+  /**
+   * 解析账号文本
+   * @param strUser 账号文本
+   * @return 账号
+   */
+  private User parseUser(String strUser) {
+    String[] arrLine = strUser.split("\n");
+    if (arrLine == null || arrLine.length <= 0) {
+      return null;
+    }
+    User user = new User();
+    for (String strLine : arrLine) {
+      int index = strLine.indexOf("=");
+      if (index <= 0) {
+        continue;
+      }
+      String key = strLine.substring(0, index).trim();
+      String value = strLine.substring(index + 1).trim();
+      if (key.equals("userName") && !Util.isTextEmpty(value)) {
+        user.setUserName(value);
+      } else if (key.equals("password") && !Util.isTextEmpty(value)) {
+        user.setPassword(value);
+      } else if (key.equals("currentTopicLevel") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setCurrentTopicLevel(this.getNumber(value));
+      } else if (key.equals("currentBarrierOrder") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setCurrentBarrierOrder(BarrierOrder.getItemByName(value));
+      } else if (key.equals("currentBarrier") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setCurrentBarrier(this.getNumber(value));
+      } else if (key.equals("currentBarrierFailTimes") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setCurrentBarrierFailTimes(this.getNumber(value));
+      } else if (key.equals("isCurrentBarrierPassed") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setCurrentBarrierPassed(this.getBoolean(value));
+      } else if (key.equals("totalScore") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setTotalScore(this.getNumber(value));
+      } else if (key.equals("usedTime") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setUsedTime(this.getNumber(value));
+      } else if (key.equals("passedBarrierCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setPassedBarrierCount(this.getNumber(value));
+      } else if (key.equals("totalSubmitCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setTotalSubmitCount(this.getNumber(value));
+      } else if (key.equals("totalRightCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setTotalRightCount(this.getNumber(value));
+      } else if (key.equals("hintCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setHintCount(this.getNumber(value));
+      } else if (key.equals("pauseCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setPauseCount(this.getNumber(value));
+      } else if (key.equals("delayCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setDelayCount(this.getNumber(value));
+      } else if (key.equals("energyCount") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setEnergyCount(this.getNumber(value));
+      } else if (key.equals("energy") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setEnergy(this.getNumber(value));
+      } else if (key.equals("startTimeMillis") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setStartTimeMillis(this.getLongNumber(value));
+      } else if (key.equals("starMap") && !Util.isTextEmpty(value)) {
+        user.idiomCache.setStarMap(this.getHashMap(value));
+      }
+    }
+    return user;
+  }
+
+  /**
+   * 将文本转换为数字
+   * @param value 文本
+   * @return 数字
+   */
+  private int getNumber(String value) {
+    int number = 0;
+    try {
+      number = Integer.parseInt(value);
     } catch (Exception x) {
       // x.printStackTrace();
     }
+    return number;
   }
 
   /**
-   * Idiom节点的解析方法
-   * 
-   * @param nodeList
-   *          节点列表
+   * 将文本转换为布尔值
+   * @param value 文本
+   * @return 布尔值
    */
-  private void parseIdiom(NodeList nodeList) {
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      Node node = nodeList.item(i);
-      if (node.hasChildNodes()) {
-        NodeList list = node.getChildNodes();
-        parseIdiom(list); // 递归调用
-      } else if (node.getNodeType() == Node.TEXT_NODE) {
-        String key = node.getParentNode().getNodeName();
-        String value = node.getTextContent().trim();
-        if (!Util.isTextEmpty(value)) {
-          int number = 0;
-          try {
-            number = Integer.parseInt(value);
-          } catch (NumberFormatException x) {
-            // x.printStackTrace();
-          }
-          if (key.equalsIgnoreCase("currentTopicLevel")) {
-            this.setting.idiomCache.setCurrentTopicLevel(number);
-          } else if (key.equalsIgnoreCase("currentBarrier")) {
-            this.setting.idiomCache.setCurrentBarrier(number);
-          } else if (key.equalsIgnoreCase("currentBarrierFailTimes")) {
-            this.setting.idiomCache.setCurrentBarrierFailTimes(number);
-          } else if (key.equalsIgnoreCase("totalScore")) {
-            this.setting.idiomCache.setTotalScore(number);
-          } else if (key.equalsIgnoreCase("usedTime")) {
-            this.setting.idiomCache.setUsedTime(number);
-          } else if (key.equalsIgnoreCase("passedBarrierCount")) {
-            this.setting.idiomCache.setPassedBarrierCount(number);
-          } else if (key.equalsIgnoreCase("totalSubmitCount")) {
-            this.setting.idiomCache.setTotalSubmitCount(number);
-          } else if (key.equalsIgnoreCase("totalRightCount")) {
-            this.setting.idiomCache.setTotalRightCount(number);
-          } else if (key.equalsIgnoreCase("hintCount")) {
-            this.setting.idiomCache.setHintCount(number);
-          } else if (key.equalsIgnoreCase("pauseCount")) {
-            this.setting.idiomCache.setPauseCount(number);
-          } else if (key.equalsIgnoreCase("delayCount")) {
-            this.setting.idiomCache.setDelayCount(number);
-          } else if (key.equalsIgnoreCase("energyCount")) {
-            this.setting.idiomCache.setEnergyCount(number);
-          } else if (key.equalsIgnoreCase("energy")) {
-            this.setting.idiomCache.setEnergy(number);
-          } else if (key.equalsIgnoreCase("startTimeMillis")) {
-            long longNumber = 0L;
-            try {
-              longNumber = Long.parseLong(value);
-            } catch (NumberFormatException x) {
-              // x.printStackTrace();
-            }
-            this.setting.idiomCache.setStartTimeMillis(longNumber);
-          } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
-            boolean logic = false;
-            if (value.equalsIgnoreCase("true")) {
-              logic = true;
-            }
-            this.setting.idiomCache.setCurrentBarrierPassed(logic);
-          } else if (key.equalsIgnoreCase("currentBarrierOrder")) {
-            this.setting.idiomCache.setCurrentBarrierOrder(BarrierOrder.getItemByName(value));
-          }
-        }
-      } else {
-        if (node.getNodeName().equalsIgnoreCase("starMap")) {
-          String[] aarValue = ((Element) node).getAttribute("value").replace(" ", "").split(",");
-          if (aarValue != null && aarValue.length > 0) {
-            HashMap<String, Integer> starMap = new HashMap<String, Integer>();
-            for (String value : aarValue) {
-              int index = value.indexOf(":");
-              String name = value.substring(0, index);
-              int count = 0;
-              try {
-                count = Integer.parseInt(value.substring(index + 1));
-              } catch (Exception x) {
-                x.printStackTrace();
-              }
-              starMap.put(name, count);
-            }
-            this.setting.idiomCache.setStarMap(starMap);
-          }
-        }
+  private boolean getBoolean(String value) {
+    boolean logic = false;
+    if (value.equalsIgnoreCase("true")) {
+      logic = true;
+    }
+    return logic;
+  }
+
+  /**
+   * 将文本转换为长整数
+   * @param value 文本
+   * @return 长整数
+   */
+  private long getLongNumber(String value) {
+    long longNumber = 0L;
+    try {
+      longNumber = Long.parseLong(value);
+    } catch (Exception x) {
+      // x.printStackTrace();
+    }
+    return longNumber;
+  }
+
+  /**
+   * 将文本转换为map
+   * @param value 文本
+   * @return map
+   */
+  private HashMap<String, Integer> getHashMap(String value) {
+    String[] aarValue = value.replace(" ", "").split(",");
+    if (aarValue == null || aarValue.length <= 0) {
+      return null;
+    }
+    HashMap<String, Integer> starMap = new HashMap<String, Integer>();
+    for (String item : aarValue) {
+      int index = item.indexOf(":");
+      String name = item.substring(0, index);
+      int count = this.getNumber(item.substring(index + 1));
+      starMap.put(name, count);
+    }
+    return starMap;
+  }
+
+  /**
+   * 注册账号
+   * @param userName 账号
+   * @param password 密码
+   * @return 是否注册成功，true表示注册成功，false反之
+   */
+  public boolean register(String userName, String password) {
+    if (Util.isTextEmpty(userName) || Util.isTextEmpty(password)) {
+      return false;
+    }
+    if (this.isUserExist(userName)) {
+      return false;
+    }
+    User user = new User(userName, password);
+    this.setting.userList.add(user);
+    String content = this.getContents(this.setting.userList);
+    this.toSaveFile(content);
+    return true;
+  }
+
+  /**
+   * 登录账号
+   * @param userName 账号
+   * @param password 密码
+   * @return 是否登录成功，true表示登录成功，false反之
+   */
+  public boolean login(String userName, String password) {
+    if (Util.isTextEmpty(userName) || Util.isTextEmpty(password)) {
+      return false;
+    }
+    User user = this.getUser(userName);
+    if (user == null) {
+      return false;
+    }
+    String strPassword = user.getPassword();
+    if (password.equals(strPassword)) {
+      this.setting.user = user;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * 账号是否已存在
+   * @param userName 账号
+   * @return 账号是否已存在，true表示账号已存在，false反之
+   */
+  private boolean isUserExist(String userName) {
+    if (this.setting.userList.isEmpty()) {
+      return false;
+    }
+    for (User user : this.setting.userList) {
+      if (userName.equals(user.getUserName())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 将账号列表转换为文本
+   * @param userList 账号列表
+   * @return 账号列表的文本
+   */
+  private String getContents(ArrayList<User> userList) {
+    StringBuilder stbResult = new StringBuilder();
+    for (User user : userList) {
+      stbResult.append(this.getContent(user));
+    }
+    return stbResult.toString();
+  }
+
+  /**
+   * 将账号转换为文本
+   * @param user 账号
+   * @return 账号的文本
+   */
+  private String getContent(User user) {
+    StringBuilder stbResult = new StringBuilder();
+    stbResult.append("userName=" + user.getUserName() + "\n");
+    stbResult.append("password=" + user.getPassword() + "\n");
+    stbResult.append("currentTopicLevel=" + user.idiomCache.getCurrentTopicLevel() + "\n");
+    stbResult.append("currentBarrierOrder=" + user.idiomCache.getCurrentBarrierOrder() + "\n");
+    stbResult.append("currentBarrier=" + user.idiomCache.getCurrentBarrier() + "\n");
+    stbResult.append("currentBarrierFailTimes=" + user.idiomCache.getCurrentBarrierFailTimes() + "\n");
+    stbResult.append("isCurrentBarrierPassed=" + String.valueOf(user.idiomCache.isCurrentBarrierPassed()) + "\n");
+    stbResult.append("totalScore=" + user.idiomCache.getTotalScore() + "\n");
+    stbResult.append("usedTime=" + user.idiomCache.getUsedTime() + "\n");
+    stbResult.append("passedBarrierCount=" + user.idiomCache.getPassedBarrierCount() + "\n");
+    stbResult.append("totalSubmitCount=" + user.idiomCache.getTotalSubmitCount() + "\n");
+    stbResult.append("totalRightCount=" + user.idiomCache.getTotalRightCount() + "\n");
+    stbResult.append("hintCount=" + user.idiomCache.getHintCount() + "\n");
+    stbResult.append("pauseCount=" + user.idiomCache.getPauseCount() + "\n");
+    stbResult.append("delayCount=" + user.idiomCache.getDelayCount() + "\n");
+    stbResult.append("energyCount=" + user.idiomCache.getEnergyCount() + "\n");
+    stbResult.append("energy=" + user.idiomCache.getEnergy() + "\n");
+    stbResult.append("startTimeMillis=" + String.valueOf(user.idiomCache.getStartTimeMillis()) + "\n");
+    stbResult.append("starMap=" + this.getStarMapText(user.idiomCache.getStarMap()) + "\n");
+    stbResult.append(Util.SETTING_USER_SEPARATOR);
+    return stbResult.toString();
+  }
+
+  /**
+   * 将群星图map转换为文本
+   * @param starMap 群星图map
+   * @return 群星图map的文本
+   */
+  private String getStarMapText(HashMap<String, Integer> starMap) {
+    StringBuilder value = new StringBuilder();
+    if (starMap != null && !starMap.isEmpty()) {
+      for (String key : starMap.keySet()) {
+        value.append(key).append(":").append(starMap.get(key)).append(",");
+      }
+      value.deleteCharAt(value.length() - 1);
+    }
+    return value.toString();
+  }
+
+  /**
+   * 保存配置文件
+   * @param content 配置文件文本
+   */
+  private void toSaveFile(String content) {
+    FileOutputStream fileOutputStream = null;
+    try {
+      fileOutputStream = new FileOutputStream(this.file);
+      byte[] byteStr = content.getBytes("UTF-8");
+      fileOutputStream.write(byteStr);
+    } catch (Exception x) {
+      // x.printStackTrace();
+    } finally {
+      try {
+        fileOutputStream.flush();
+        fileOutputStream.close();
+      } catch (Exception x) {
+        // x.printStackTrace();
       }
     }
   }
 
   /**
-   * 将软件设置保存到XML配置文件的方法
+   * 获取账号
+   * @param userName 用户名
+   * @return 账号
+   */
+  private User getUser(String userName) {
+    if (this.setting.userList.isEmpty()) {
+      return null;
+    }
+    for (User user : this.setting.userList) {
+      if (userName.equals(user.getUserName())) {
+        return user;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * 将软件设置保存到配置文件的方法
    */
   public void save() {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      DocumentBuilder builder = factory.newDocumentBuilder();
-      URL url = ClassLoader.getSystemResource("res/" + Util.SETTING_XML);
-      Document document = builder.parse(url.openStream());
-      Element root = document.getDocumentElement();
-      NodeList nodeList = root.getElementsByTagName("Idiom");
-      saveIdiom(nodeList);
-      // 以下操作最终将数据写入到硬盘文件中
-      TransformerFactory tff = TransformerFactory.newInstance();
-      Transformer tf = tff.newTransformer();
-      DOMSource ds = new DOMSource(document);
-      StreamResult sr = new StreamResult(this.file);
-      tf.transform(ds, sr);
-    } catch (Exception x) {
-      // x.printStackTrace();
-    }
+    String content = this.getContents(this.setting.userList);
+    this.toSaveFile(content);
   }
 
-  /**
-   * Idiom节点的保存方法
-   * 
-   * @param nodeList
-   *          节点列表
-   */
-  private void saveIdiom(NodeList nodeList) {
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      Node node = nodeList.item(i);
-      if (node.hasChildNodes()) {
-        NodeList list = node.getChildNodes();
-        saveIdiom(list); // 递归调用
-      } else if (node.getNodeType() == Node.TEXT_NODE) {
-        String key = node.getParentNode().getNodeName();
-        if (key.equalsIgnoreCase("currentTopicLevel")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentTopicLevel()));
-        } else if (key.equalsIgnoreCase("currentBarrierOrder")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentBarrierOrder()));
-        } else if (key.equalsIgnoreCase("currentBarrier")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentBarrier()));
-        } else if (key.equalsIgnoreCase("currentBarrierFailTimes")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getCurrentBarrierFailTimes()));
-        } else if (key.equalsIgnoreCase("totalScore")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalScore()));
-        } else if (key.equalsIgnoreCase("usedTime")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getUsedTime()));
-        } else if (key.equalsIgnoreCase("passedBarrierCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getPassedBarrierCount()));
-        } else if (key.equalsIgnoreCase("totalSubmitCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalSubmitCount()));
-        } else if (key.equalsIgnoreCase("totalRightCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getTotalRightCount()));
-        } else if (key.equalsIgnoreCase("hintCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getHintCount()));
-        } else if (key.equalsIgnoreCase("pauseCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getPauseCount()));
-        } else if (key.equalsIgnoreCase("delayCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getDelayCount()));
-        } else if (key.equalsIgnoreCase("energyCount")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getEnergyCount()));
-        } else if (key.equalsIgnoreCase("energy")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getEnergy()));
-        } else if (key.equalsIgnoreCase("startTimeMillis")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.getStartTimeMillis()));
-        } else if (key.equalsIgnoreCase("isCurrentBarrierPassed")) {
-          node.setTextContent(String.valueOf(this.setting.idiomCache.isCurrentBarrierPassed()));
-        }
-      } else {
-        if (node.getNodeName().equalsIgnoreCase("starMap")) {
-          HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
-          StringBuilder value = new StringBuilder();
-          if (starMap != null && !starMap.isEmpty()) {
-            for (String key : starMap.keySet()) {
-              value.append(key).append(":").append(starMap.get(key)).append(",");
-            }
-            value.deleteCharAt(value.length() - 1);
-          }
-          Element element = (Element) node;
-          element.setAttribute("value", value.toString());
-        }
-      }
-    }
-  }
-
-  /**
-   * 删除XML配置文件
-   */
-  public void deleteSettingFile() {
-    if (this.file.exists()) {
-      this.file.delete();
-    }
-  }
 }

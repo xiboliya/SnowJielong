@@ -163,7 +163,7 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   }
 
   private void updateToolPanel() {
-    IdiomCache idiomCache = this.setting.idiomCache;
+    IdiomCache idiomCache = this.setting.user.idiomCache;
     // 提示卡
     int hintCount = idiomCache.getHintCount();
     BaseLabel lblCellHint = this.toolLabelList.get(0);
@@ -219,7 +219,7 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   }
 
   private void updateStarPanel() {
-    HashMap<String, Integer> starMap = this.setting.idiomCache.getStarMap();
+    HashMap<String, Integer> starMap = this.setting.user.idiomCache.getStarMap();
     int size = this.starLabelList.size();
     for (int i = 0; i < size; i++) {
       BaseLabel lblElement = this.starLabelList.get(i);

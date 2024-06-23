@@ -19,8 +19,7 @@ package com.xiboliya.snowjielong;
 
 import javax.swing.SwingUtilities;
 
-import com.xiboliya.snowjielong.frame.SnowJielongFrame;
-import com.xiboliya.snowjielong.setting.Setting;
+import com.xiboliya.snowjielong.frame.LoginFrame;
 import com.xiboliya.snowjielong.setting.SettingAdapter;
 import com.xiboliya.snowjielong.util.Util;
 
@@ -40,12 +39,10 @@ public class SnowJielong {
   public static void main(final String[] args) {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        Setting setting = new Setting();
-        SettingAdapter settingAdapter = new SettingAdapter(setting);
-        settingAdapter.parse();
+        Util.settingAdapter.parse();
         Util.setDefaultFont();
         System.setProperty("java.awt.im.style", "on-the-spot"); // 去掉文本框输入中文时所弹出的输入窗口
-        new SnowJielongFrame(setting, settingAdapter); // 初始化界面和设置的同时打开文件
+        new LoginFrame();
       }
     });
   }
