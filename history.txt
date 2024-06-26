@@ -198,3 +198,7 @@ src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 src/com/xiboliya/snowjielong/util/Util.java
 2.补充中级成语。
 res/idiom/level1.txt
+
+2024-06-26
+1.补充中级成语。
+res/idiom/level1.txt
