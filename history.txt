@@ -202,3 +202,8 @@ res/idiom/level1.txt
 2024-06-26
 1.补充中级成语。
 res/idiom/level1.txt
+
+2024-06-30
+1.修改重复成语，并补充中级成语。
+res/idiom/level0.txt
+res/idiom/level1.txt
