@@ -207,3 +207,9 @@ res/idiom/level1.txt
 1.修改重复成语，并补充中级成语。
 res/idiom/level0.txt
 res/idiom/level1.txt
+
+2024-08-17
+1.修改初级的重复成语，删除临时成语，并添加高级成语。
+res/idiom/level0.txt
+res/idiom/level2.txt（添加）
+res/idiom/level9.txt（删除）
