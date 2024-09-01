@@ -213,3 +213,7 @@ res/idiom/level1.txt
 res/idiom/level0.txt
 res/idiom/level2.txt（添加）
 res/idiom/level9.txt（删除）
+
+2024-09-01
+1.补充高级成语。
+res/idiom/level2.txt
