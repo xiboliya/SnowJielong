@@ -217,3 +217,9 @@ res/idiom/level9.txt（删除）
 2024-09-01
 1.补充高级成语。
 res/idiom/level2.txt
+
+2024-10-21
+1.修改初级和中级的重复成语，并添加特级成语。
+res/idiom/level0.txt
+res/idiom/level1.txt
+res/idiom/level3.txt（添加）
