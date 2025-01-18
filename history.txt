@@ -223,3 +223,9 @@ res/idiom/level2.txt
 res/idiom/level0.txt
 res/idiom/level1.txt
 res/idiom/level3.txt（添加）
+
+2025-01-18
+1.修改中级和特级的重复成语，并添加顶级成语。
+res/idiom/level1.txt
+res/idiom/level3.txt
+res/idiom/level4.txt（添加）
