@@ -233,3 +233,7 @@ res/idiom/level4.txt（添加）
 2025-01-19
 1.补充高级成语备选项。
 res/idiom/level2.txt
+
+2025-01-20
+1.补充高级成语备选项。
+res/idiom/level2.txt
