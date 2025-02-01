@@ -352,6 +352,58 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
           }
         });
         break;
+      case CENTER_NUMBER_ASCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            String[] array1 = str1.split("#");
+            String[] array2 = str2.split("#");
+            str1 = array1[1];
+            str2 = array2[1];
+            return str1.compareTo(str2);
+          }
+        });
+        break;
+      case CENTER_NUMBER_DESCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            String[] array1 = str1.split("#");
+            String[] array2 = str2.split("#");
+            str1 = array1[1];
+            str2 = array2[1];
+            return str2.compareTo(str1);
+          }
+        });
+        break;
+      case CENTER_NUMBER_REVERSE_ASCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            String[] array1 = str1.split("#");
+            String[] array2 = str2.split("#");
+            StringBuilder stb1 = new StringBuilder(array1[1]);
+            StringBuilder stb2 = new StringBuilder(array2[1]);
+            stb1.reverse();
+            stb2.reverse();
+            return stb1.toString().compareTo(stb2.toString());
+          }
+        });
+        break;
+      case CENTER_NUMBER_REVERSE_DESCEND:
+        Collections.sort(this.idiomList, new Comparator<String>() {
+          @Override
+          public int compare(String str1, String str2) {
+            String[] array1 = str1.split("#");
+            String[] array2 = str2.split("#");
+            StringBuilder stb1 = new StringBuilder(array1[1]);
+            StringBuilder stb2 = new StringBuilder(array2[1]);
+            stb1.reverse();
+            stb2.reverse();
+            return stb2.toString().compareTo(stb1.toString());
+          }
+        });
+        break;
     }
   }
 
