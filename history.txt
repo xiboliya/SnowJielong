@@ -244,3 +244,7 @@ res/idiom/level2.txt
 2.新增2类4种当前难度等级的关卡顺序。
 src/com/xiboliya/snowjielong/common/BarrierOrder.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-02-05
+1.补充特级成语备选项。
+res/idiom/level3.txt
