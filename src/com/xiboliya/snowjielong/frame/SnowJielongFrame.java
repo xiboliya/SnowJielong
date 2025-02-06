@@ -742,8 +742,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     String[] idiomArray = itemSplit[0].split("，");
     // 规则数组
     String[] ruleArray = itemSplit[1].split("，");
-    int startIndex = this.getStartIndex(idiomArray, ruleArray);
-    this.viewCells(idiomArray, ruleArray, startIndex);
+    boolean isStartVertical = this.getRandomIsStartVertical();
+    int startIndex = this.getStartIndex(idiomArray, ruleArray, isStartVertical);
+    this.viewCells(idiomArray, ruleArray, startIndex, isStartVertical);
     // 备选答案
     String option = itemSplit[2];
     this.refreshOptionCell(option);
@@ -756,9 +757,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 获取当前题目显示的起始索引
    * @param idiomArray 成语数组
    * @param ruleArray 规则数组
+   * @param isStartVertical 第一个成语显示的方向
    * @return 当前题目显示的起始索引
    */
-  private int getStartIndex(String[] idiomArray, String[] ruleArray) {
+  private int getStartIndex(String[] idiomArray, String[] ruleArray, boolean isStartVertical) {
     int size = ruleArray.length;
     int startIndex = this.getRandomStartIndex();
     int tempStartIndex = startIndex;
@@ -777,9 +779,13 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         }
         if (i % 2 == 0) {
           if (i != 0) {
-            tempStartIndex -= answerIndexList.getFirst();
+            if (isStartVertical) {
+              tempStartIndex -= answerIndexList.getFirst() * 10;
+            } else {
+              tempStartIndex -= answerIndexList.getFirst();
+            }
           }
-          moveCount = this.checkViewCellIndex(tempStartIndex, answerIndexList, idiomArray[i], false, answerCellIndexList);
+          moveCount = this.checkViewCellIndex(tempStartIndex, answerIndexList, idiomArray[i], isStartVertical, answerCellIndexList);
           if (moveCount != 0) {
             startIndex += moveCount;
             tempStartIndex = startIndex;
@@ -787,8 +793,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
             break;
           }
         } else {
-          tempStartIndex -= answerIndexList.getFirst() * 10;
-          moveCount = this.checkViewCellIndex(tempStartIndex, answerIndexList, idiomArray[i], true, answerCellIndexList);
+          if (isStartVertical) {
+            tempStartIndex -= answerIndexList.getFirst();
+          } else {
+            tempStartIndex -= answerIndexList.getFirst() * 10;
+          }
+          moveCount = this.checkViewCellIndex(tempStartIndex, answerIndexList, idiomArray[i], !isStartVertical, answerCellIndexList);
           if (moveCount != 0) {
             startIndex += moveCount;
             tempStartIndex = startIndex;
@@ -809,6 +819,15 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     Random random = new Random();
     int randomIndex = random.nextInt(START_INDEX.length);
     return START_INDEX[randomIndex];
+  }
+
+  /**
+   * 随机获取当前题目第一个成语显示的方向
+   * @return 当前题目第一个成语显示的方向是否为竖向，true为竖向，否则为横向
+   */
+  private boolean getRandomIsStartVertical() {
+    Random random = new Random();
+    return random.nextBoolean();
   }
 
   /**
@@ -873,8 +892,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @param idiomArray 成语数组
    * @param ruleArray 规则数组
    * @param startIndex 当前题目显示的起始索引
+   * @param isStartVertical 第一个成语显示的方向
    */
-  private void viewCells(String[] idiomArray, String[] ruleArray, int startIndex) {
+  private void viewCells(String[] idiomArray, String[] ruleArray, int startIndex, boolean isStartVertical) {
     int size = ruleArray.length;
     int tempStartIndex = startIndex;
     for (int i = 0; i < size; i++) {
@@ -889,12 +909,20 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       }
       if (i % 2 == 0) {
         if (i != 0) {
-          tempStartIndex -= answerIndexList.getFirst();
+          if (isStartVertical) {
+            tempStartIndex -= answerIndexList.getFirst() * 10;
+          } else {
+            tempStartIndex -= answerIndexList.getFirst();
+          }
         }
-        this.viewCell(tempStartIndex, answerIndexList, idiomArray[i], false);
+        this.viewCell(tempStartIndex, answerIndexList, idiomArray[i], isStartVertical);
       } else {
-        tempStartIndex -= answerIndexList.getFirst() * 10;
-        this.viewCell(tempStartIndex, answerIndexList, idiomArray[i], true);
+        if (isStartVertical) {
+          tempStartIndex -= answerIndexList.getFirst();
+        } else {
+          tempStartIndex -= answerIndexList.getFirst() * 10;
+        }
+        this.viewCell(tempStartIndex, answerIndexList, idiomArray[i], !isStartVertical);
       }
     }
   }
