@@ -97,7 +97,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   // 头衔等级分数数组
   private static final int[] RANK_LEVEL_SCORE = new int[] { 0, 60, 180, 360, 600, 900, 1260, 1680, 2160, 2700, 3300, 3960, 4680 };
   // 当前题目显示的默认起始索引数组
-  private static final int[] START_INDEX = new int[] { 31, 32, 33, 34, 35, 41, 42, 43, 44, 45, 51, 52, 53, 54, 55, 61, 62, 63, 64, 65 };
+  private static final int[] START_INDEX = new int[] { 21, 22, 23, 24, 25, 31, 32, 33, 34, 35, 41, 42, 43, 44, 45, 51, 52, 53, 54, 55, 61, 62, 63, 64, 65, 71, 72, 73, 74, 75 };
   private JMenuBar menuBar = new JMenuBar();
   private JMenu menuGame = new JMenu("游戏(G)");
   private JMenuItem itemRestart = new JMenuItem("从头开始(R)", 'R');
