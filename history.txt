@@ -252,3 +252,7 @@ res/idiom/level3.txt
 2025-02-06
 1.每个题目的第一个成语的显示方向随机产生。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-02-08
+1.扩充当前题目显示的默认起始索引随机产生的数组元素。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
