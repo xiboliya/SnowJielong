@@ -29,6 +29,7 @@ import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseTextField;
+import com.xiboliya.snowjielong.common.RegisterResult;
 import com.xiboliya.snowjielong.util.Util;
 import com.xiboliya.snowjielong.window.TipsWindow;
 
@@ -104,44 +105,14 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
    */
   private void register() {
     String strUserName = this.txtUserName.getText();
-    if (Util.isTextEmpty(strUserName)) {
-      TipsWindow.show(this, "账号不能为空！");
-      return;
-    }
-    if (strUserName.matches(".*[ \t\r\n].*")) {
-      TipsWindow.show(this, "账号中不能含有空格、制表符等特殊字符！", TipsWindow.Background.PINK, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.BIGGER);
-      return;
-    }
     char[] aarPassword = this.psdPassword.getPassword();
-    if (aarPassword == null || aarPassword.length == 0) {
-      TipsWindow.show(this, "密码不能为空！");
-      return;
-    }
     char[] aarPasswordAgain = this.psdPasswordAgain.getPassword();
-    if (aarPasswordAgain == null || aarPasswordAgain.length == 0) {
-      TipsWindow.show(this, "确认密码不能为空！");
-      return;
-    }
-    if (aarPassword.length > 20 || aarPasswordAgain.length > 20) {
-      TipsWindow.show(this, "密码不能超过20个字符！");
-      return;
-    }
-    String strPassword = new String(aarPassword);
-    if (strPassword.matches(".*[ \t\r\n].*")) {
-      TipsWindow.show(this, "密码中不能含有空格、制表符等特殊字符！", TipsWindow.Background.PINK, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.BIGGER);
-      return;
-    }
-    String strPasswordAgain = new String(aarPasswordAgain);
-    if (!strPassword.equals(strPasswordAgain)) {
-      TipsWindow.show(this, "确认密码与密码必须相同！");
-      return;
-    }
-    boolean isSuccess = Util.settingAdapter.register(strUserName, strPassword);
-    if (isSuccess) {
-      JOptionPane.showMessageDialog(this, "注册成功！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
+    RegisterResult registerResult = Util.settingAdapter.register(strUserName, aarPassword, aarPasswordAgain);
+    if (registerResult.isSuccess()) {
+      JOptionPane.showMessageDialog(this, registerResult.toString(), Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
       this.onCancel();
     } else {
-      JOptionPane.showMessageDialog(this, "注册失败！", Util.SOFTWARE, JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, registerResult.toString(), Util.SOFTWARE, JOptionPane.ERROR_MESSAGE);
     }
   }
 

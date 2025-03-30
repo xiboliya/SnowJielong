@@ -30,6 +30,7 @@ import java.util.HashMap;
 
 import com.xiboliya.snowjielong.common.BarrierOrder;
 import com.xiboliya.snowjielong.common.LoginResult;
+import com.xiboliya.snowjielong.common.RegisterResult;
 import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.util.Util;
 
@@ -271,28 +272,49 @@ public final class SettingAdapter {
   /**
    * 注册账号
    * @param userName 账号
-   * @param password 密码
-   * @return 是否注册成功，true表示注册成功，false反之
+   * @param aarPassword 密码
+   * @param aarPasswordAgain 确认密码
+   * @return 注册结果
    */
-  public boolean register(String userName, String password) {
-    if (Util.isTextEmpty(userName) || Util.isTextEmpty(password)) {
-      return false;
+  public RegisterResult register(String userName, char[] aarPassword, char[] aarPasswordAgain) {
+    if (Util.isTextEmpty(userName)) {
+      return RegisterResult.USER_NAME_EMPTY;
+    }
+    if (aarPassword == null || aarPassword.length == 0) {
+      return RegisterResult.PASSWORD_EMPTY;
+    }
+    if (aarPasswordAgain == null || aarPasswordAgain.length == 0) {
+      return RegisterResult.PASSWORD_AGAIN_EMPTY;
+    }
+    if (userName.matches(".*[ \t\r\n].*")) {
+      return RegisterResult.USER_NAME_HAS_SPECIAL_CHAR;
+    }
+    if (aarPassword.length > 20 || aarPasswordAgain.length > 20) {
+      return RegisterResult.PASSWORD_MORE_THAN_20_CHARS;
+    }
+    String password = new String(aarPassword);
+    if (password.matches(".*[ \t\r\n].*")) {
+      return RegisterResult.PASSWORD_HAS_SPECIAL_CHAR;
+    }
+    String passwordAgain = new String(aarPasswordAgain);
+    if (!password.equals(passwordAgain)) {
+      return RegisterResult.PASSWORD_AND_PASSWORD_AGAIN_DIFFERENT;
     }
     if (this.isUserExist(userName)) {
-      return false;
+      return RegisterResult.USER_NAME_ALREADY_EXIST;
     }
     User user = new User(userName, password);
     this.setting.userList.add(user);
     String content = this.getContents(this.setting.userList);
     this.toSaveFile(content);
-    return true;
+    return RegisterResult.REGISTER_SUCCESS;
   }
 
   /**
    * 登录账号
    * @param userName 账号
    * @param aarPassword 密码
-   * @return 是否登录成功，true表示登录成功，false反之
+   * @return 登录结果
    */
   public LoginResult login(String userName, char[] aarPassword) {
     if (Util.isTextEmpty(userName)) {
