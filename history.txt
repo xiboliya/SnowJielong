@@ -270,3 +270,7 @@ src/com/xiboliya/snowjielong/dialog/RulesDialog.java
 src/com/xiboliya/snowjielong/common/LoginResult.java（添加）
 src/com/xiboliya/snowjielong/frame/LoginFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+4.注册页面中注册失败时，调整注册失败原因提示方式。
+src/com/xiboliya/snowjielong/common/RegisterResult.java（添加）
+src/com/xiboliya/snowjielong/dialog/RegisterDialog.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
