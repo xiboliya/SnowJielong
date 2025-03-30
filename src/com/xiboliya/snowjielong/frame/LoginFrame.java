@@ -29,6 +29,7 @@ import javax.swing.JPasswordField;
 
 import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseTextField;
+import com.xiboliya.snowjielong.common.LoginResult;
 import com.xiboliya.snowjielong.dialog.RegisterDialog;
 import com.xiboliya.snowjielong.util.Util;
 import com.xiboliya.snowjielong.window.TipsWindow;
@@ -124,23 +125,13 @@ public class LoginFrame extends JFrame implements ActionListener {
    */
   private void login() {
     String strUserName = this.txtUserName.getText();
-    if (Util.isTextEmpty(strUserName)) {
-      TipsWindow.show(this, "账号不能为空！");
-      return;
-    }
     char[] aarPassword = this.psdPassword.getPassword();
-    if (aarPassword == null || aarPassword.length == 0) {
-      TipsWindow.show(this, "密码不能为空！");
-      return;
-    }
-    String strPassword = new String(aarPassword);
-    boolean isSuccess = Util.settingAdapter.login(strUserName, strPassword);
-    if (isSuccess) {
-      TipsWindow.show(this, "登录成功！");
+    LoginResult loginResult = Util.settingAdapter.login(strUserName, aarPassword);
+    if (loginResult.isSuccess()) {
       new SnowJielongFrame();
       this.dispose();
     } else {
-      JOptionPane.showMessageDialog(this, "登录失败！", Util.SOFTWARE, JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(this, loginResult.toString(), Util.SOFTWARE, JOptionPane.ERROR_MESSAGE);
     }
   }
 

@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import com.xiboliya.snowjielong.common.BarrierOrder;
+import com.xiboliya.snowjielong.common.LoginResult;
 import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.util.Util;
 
@@ -290,23 +291,27 @@ public final class SettingAdapter {
   /**
    * 登录账号
    * @param userName 账号
-   * @param password 密码
+   * @param aarPassword 密码
    * @return 是否登录成功，true表示登录成功，false反之
    */
-  public boolean login(String userName, String password) {
-    if (Util.isTextEmpty(userName) || Util.isTextEmpty(password)) {
-      return false;
+  public LoginResult login(String userName, char[] aarPassword) {
+    if (Util.isTextEmpty(userName)) {
+      return LoginResult.USER_NAME_EMPTY;
+    }
+    if (aarPassword == null || aarPassword.length == 0) {
+      return LoginResult.PASSWORD_EMPTY;
     }
     User user = this.getUser(userName);
     if (user == null) {
-      return false;
+      return LoginResult.ACCOUNT_NOT_REGISTERED;
     }
+    String password = new String(aarPassword);
     String strPassword = user.getPassword();
     if (password.equals(strPassword)) {
       this.setting.user = user;
-      return true;
+      return LoginResult.LOGIN_SUCCESS;
     }
-    return false;
+    return LoginResult.PASSWORD_WRONG;
   }
 
   /**
