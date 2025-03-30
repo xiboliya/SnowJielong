@@ -260,3 +260,13 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2025-02-28
 1.补充特级成语备选项。
 res/idiom/level3.txt
+
+2025-03-30
+1.补充顶级成语备选项。
+res/idiom/level4.txt
+2.修改：游戏规则页面中规则描述。
+src/com/xiboliya/snowjielong/dialog/RulesDialog.java
+3.登录页面中登录失败时，添加登录失败原因提示。
+src/com/xiboliya/snowjielong/common/LoginResult.java（添加）
+src/com/xiboliya/snowjielong/frame/LoginFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
