@@ -280,3 +280,5 @@ src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 SnowJielong.bat
 2.每次打开注册页面的时候，清空所有输入框的内容。
 src/com/xiboliya/snowjielong/dialog/RegisterDialog.java
+3.补充顶级成语备选项。
+res/idiom/level4.txt
