@@ -68,6 +68,17 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
   }
 
   /**
+   * 重写父类的方法：显示或隐藏当前窗口
+   */
+  @Override
+  public void setVisible(boolean visible) {
+    this.txtUserName.setText("");
+    this.psdPassword.setText("");
+    this.psdPasswordAgain.setText("");
+    super.setVisible(visible);
+  }
+
+  /**
    * 初始化界面
    */
   private void init() {
