@@ -19,6 +19,7 @@ package com.xiboliya.snowjielong.frame;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -44,6 +45,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -51,8 +53,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EtchedBorder;
 
 import com.xiboliya.snowjielong.base.BaseButton;
@@ -101,6 +105,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private JMenuItem itemRestart = new JMenuItem("从头开始(R)", 'R');
   private JMenuItem itemDepository = new JMenuItem("仓库(D)...", 'D');
   private JMenuItem itemExit = new JMenuItem("退出(X)", 'X');
+  private JMenu menuSetting = new JMenu("设置(S)");
+  private JMenu menuScale = new JMenu("窗口缩放(C)");
+  private JRadioButtonMenuItem itemScaleDefault = new JRadioButtonMenuItem("原始比例(A)");
+  private JRadioButtonMenuItem itemScale10 = new JRadioButtonMenuItem("放大10%(B)");
+  private JRadioButtonMenuItem itemScale20 = new JRadioButtonMenuItem("放大20%(C)");
+  private JRadioButtonMenuItem itemScale30 = new JRadioButtonMenuItem("放大30%(D)");
+  private JRadioButtonMenuItem itemScale40 = new JRadioButtonMenuItem("放大40%(E)");
+  private JRadioButtonMenuItem itemScale50 = new JRadioButtonMenuItem("放大50%(F)");
   private JMenu menuHelp = new JMenu("帮助(H)");
   private JMenuItem itemHelp = new JMenuItem("游戏规则(H)", 'H');
   private JMenuItem itemAbout = new JMenuItem("关于(A)", 'A');
@@ -127,6 +139,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private BaseButton btnEnergy = new BaseButton("体力", Util.ICON_ENERGY_SMALL);
   private BaseButton btnStart = new BaseButton("开始闯关");
   private BaseButton btnCancel = new BaseButton("退出");
+
+  // 用于存放窗口缩放比例的按钮组
+  private ButtonGroup bgpScale = new ButtonGroup();
   private EtchedBorder etchedBorder = new EtchedBorder();
   private MouseAdapter mouseAdapter = null;
   private SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
@@ -205,7 +220,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 构造方法
    */
   public SnowJielongFrame() {
-    this.setSize(570, 650);
+    this.setSize(Util.getSize(570), Util.getSize(650));
     this.setLocationRelativeTo(null); // 使窗口居中显示
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // 设置默认关闭操作为空，以便添加窗口监听事件
@@ -447,6 +462,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.simpleDateFormat.applyPattern("yyyy-MM-dd");
     this.initPanel();
     this.initMenuBar();
+    this.setMenuDefaultInit();
     this.setMenuMnemonic();
     this.setMenuAccelerator();
   }
@@ -456,18 +472,18 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void initPanel() {
     this.pnlMain.setLayout(null);
-    this.lblTopic.setBounds(145, 5, 100, Util.VIEW_HEIGHT);
-    this.lblUserName.setBounds(5, 5, 135, Util.VIEW_HEIGHT);
-    this.lblTopicLevel.setBounds(5, 30, 135, Util.VIEW_HEIGHT);
-    this.lblBarrier.setBounds(5, 70, 135, Util.VIEW_HEIGHT);
-    this.lblCountdown.setBounds(5, 110, 135, Util.VIEW_HEIGHT);
-    this.lblScore.setBounds(5, 150, 135, Util.VIEW_HEIGHT);
-    this.lblTime.setBounds(5, 190, 135, Util.VIEW_HEIGHT);
-    this.lblRankLevel.setBounds(5, 230, 135, Util.VIEW_HEIGHT);
-    this.lblSpeed.setBounds(5, 270, 135, Util.VIEW_HEIGHT);
-    this.lblAccuracy.setBounds(5, 310, 135, Util.VIEW_HEIGHT);
-    this.lblEnergy.setBounds(5, 350, 135, Util.VIEW_HEIGHT);
-    this.pnlCenter.setBounds(140, 30, 400, 400);
+    this.lblTopic.setBounds(Util.getSize(145), Util.getSize(5), Util.getSize(100), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblUserName.setBounds(Util.getSize(5), Util.getSize(5), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblTopicLevel.setBounds(Util.getSize(5), Util.getSize(30), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblBarrier.setBounds(Util.getSize(5), Util.getSize(70), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblCountdown.setBounds(Util.getSize(5), Util.getSize(110), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblScore.setBounds(Util.getSize(5), Util.getSize(150), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblTime.setBounds(Util.getSize(5), Util.getSize(190), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblRankLevel.setBounds(Util.getSize(5), Util.getSize(230), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblSpeed.setBounds(Util.getSize(5), Util.getSize(270), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblAccuracy.setBounds(Util.getSize(5), Util.getSize(310), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblEnergy.setBounds(Util.getSize(5), Util.getSize(350), Util.getSize(135), Util.getSize(Util.VIEW_HEIGHT));
+    this.pnlCenter.setBounds(Util.getSize(140), Util.getSize(30), Util.getSize(400), Util.getSize(400));
     this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.lblTopicLevel);
     this.pnlMain.add(this.lblBarrier);
@@ -480,20 +496,20 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.pnlMain.add(this.lblEnergy);
     this.pnlMain.add(this.lblTopic);
     this.pnlMain.add(this.pnlCenter);
-    this.lblOption.setBounds(145, 435, 100, Util.VIEW_HEIGHT);
-    this.pnlOption.setBounds(140, 460, 400, 80);
+    this.lblOption.setBounds(Util.getSize(145), Util.getSize(435), Util.getSize(100), Util.getSize(Util.VIEW_HEIGHT));
+    this.pnlOption.setBounds(Util.getSize(140), Util.getSize(460), Util.getSize(400), Util.getSize(80));
     this.pnlCenter.setOpaque(true); // 设置组件可以绘制背景
     this.pnlOption.setOpaque(true); // 设置组件可以绘制背景
     this.pnlCenter.setBackground(Color.LIGHT_GRAY);
     this.pnlOption.setBackground(Color.LIGHT_GRAY);
     this.pnlMain.add(this.lblOption);
     this.pnlMain.add(this.pnlOption);
-    this.btnHint.setBounds(20, 430, 80, Util.ICON_BUTTON_HEIGHT);
-    this.btnPause.setBounds(20, 470, 80, Util.ICON_BUTTON_HEIGHT);
-    this.btnDelay.setBounds(20, 510, 80, Util.ICON_BUTTON_HEIGHT);
-    this.btnEnergy.setBounds(20, 550, 80, Util.ICON_BUTTON_HEIGHT);
-    this.btnStart.setBounds(200, 560, 100, Util.BUTTON_HEIGHT);
-    this.btnCancel.setBounds(390, 560, 100, Util.BUTTON_HEIGHT);
+    this.btnHint.setBounds(Util.getSize(20), Util.getSize(430), Util.getSize(80), Util.getSize(Util.ICON_BUTTON_HEIGHT));
+    this.btnPause.setBounds(Util.getSize(20), Util.getSize(470), Util.getSize(80), Util.getSize(Util.ICON_BUTTON_HEIGHT));
+    this.btnDelay.setBounds(Util.getSize(20), Util.getSize(510), Util.getSize(80), Util.getSize(Util.ICON_BUTTON_HEIGHT));
+    this.btnEnergy.setBounds(Util.getSize(20), Util.getSize(550), Util.getSize(80), Util.getSize(Util.ICON_BUTTON_HEIGHT));
+    this.btnStart.setBounds(Util.getSize(200), Util.getSize(560), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.btnCancel.setBounds(Util.getSize(390), Util.getSize(560), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
     this.pnlMain.add(this.btnHint);
     this.pnlMain.add(this.btnPause);
     this.pnlMain.add(this.btnDelay);
@@ -542,9 +558,43 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.menuGame.add(this.itemRestart);
     this.menuGame.add(this.itemDepository);
     this.menuGame.add(this.itemExit);
+    this.menuBar.add(this.menuSetting);
+    this.menuSetting.add(this.menuScale);
+    this.menuScale.add(this.itemScaleDefault);
+    this.menuScale.add(this.itemScale10);
+    this.menuScale.add(this.itemScale20);
+    this.menuScale.add(this.itemScale30);
+    this.menuScale.add(this.itemScale40);
+    this.menuScale.add(this.itemScale50);
     this.menuBar.add(this.menuHelp);
     this.menuHelp.add(this.itemHelp);
     this.menuHelp.add(this.itemAbout);
+    this.bgpScale.add(this.itemScaleDefault);
+    this.bgpScale.add(this.itemScale10);
+    this.bgpScale.add(this.itemScale20);
+    this.bgpScale.add(this.itemScale30);
+    this.bgpScale.add(this.itemScale40);
+    this.bgpScale.add(this.itemScale50);
+  }
+
+  /**
+   * 界面初始化时，设置有关菜单的初始状态与功能
+   */
+  private void setMenuDefaultInit() {
+    float scale = Util.setting.global.scale;
+    if (scale == Util.SCALE_10) {
+      this.itemScale10.setSelected(true);
+    } else if (scale == Util.SCALE_20) {
+      this.itemScale20.setSelected(true);
+    } else if (scale == Util.SCALE_30) {
+      this.itemScale30.setSelected(true);
+    } else if (scale == Util.SCALE_40) {
+      this.itemScale40.setSelected(true);
+    } else if (scale == Util.SCALE_50) {
+      this.itemScale50.setSelected(true);
+    } else {
+      this.itemScaleDefault.setSelected(true);
+    }
   }
 
   /**
@@ -552,6 +602,14 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void setMenuMnemonic() {
     this.menuGame.setMnemonic('G');
+    this.menuSetting.setMnemonic('S');
+    this.itemScaleDefault.setMnemonic('A');
+    this.itemScale10.setMnemonic('B');
+    this.itemScale20.setMnemonic('C');
+    this.itemScale30.setMnemonic('D');
+    this.itemScale40.setMnemonic('E');
+    this.itemScale50.setMnemonic('F');
+    this.menuScale.setMnemonic('C');
     this.menuHelp.setMnemonic('H');
   }
 
@@ -1098,6 +1156,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.itemRestart.addActionListener(this);
     this.itemDepository.addActionListener(this);
     this.itemExit.addActionListener(this);
+    this.itemScaleDefault.addActionListener(this);
+    this.itemScale10.addActionListener(this);
+    this.itemScale20.addActionListener(this);
+    this.itemScale30.addActionListener(this);
+    this.itemScale40.addActionListener(this);
+    this.itemScale50.addActionListener(this);
     this.itemHelp.addActionListener(this);
     this.itemAbout.addActionListener(this);
     this.mouseAdapter = new MouseAdapter() {
@@ -1734,6 +1798,26 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   }
 
   /**
+   * 缩放页面显示比例
+   */
+  private void zoom(float scale) {
+    if (Util.setting.global.scale == scale) {
+      return;
+    }
+    Util.setting.global.scale = scale;
+    Window[] windows = Window.getWindows();
+    for (Window window : windows) {
+      window.dispose();
+    }
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        Util.setDefaultFont();
+        new SnowJielongFrame();
+      }
+    });
+  }
+
+  /**
    * 为各组件添加事件的处理方法
    */
   @Override
@@ -1757,6 +1841,18 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.openDepositoryDialog();
     } else if (this.itemExit.equals(source)) {
       this.exit();
+    } else if (this.itemScaleDefault.equals(source)) {
+      this.zoom(Util.SCALE_DEFAULT);
+    } else if (this.itemScale10.equals(source)) {
+      this.zoom(Util.SCALE_10);
+    } else if (this.itemScale20.equals(source)) {
+      this.zoom(Util.SCALE_20);
+    } else if (this.itemScale30.equals(source)) {
+      this.zoom(Util.SCALE_30);
+    } else if (this.itemScale40.equals(source)) {
+      this.zoom(Util.SCALE_40);
+    } else if (this.itemScale50.equals(source)) {
+      this.zoom(Util.SCALE_50);
     } else if (this.itemHelp.equals(source)) {
       this.openIdiomRulesDialog();
     } else if (this.itemAbout.equals(source)) {

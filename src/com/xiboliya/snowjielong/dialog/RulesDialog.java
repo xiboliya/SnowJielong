@@ -28,6 +28,7 @@ import javax.swing.JTextArea;
 import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
+import com.xiboliya.snowjielong.util.Util;
 
 /**
  * "游戏规则"对话框
@@ -55,7 +56,7 @@ public class RulesDialog extends BaseDialog implements ActionListener {
     this.init();
     this.initView();
     this.addListeners();
-    this.setSize(550, 450);
+    this.setSize(Util.getSize(550), Util.getSize(450));
     this.setResizable(true);
     this.setVisible(true);
   }

@@ -46,7 +46,7 @@ public class TipsWindow extends JWindow implements ActionListener {
 
   private TipsWindow(Window owner, String message, Background bgColor, TimerLength timerLength, WindowSize windowSize) {
     super(owner);
-    this.setSize(windowSize.getWindowWidth(), 36);
+    this.setSize(Util.getSize(windowSize.getWindowWidth()), Util.getSize(36));
     this.setLocationRelativeTo(owner);
     this.init(message, bgColor);
     this.setVisible(true);

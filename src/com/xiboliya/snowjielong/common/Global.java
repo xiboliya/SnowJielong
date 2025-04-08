@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 冰原
+ * Copyright (C) 2025 冰原
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.xiboliya.snowjielong.setting;
+package com.xiboliya.snowjielong.common;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.xiboliya.snowjielong.common.Global;
-import com.xiboliya.snowjielong.common.IdiomCache;
-import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.util.Util;
 
 /**
- * 软件参数配置类
+ * 全局参数类
  * 
  * @author 冰原
  * 
  */
-public class Setting {
-  // 成语接龙游戏的进度存档
-  public ArrayList<User> userList = new ArrayList<User>();
-  // 当前账号的进度存档
-  public User user = null;
-  // 全局参数
-  public Global global = new Global();
+public class Global {
+  // 缩放比例
+  public float scale = Util.SCALE_DEFAULT;
 }

@@ -84,7 +84,7 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
     this.init();
     this.addListeners();
     this.createElements();
-    this.setSize(500, 400);
+    this.setSize(Util.getSize(500), Util.getSize(400));
     this.setVisible(true);
   }
 

@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import com.xiboliya.snowjielong.common.BarrierOrder;
+import com.xiboliya.snowjielong.common.Global;
 import com.xiboliya.snowjielong.common.LoginResult;
 import com.xiboliya.snowjielong.common.RegisterResult;
 import com.xiboliya.snowjielong.common.User;
@@ -136,11 +137,61 @@ public final class SettingAdapter {
    * @param content 配置文件文本
    */
   private void parseSetting(String content) {
-    String[] arrUser = content.split(Util.SETTING_USER_SEPARATOR);
-    for (String strUser : arrUser) {
-      User user = this.parseUser(strUser);
-      if (user != null) {
-        this.setting.userList.add(user);
+    String[] arrContent = content.split(Util.SETTING_USER_SEPARATOR);
+    for (String text : arrContent) {
+      if (this.isGlobal(text)) {
+        this.parseGlobal(text);
+      } else if (this.isUser(text)) {
+        User user = this.parseUser(text);
+        if (user != null) {
+          this.setting.userList.add(user);
+        }
+      }
+    }
+  }
+
+  /**
+   * 判断文本是否为全局参数
+   * @param text 文本
+   * @return 是否为全局参数，true表示为全局参数，false反之
+   */
+  private boolean isGlobal(String text) {
+    return text.contains("[Global]\n");
+  }
+
+  /**
+   * 判断文本是否为账号
+   * @param text 文本
+   * @return 是否为账号，true表示为账号，false反之
+   */
+  private boolean isUser(String text) {
+    return text.contains("[User]\n");
+  }
+
+  /**
+   * 解析全局参数文本，并保存到参数配置中
+   * @param strGlobal 全局参数文本
+   */
+  private void parseGlobal(String strGlobal) {
+    String[] arrLine = strGlobal.split("\n");
+    if (arrLine == null || arrLine.length <= 0) {
+      return;
+    }
+    for (String strLine : arrLine) {
+      int index = strLine.indexOf("=");
+      if (index <= 0) {
+        continue;
+      }
+      String key = strLine.substring(0, index).trim();
+      String value = strLine.substring(index + 1).trim();
+      if (key.equals("scale") && !Util.isTextEmpty(value)) {
+        float number = this.getFloatNumber(value);
+        if (number == Util.SCALE_DEFAULT || number == Util.SCALE_10 || number == Util.SCALE_20 ||
+          number == Util.SCALE_30 || number == Util.SCALE_40 || number == Util.SCALE_50) {
+          this.setting.global.scale = number;
+        } else {
+          this.setting.global.scale = Util.SCALE_DEFAULT;
+        }
       }
     }
   }
@@ -250,6 +301,21 @@ public final class SettingAdapter {
   }
 
   /**
+   * 将文本转换为浮点数
+   * @param value 文本
+   * @return 长整数
+   */
+  private float getFloatNumber(String value) {
+    float floatNumber = 0L;
+    try {
+      floatNumber = Float.parseFloat(value);
+    } catch (Exception x) {
+      // x.printStackTrace();
+    }
+    return floatNumber;
+  }
+
+  /**
    * 将文本转换为map
    * @param value 文本
    * @return map
@@ -305,7 +371,7 @@ public final class SettingAdapter {
     }
     User user = new User(userName, password);
     this.setting.userList.add(user);
-    String content = this.getContents(this.setting.userList);
+    String content = this.getContents();
     this.toSaveFile(content);
     return RegisterResult.REGISTER_SUCCESS;
   }
@@ -354,15 +420,28 @@ public final class SettingAdapter {
   }
 
   /**
-   * 将账号列表转换为文本
-   * @param userList 账号列表
-   * @return 账号列表的文本
+   * 将参数配置转换为文本
+   * @return 参数配置的文本
    */
-  private String getContents(ArrayList<User> userList) {
+  private String getContents() {
     StringBuilder stbResult = new StringBuilder();
-    for (User user : userList) {
+    stbResult.append(this.getContent(this.setting.global));
+    for (User user : this.setting.userList) {
       stbResult.append(this.getContent(user));
     }
+    return stbResult.toString();
+  }
+
+  /**
+   * 将全局参数转换为文本
+   * @param global 全局参数
+   * @return 全局参数的文本
+   */
+  private String getContent(Global global) {
+    StringBuilder stbResult = new StringBuilder();
+    stbResult.append("[Global]\n");
+    stbResult.append("scale=" + global.scale + "\n");
+    stbResult.append(Util.SETTING_USER_SEPARATOR);
     return stbResult.toString();
   }
 
@@ -373,6 +452,7 @@ public final class SettingAdapter {
    */
   private String getContent(User user) {
     StringBuilder stbResult = new StringBuilder();
+    stbResult.append("[User]\n");
     stbResult.append("userName=" + user.getUserName() + "\n");
     stbResult.append("password=" + user.getPassword() + "\n");
     stbResult.append("currentTopicLevel=" + user.idiomCache.getCurrentTopicLevel() + "\n");
@@ -455,7 +535,7 @@ public final class SettingAdapter {
    * 将软件设置保存到配置文件的方法
    */
   public void save() {
-    String content = this.getContents(this.setting.userList);
+    String content = this.getContents();
     this.toSaveFile(content);
   }
 

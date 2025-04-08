@@ -63,7 +63,7 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
     super(owner, modal);
     this.init();
     this.addListeners();
-    this.setSize(300, 300);
+    this.setSize(Util.getSize(300), Util.getSize(300));
     this.setVisible(true);
   }
 
@@ -84,13 +84,13 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
   private void init() {
     this.setTitle("注册");
     this.pnlMain.setLayout(null);
-    this.lblUserName.setBounds(20, 20, 70, Util.VIEW_HEIGHT);
-    this.txtUserName.setBounds(90, 20, 170, Util.INPUT_HEIGHT);
-    this.lblPassword.setBounds(20, 55, 70, Util.VIEW_HEIGHT);
-    this.psdPassword.setBounds(90, 55, 170, Util.INPUT_HEIGHT);
-    this.lblPasswordAgain.setBounds(20, 90, 70, Util.VIEW_HEIGHT);
-    this.psdPasswordAgain.setBounds(90, 90, 170, Util.INPUT_HEIGHT);
-    this.btnRegister.setBounds(100, 150, 100, Util.BUTTON_HEIGHT);
+    this.lblUserName.setBounds(Util.getSize(20), Util.getSize(20), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.txtUserName.setBounds(Util.getSize(90), Util.getSize(20), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.lblPassword.setBounds(Util.getSize(20), Util.getSize(55), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.psdPassword.setBounds(Util.getSize(90), Util.getSize(55), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.lblPasswordAgain.setBounds(Util.getSize(20), Util.getSize(90), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.psdPasswordAgain.setBounds(Util.getSize(90), Util.getSize(90), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(150), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
     this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.txtUserName);
     this.pnlMain.add(this.lblPassword);

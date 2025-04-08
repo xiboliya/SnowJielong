@@ -55,7 +55,7 @@ public class LoginFrame extends JFrame implements ActionListener {
    * 构造方法
    */
   public LoginFrame() {
-    this.setSize(300, 300);
+    this.setSize(Util.getSize(300), Util.getSize(300));
     this.setLocationRelativeTo(null); // 使窗口居中显示
     this.setResizable(false);
     this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); // 设置默认关闭操作为空，以便添加窗口监听事件
@@ -89,13 +89,13 @@ public class LoginFrame extends JFrame implements ActionListener {
    */
   private void initPanel() {
     this.pnlMain.setLayout(null);
-    this.lblUserName.setBounds(20, 20, 70, Util.VIEW_HEIGHT);
-    this.txtUserName.setBounds(90, 20, 170, Util.INPUT_HEIGHT);
-    this.lblPassword.setBounds(20, 55, 70, Util.VIEW_HEIGHT);
-    this.psdPassword.setBounds(90, 55, 170, Util.INPUT_HEIGHT);
-    this.btnLogin.setBounds(100, 110, 100, Util.BUTTON_HEIGHT);
-    this.btnRegister.setBounds(100, 150, 100, Util.BUTTON_HEIGHT);
-    this.btnQuit.setBounds(100, 190, 100, Util.BUTTON_HEIGHT);
+    this.lblUserName.setBounds(Util.getSize(20), Util.getSize(20), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.txtUserName.setBounds(Util.getSize(90), Util.getSize(20), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.lblPassword.setBounds(Util.getSize(20), Util.getSize(55), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.psdPassword.setBounds(Util.getSize(90), Util.getSize(55), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.btnLogin.setBounds(Util.getSize(100), Util.getSize(110), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(150), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.btnQuit.setBounds(Util.getSize(100), Util.getSize(190), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
     this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.txtUserName);
     this.pnlMain.add(this.lblPassword);

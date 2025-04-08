@@ -48,6 +48,12 @@ public final class Util {
   public static final int ICON_BUTTON_HEIGHT = 30; // 图标按钮的高度
   public static final int BUFFER_LENGTH = 1024; // 缓冲区的大小
   public static final int MSG_LINE_SIZE = 60; // 提示框中每行字符串显示的最大字数
+  public static final float SCALE_DEFAULT = 1.0f; // 窗口缩放比例：原始比例
+  public static final float SCALE_10 = 1.1f; // 窗口缩放比例：放大10%
+  public static final float SCALE_20 = 1.2f; // 窗口缩放比例：放大20%
+  public static final float SCALE_30 = 1.3f; // 窗口缩放比例：放大30%
+  public static final float SCALE_40 = 1.4f; // 窗口缩放比例：放大40%
+  public static final float SCALE_50 = 1.5f; // 窗口缩放比例：放大50%
   public static final ImageIcon ICON_SW = new ImageIcon(ClassLoader.getSystemResource("res/icon.png")); // 主程序图标
   public static final ImageIcon ICON_HINT = new ImageIcon(ClassLoader.getSystemResource("res/hint.png")); // 提示卡图标
   public static final ImageIcon ICON_PAUSE = new ImageIcon(ClassLoader.getSystemResource("res/pause.png")); // 暂停卡图标
@@ -73,6 +79,7 @@ public final class Util {
 
   public static Setting setting = new Setting(); // 软件参数配置类
   public static SettingAdapter settingAdapter = new SettingAdapter(setting); // 用于解析和保存软件配置文件的工具类
+
   /**
    * 由于此类为工具类，故将构造方法私有化
    */
@@ -81,9 +88,8 @@ public final class Util {
 
   /**
    * 判断给定的字符串是否为空
-   * 
-   * @param str
-   *          待判断的字符串
+   * @param str 待判断的字符串
+   * @return 字符串是否为空，true表示为空，false反之
    */
   public static boolean isTextEmpty(String str) {
     return (str == null || str.isEmpty());
@@ -93,7 +99,7 @@ public final class Util {
    * 修改整个程序的默认字体
    */
   public static void setDefaultFont() {
-    Font font = new Font("宋体", Font.PLAIN, 12);
+    Font font = new Font("宋体", Font.PLAIN, getSize(12));
     FontUIResource fontRes = new FontUIResource(font);
     Enumeration<Object> keys = UIManager.getDefaults().keys();
     while (keys.hasMoreElements()) {
@@ -103,6 +109,15 @@ public final class Util {
         UIManager.put(key, fontRes);
       }
     }
+  }
+
+  /**
+   * 获取按比例缩放的实际大小
+   * @param size 原始大小
+   * @return 实际大小
+   */
+  public static int getSize(int size) {
+    return (int)(size * setting.global.scale);
   }
 
 }
