@@ -287,3 +287,16 @@ res/idiom/level4.txt
 1.删除冗余的注释和方法。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/util/Util.java
+
+2025-04-08
+1.主界面添加：设置-窗口缩放功能，菜单有：原始比例、放大10%、放大20%、放大30%、放大40%、放大50%。
+src/com/xiboliya/snowjielong/common/Global.java（添加）
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+src/com/xiboliya/snowjielong/dialog/RegisterDialog.java
+src/com/xiboliya/snowjielong/dialog/RulesDialog.java
+src/com/xiboliya/snowjielong/frame/LoginFrame.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/Setting.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+src/com/xiboliya/snowjielong/util/Util.java
+src/com/xiboliya/snowjielong/window/TipsWindow.java
