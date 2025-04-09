@@ -304,3 +304,5 @@ src/com/xiboliya/snowjielong/window/TipsWindow.java
 2025-04-09
 1.解决生成每个难度等级的题目随机顺序时，只能生成前8个顺序的问题，现改为可以生成所有的顺序。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+2.删除仓库页面中未实现的百宝箱和丹药匣功能。
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
