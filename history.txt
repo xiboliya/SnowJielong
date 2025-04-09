@@ -300,3 +300,7 @@ src/com/xiboliya/snowjielong/setting/Setting.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 src/com/xiboliya/snowjielong/util/Util.java
 src/com/xiboliya/snowjielong/window/TipsWindow.java
+
+2025-04-09
+1.解决生成每个难度等级的题目随机顺序时，只能生成前8个顺序的问题，现改为可以生成所有的顺序。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
