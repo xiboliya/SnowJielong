@@ -277,7 +277,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void refreshCurrentBarrierOrder() {
     Random random = new Random();
-    int randomIndex = random.nextInt(8);
+    int length = BarrierOrder.values().length;
+    int randomIndex = random.nextInt(length);
     this.currentBarrierOrder = BarrierOrder.getItemByIndex(randomIndex);
   }
 
