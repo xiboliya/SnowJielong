@@ -61,15 +61,11 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   private EtchedBorder etchedBorder = new EtchedBorder();
   private JPanel pnlTool = new JPanel(this.gridLayout);
   private JPanel pnlStar = new JPanel(this.gridLayout);
-  private JPanel pnlTreasure = new JPanel(this.gridLayout);
-  private JPanel pnlDanMedicine = new JPanel(this.gridLayout);
   private BaseKeyAdapter keyAdapter = new BaseKeyAdapter(this);
   private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
   private MouseAdapter mouseAdapter = null;
   private ArrayList<BaseLabel> toolLabelList = new ArrayList<BaseLabel>();
   private ArrayList<BaseLabel> starLabelList = new ArrayList<BaseLabel>();
-  private ArrayList<BaseLabel> treasureLabelList = new ArrayList<BaseLabel>();
-  private ArrayList<BaseLabel> danMedicineLabelList = new ArrayList<BaseLabel>();
 
   /**
    * 构造方法
@@ -106,8 +102,6 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
     this.setTitle("仓库");
     this.tpnMain.add(this.pnlTool, "功能卡");
     this.tpnMain.add(this.pnlStar, "群星图");
-    this.tpnMain.add(this.pnlTreasure, "百宝箱");
-    this.tpnMain.add(this.pnlDanMedicine, "丹药匣");
     this.tpnMain.setSelectedIndex(0);
     this.tpnMain.setFocusable(false);
     this.pnlMain.add(this.tpnMain, BorderLayout.CENTER);
@@ -126,16 +120,6 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
       BaseLabel lblElement = this.createCellElement();
       this.starLabelList.add(lblElement);
       this.pnlStar.add(lblElement);
-    }
-    for (int index = 0; index < 108; index++) {
-      BaseLabel lblElement = this.createCellElement();
-      this.treasureLabelList.add(lblElement);
-      this.pnlTreasure.add(lblElement);
-    }
-    for (int index = 0; index < 108; index++) {
-      BaseLabel lblElement = this.createCellElement();
-      this.danMedicineLabelList.add(lblElement);
-      this.pnlDanMedicine.add(lblElement);
     }
   }
 
