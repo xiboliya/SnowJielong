@@ -43,7 +43,7 @@ public class LoginFrame extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
   private JPanel pnlMain = (JPanel) this.getContentPane();
   private JLabel lblUserName = new JLabel("账号：");
-  private BaseTextField txtUserName = new BaseTextField();
+  private BaseTextField txtUserName = new BaseTextField(true, ".{0,20}"); // 限制用户输入的字符数量不能超过20个
   private JLabel lblPassword = new JLabel("密码：");
   private JPasswordField psdPassword = new JPasswordField();
   private BaseButton btnLogin = new BaseButton("登录");
