@@ -318,3 +318,7 @@ src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 4.登录页面中在账号或密码输入框中，添加按回车键进行登录的功能。
 src/com/xiboliya/snowjielong/frame/LoginFrame.java
+
+******************************
+git tag V1.0-20250412
+******************************
