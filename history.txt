@@ -306,3 +306,13 @@ src/com/xiboliya/snowjielong/window/TipsWindow.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2.删除仓库页面中未实现的百宝箱和丹药匣功能。
 src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+
+2025-04-12
+1.登录页面中账号输入框限制只能输入20个字符，保持与注册页面中账号输入框一致。
+src/com/xiboliya/snowjielong/frame/LoginFrame.java
+2.登录页面退出时去掉确认弹窗。
+src/com/xiboliya/snowjielong/frame/LoginFrame.java
+3.添加群星图中三十六天罡和七十二地煞的功能：合成功能卡、抽取随机奖励。
+src/com/xiboliya/snowjielong/common/StarTag.java（添加）
+src/com/xiboliya/snowjielong/dialog/DepositoryDialog.java
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
