@@ -150,10 +150,6 @@ public class LoginFrame extends JFrame implements ActionListener {
    * 退出
    */
   private void exit() {
-    int result = JOptionPane.showConfirmDialog(this, "是否继续退出？", Util.SOFTWARE, JOptionPane.YES_NO_CANCEL_OPTION);
-    if (result != JOptionPane.YES_OPTION) {
-      return;
-    }
     System.exit(0);
   }
 
