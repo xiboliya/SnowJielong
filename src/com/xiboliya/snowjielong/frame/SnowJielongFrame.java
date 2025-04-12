@@ -1489,6 +1489,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void obtainHint() {
     this.hintCount++;
+    Util.setting.user.idiomCache.setHintCount(this.hintCount);
     this.refreshHint();
     TipsWindow.show(this, "恭喜：获得1张提示卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
@@ -1498,6 +1499,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void obtainPause() {
     this.pauseCount++;
+    Util.setting.user.idiomCache.setPauseCount(this.pauseCount);
     this.refreshPause();
     TipsWindow.show(this, "恭喜：获得1张暂停卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
@@ -1507,6 +1509,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void obtainDelay() {
     this.delayCount++;
+    Util.setting.user.idiomCache.setDelayCount(this.delayCount);
     this.refreshDelay();
     TipsWindow.show(this, "恭喜：获得1张延时卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
@@ -1516,6 +1519,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void obtainEnergy() {
     this.energyCount++;
+    Util.setting.user.idiomCache.setEnergyCount(this.energyCount);
     this.refreshEnergy();
     TipsWindow.show(this, "恭喜：获得1张体力卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
@@ -1590,6 +1594,21 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     } else {
       this.depositoryDialog.setVisible(true);
     }
+    this.refreshToolCount();
+  }
+
+  /**
+   * 刷新功能卡数据和显示
+   */
+  private void refreshToolCount() {
+    this.hintCount = Util.setting.user.idiomCache.getHintCount();
+    this.pauseCount = Util.setting.user.idiomCache.getPauseCount();
+    this.delayCount = Util.setting.user.idiomCache.getDelayCount();
+    this.energyCount = Util.setting.user.idiomCache.getEnergyCount();
+    this.refreshHint();
+    this.refreshPause();
+    this.refreshDelay();
+    this.refreshEnergy();
   }
 
   /**
@@ -1631,6 +1650,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       if (text.equals(lblOption.getTag())) {
         lblOption.setBackground(Color.PINK);
         this.hintCount--;
+        Util.setting.user.idiomCache.setHintCount(this.hintCount);
         this.refreshHint();
         break;
       }
@@ -1641,8 +1661,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新提示功能
    */
   private void refreshHint() {
-    Util.setting.user.idiomCache.setHintCount(this.hintCount);
-    this.btnHint.setEnabled(this.hintCount > 0);
+    if (this.countdown > 0) {
+      this.btnHint.setEnabled(this.hintCount > 0);
+    } else {
+      this.btnHint.setEnabled(false);
+    }
     this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
   }
 
@@ -1657,14 +1680,15 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.setCellsVisible(true);
       this.btnPause.setText("暂停");
       this.startTimer(true);
+      this.refreshPause();
       // 继续后可以使用提示功能，因此恢复提示按钮状态
       this.btnHint.setEnabled(this.hintCount > 0);
-      this.btnPause.setEnabled(this.pauseCount > 0);
     } else {
       this.setCellsVisible(false);
       this.btnPause.setText("继续");
       this.stopTimer();
       this.pauseCount--;
+      Util.setting.user.idiomCache.setPauseCount(this.pauseCount);
       this.refreshPause();
       // 暂停后无法使用提示功能，因此设置提示按钮不可用
       this.btnHint.setEnabled(false);
@@ -1691,7 +1715,16 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新暂停功能
    */
   private void refreshPause() {
-    Util.setting.user.idiomCache.setPauseCount(this.pauseCount);
+    if (this.countdown > 0) {
+      if ("继续".equals(this.btnPause.getText())) {
+        // 已暂停状态下，按钮可用
+        this.btnPause.setEnabled(true);
+      } else {
+        this.btnPause.setEnabled(this.pauseCount > 0);
+      }
+    } else {
+      this.btnPause.setEnabled(false);
+    }
     this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
   }
 
@@ -1705,6 +1738,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     // 一次延时10秒
     this.countdown += 10;
     this.delayCount--;
+    Util.setting.user.idiomCache.setDelayCount(this.delayCount);
     this.refreshDelay();
   }
 
@@ -1712,8 +1746,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新延时功能
    */
   private void refreshDelay() {
-    Util.setting.user.idiomCache.setDelayCount(this.delayCount);
-    this.btnDelay.setEnabled(this.delayCount > 0);
+    if (this.countdown > 0) {
+      this.btnDelay.setEnabled(this.delayCount > 0);
+    } else {
+      this.btnDelay.setEnabled(false);
+    }
     this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
   }
 
@@ -1726,6 +1763,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     Util.setting.user.idiomCache.setEnergy(this.energy);
     this.lblEnergy.setText("体力：" + this.energy);
     this.energyCount--;
+    Util.setting.user.idiomCache.setEnergyCount(this.energyCount);
     this.refreshEnergy();
   }
 
@@ -1733,9 +1771,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * 刷新体力功能
    */
   private void refreshEnergy() {
-    Util.setting.user.idiomCache.setEnergyCount(this.energyCount);
-    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
     this.btnEnergy.setEnabled(this.energyCount > 0);
+    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
   }
 
   /**

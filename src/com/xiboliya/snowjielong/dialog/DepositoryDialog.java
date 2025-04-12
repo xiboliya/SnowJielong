@@ -28,9 +28,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
@@ -43,6 +48,7 @@ import com.xiboliya.snowjielong.base.BaseDialog;
 import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseLabel;
 import com.xiboliya.snowjielong.common.IdiomCache;
+import com.xiboliya.snowjielong.common.StarTag;
 import com.xiboliya.snowjielong.setting.Setting;
 import com.xiboliya.snowjielong.util.Util;
 
@@ -62,10 +68,18 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   private JPanel pnlTool = new JPanel(this.gridLayout);
   private JPanel pnlStar = new JPanel(this.gridLayout);
   private BaseKeyAdapter keyAdapter = new BaseKeyAdapter(this);
-  private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
   private MouseAdapter mouseAdapter = null;
   private ArrayList<BaseLabel> toolLabelList = new ArrayList<BaseLabel>();
   private ArrayList<BaseLabel> starLabelList = new ArrayList<BaseLabel>();
+  private BaseLabel currentStarLabel = null;
+
+  private JPopupMenu popMenuMain = new JPopupMenu();
+  private JMenu menuPopCompose = new JMenu("合成功能卡(C)");
+  private JMenuItem itemPopComposeHint = new JMenuItem("提示卡(H)", 'H');
+  private JMenuItem itemPopComposePause = new JMenuItem("暂停卡(P)", 'P');
+  private JMenuItem itemPopComposeDelay = new JMenuItem("延时卡(D)", 'D');
+  private JMenuItem itemPopComposeEnergy = new JMenuItem("体力卡(E)", 'E');
+  private JMenuItem itemPopComposeRandom = new JMenuItem("抽取随机奖励(R)", 'R');
 
   /**
    * 构造方法
@@ -100,11 +114,32 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
    */
   private void init() {
     this.setTitle("仓库");
+    this.addTabbedPane();
+    this.initPopMenu();
+  }
+
+  /**
+   * 主面板上添加选项卡视图
+   */
+  private void addTabbedPane() {
     this.tpnMain.add(this.pnlTool, "功能卡");
     this.tpnMain.add(this.pnlStar, "群星图");
     this.tpnMain.setSelectedIndex(0);
     this.tpnMain.setFocusable(false);
     this.pnlMain.add(this.tpnMain, BorderLayout.CENTER);
+  }
+
+  /**
+   * 初始化快捷菜单
+   */
+  private void initPopMenu() {
+    this.popMenuMain.add(this.menuPopCompose);
+    this.menuPopCompose.add(this.itemPopComposeHint);
+    this.menuPopCompose.add(this.itemPopComposePause);
+    this.menuPopCompose.add(this.itemPopComposeDelay);
+    this.menuPopCompose.add(this.itemPopComposeEnergy);
+    this.popMenuMain.addSeparator();
+    this.popMenuMain.add(this.itemPopComposeRandom);
   }
 
   /**
@@ -118,6 +153,8 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
     }
     for (int index = 0; index < 108; index++) {
       BaseLabel lblElement = this.createCellElement();
+      StarTag starTag = new StarTag(Util.STAR_NAMES[index], index < 36, 0);
+      lblElement.setTag(starTag);
       this.starLabelList.add(lblElement);
       this.pnlStar.add(lblElement);
     }
@@ -135,6 +172,7 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
     lblElement.setFocusable(false); // 设置标签不可以获得焦点
     lblElement.addFocusListener(this);
     lblElement.addMouseListener(this.mouseAdapter);
+    lblElement.addKeyListener(this.keyAdapter);
     return lblElement;
   }
 
@@ -208,14 +246,17 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
     for (int i = 0; i < size; i++) {
       BaseLabel lblElement = this.starLabelList.get(i);
       lblElement.setBackground(Color.WHITE);
-      String name = Util.STAR_NAMES[i];
+      StarTag starTag = (StarTag)lblElement.getTag();
+      String name = starTag.getName();
       Integer count = starMap.get(name);
-      if (count == null) {
+      if (count == null || count <= 0) {
+        starTag.setCount(0);
         lblElement.setIcon(null);
         lblElement.setFocusable(false); // 设置标签不可以获得焦点
         lblElement.setToolTipText(null);
       } else {
-        if (i < 36) {
+        starTag.setCount(count);
+        if (starTag.isTian()) {
           lblElement.setIcon(Util.ICON_STAR_1);
         } else {
           lblElement.setIcon(Util.ICON_STAR_2);
@@ -231,12 +272,60 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
    */
   private void addListeners() {
     this.tpnMain.addChangeListener(this);
+    this.pnlTool.addKeyListener(this.keyAdapter);
+    this.pnlStar.addKeyListener(this.keyAdapter);
+    this.itemPopComposeHint.addActionListener(this);
+    this.itemPopComposePause.addActionListener(this);
+    this.itemPopComposeDelay.addActionListener(this);
+    this.itemPopComposeEnergy.addActionListener(this);
+    this.itemPopComposeRandom.addActionListener(this);
     this.mouseAdapter = new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         BaseLabel lblElement = (BaseLabel) e.getSource();
         lblElement.requestFocus(); // 当鼠标单击时，获得焦点
+        currentStarLabel = lblElement;
+        if (e.getButton() == MouseEvent.BUTTON3) { // 点击右键时，显示快捷菜单
+          if (tpnMain.getSelectedIndex() == 1 && lblElement.isFocusable()) {
+            setMenuState(lblElement);
+            popMenuMain.show(lblElement, e.getX(), e.getY());
+          }
+        }
       }
     };
+  }
+
+  /**
+   * 根据当前星的信息，设置相关菜单的状态
+   * @param lblElement 当前星
+   */
+  private void setMenuState(BaseLabel lblElement) {
+    StarTag starTag = (StarTag)lblElement.getTag();
+    int count = starTag.getCount();
+    if (starTag.isTian()) {
+      // 三十六天罡：1颗星可以抽取随机奖励、2颗星可以合成功能卡
+      if (count >= 2) {
+        this.menuPopCompose.setEnabled(true);
+        this.itemPopComposeRandom.setEnabled(true);
+      } else if (count >= 1) {
+        this.menuPopCompose.setEnabled(false);
+        this.itemPopComposeRandom.setEnabled(true);
+      } else {
+        this.menuPopCompose.setEnabled(false);
+        this.itemPopComposeRandom.setEnabled(false);
+      }
+    } else {
+      // 七十二地煞：2颗星可以抽取随机奖励、3颗星可以合成功能卡
+      if (count >= 3) {
+        this.menuPopCompose.setEnabled(true);
+        this.itemPopComposeRandom.setEnabled(true);
+      } else if (count >= 2) {
+        this.menuPopCompose.setEnabled(false);
+        this.itemPopComposeRandom.setEnabled(true);
+      } else {
+        this.menuPopCompose.setEnabled(false);
+        this.itemPopComposeRandom.setEnabled(false);
+      }
+    }
   }
 
   /**
@@ -257,10 +346,134 @@ public class DepositoryDialog extends BaseDialog implements ActionListener, Chan
   }
 
   /**
+   * "合成功能卡"的处理方法
+   * @param index 合成功能卡的索引
+   */
+  private void composeTool(int index) {
+    String tool = "";
+    switch (index) {
+      case 0:
+        tool = "提示卡";
+        break;
+      case 1:
+        tool = "暂停卡";
+        break;
+      case 2:
+        tool = "延时卡";
+        break;
+      case 3:
+        tool = "体力卡";
+        break;
+    }
+    StarTag starTag = (StarTag)this.currentStarLabel.getTag();
+    int useCount = 3;
+    if (starTag.isTian()) {
+      useCount = 2;
+    }
+    String name = starTag.getName();
+    int result = JOptionPane.showConfirmDialog(this,
+        "此操作将消耗" + useCount + "颗" + name + "，合成1张" + tool + "！\n是否继续？",
+        Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
+    if (result != JOptionPane.YES_OPTION) {
+      return;
+    }
+    HashMap<String, Integer> starMap = this.setting.user.idiomCache.getStarMap();
+    Integer count = starMap.get(name);
+    count -= useCount;
+    starMap.put(name, count);
+    switch (index) {
+      case 0:
+        int hintCount = this.setting.user.idiomCache.getHintCount() + 1;
+        this.setting.user.idiomCache.setHintCount(hintCount);
+        break;
+      case 1:
+        int pauseCount = this.setting.user.idiomCache.getPauseCount() + 1;
+        this.setting.user.idiomCache.setPauseCount(pauseCount);
+        break;
+      case 2:
+        int delayCount = this.setting.user.idiomCache.getDelayCount() + 1;
+        this.setting.user.idiomCache.setDelayCount(delayCount);
+        break;
+      case 3:
+        int energyCount = this.setting.user.idiomCache.getEnergyCount() + 1;
+        this.setting.user.idiomCache.setEnergyCount(energyCount);
+        break;
+    }
+    JOptionPane.showMessageDialog(this, "成功合成1张：" + tool + "!", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
+    this.updateCurrentPanel();
+  }
+
+  /**
+   * "抽取随机奖励"的处理方法
+   */
+  private void composeRandom() {
+    StarTag starTag = (StarTag)this.currentStarLabel.getTag();
+    int useCount = 2;
+    if (starTag.isTian()) {
+      useCount = 1;
+    }
+    String name = starTag.getName();
+    int result = JOptionPane.showConfirmDialog(this,
+        "此操作将消耗" + useCount + "颗" + name + "，并有机会抽取到随机奖励！\n是否继续？",
+        Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
+    if (result != JOptionPane.YES_OPTION) {
+      return;
+    }
+    HashMap<String, Integer> starMap = this.setting.user.idiomCache.getStarMap();
+    Integer count = starMap.get(name);
+    count -= useCount;
+    starMap.put(name, count);
+    Random random = new Random();
+    // 生成随机奖励的索引
+    int index = random.nextInt(8);
+    String tool = "";
+    switch (index) {
+      case 0:
+        tool = "提示卡";
+        int hintCount = this.setting.user.idiomCache.getHintCount() + 1;
+        this.setting.user.idiomCache.setHintCount(hintCount);
+        break;
+      case 1:
+        tool = "暂停卡";
+        int pauseCount = this.setting.user.idiomCache.getPauseCount() + 1;
+        this.setting.user.idiomCache.setPauseCount(pauseCount);
+        break;
+      case 2:
+        tool = "延时卡";
+        int delayCount = this.setting.user.idiomCache.getDelayCount() + 1;
+        this.setting.user.idiomCache.setDelayCount(delayCount);
+        break;
+      case 3:
+        tool = "体力卡";
+        int energyCount = this.setting.user.idiomCache.getEnergyCount() + 1;
+        this.setting.user.idiomCache.setEnergyCount(energyCount);
+        break;
+      default:
+        JOptionPane.showMessageDialog(this, "抱歉：没有抽取到奖励！\n下次再试吧！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
+        this.updateCurrentPanel();
+        return;
+    }
+    JOptionPane.showMessageDialog(this, "恭喜：成功抽取到1张" + tool + "!", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
+    this.updateCurrentPanel();
+  }
+
+  /**
    * 为各组件添加事件的处理方法
    */
   @Override
   public void actionPerformed(ActionEvent e) {
+    Object source = e.getSource();
+    if (this.itemPopComposeHint.equals(source)) {
+      this.composeTool(0);
+    } else if (this.itemPopComposePause.equals(source)) {
+      this.composeTool(1);
+    } else if (this.itemPopComposeDelay.equals(source)) {
+      this.composeTool(2);
+    } else if (this.itemPopComposeEnergy.equals(source)) {
+      this.composeTool(3);
+    } else if (this.itemPopComposeRandom.equals(source)) {
+      this.composeRandom();
+    }
   }
 
   /**
