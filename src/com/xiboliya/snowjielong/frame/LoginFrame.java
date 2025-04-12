@@ -19,6 +19,8 @@ package com.xiboliya.snowjielong.frame;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
@@ -50,6 +52,7 @@ public class LoginFrame extends JFrame implements ActionListener {
   private BaseButton btnRegister = new BaseButton("注册");
   private BaseButton btnQuit = new BaseButton("退出");
   private RegisterDialog registerDialog = null;
+  private KeyAdapter keyAdapter = null;
 
   /**
    * 构造方法
@@ -109,11 +112,22 @@ public class LoginFrame extends JFrame implements ActionListener {
    * 添加事件监听器
    */
   private void addListeners() {
+    this.keyAdapter = new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+          login();
+        }
+      }
+    };
+    this.txtUserName.addKeyListener(this.keyAdapter);
+    this.psdPassword.addKeyListener(this.keyAdapter);
     this.btnLogin.addActionListener(this);
     this.btnRegister.addActionListener(this);
     this.btnQuit.addActionListener(this);
     // 为窗口添加事件监听器
     this.addWindowListener(new WindowAdapter() {
+      @Override
       public void windowClosing(WindowEvent e) {
         exit();
       }
