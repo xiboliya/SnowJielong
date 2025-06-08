@@ -322,3 +322,11 @@ src/com/xiboliya/snowjielong/frame/LoginFrame.java
 ******************************
 git tag V1.0-20250412
 ******************************
+
+2025-06-08
+1.一天中首次闯关时，无论剩余体力值是否超过100，都重置为100。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+2.当答对一个字，但是整个成语没有全对时，只将答对的字对应的格子背景设置为绿色。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+3.当闯关超时、超过答题次数、闯关成功、从头开始时，清除当前关卡标签的属性为空，并且设置不可以获得焦点。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
