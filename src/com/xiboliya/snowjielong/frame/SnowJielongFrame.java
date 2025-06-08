@@ -763,9 +763,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         // 不是同一天，重新记录时间戳，体力恢复为100
         this.startTimeMillis = currentTimeMillis;
         Util.setting.user.idiomCache.setStartTimeMillis(this.startTimeMillis);
-        if (this.energy < 100) {
-          this.energy = 100;
-        }
+        this.energy = 100;
         Util.setting.user.idiomCache.setEnergy(this.energy);
       }
     }
