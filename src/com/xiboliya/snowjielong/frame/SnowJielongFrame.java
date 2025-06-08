@@ -1256,6 +1256,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       this.btnDelay.setEnabled(false);
       TipsWindow.show(this, "回答正确，加" + currentScore + "分！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.SMALL);
       this.refreshRankLevel();
+      this.clearAnswerCellsTag();
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
           JOptionPane.showMessageDialog(this, "恭喜通关！你可以进入下一等级了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
@@ -1284,6 +1285,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         this.btnPause.setEnabled(false);
         this.btnDelay.setEnabled(false);
         this.setCellsVisible(false);
+        this.clearAnswerCellsTag();
       } else {
         TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
       }
@@ -1354,6 +1356,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         lblAnswer.setBackground(Color.GREEN);
       }
       lblAnswer.setFocusable(false);
+      IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
+      idiomTag.setFocused(false);
     }
   }
 
@@ -1407,6 +1411,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.btnPause.setEnabled(false);
     this.btnDelay.setEnabled(false);
     this.setCellsVisible(false);
+    this.clearAnswerCellsTag();
   }
 
   /**
@@ -1572,6 +1577,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
     this.initIdiomList();
     this.refreshElements();
+    this.clearAnswerCellsTag();
     this.btnEnergy.setEnabled(this.energyCount > 0);
     this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
@@ -1708,6 +1714,16 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     }
     for (BaseLabel lblElement : this.charOptionCellList) {
       lblElement.setVisible(visible);
+    }
+  }
+
+  /**
+   * 清除空格子的属性
+   */
+  private void clearAnswerCellsTag() {
+    for (BaseLabel lblElement : this.answerCellList) {
+      lblElement.setTag(null);
+      lblElement.setFocusable(false); // 设置标签不可以获得焦点
     }
   }
 
