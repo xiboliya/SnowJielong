@@ -1226,8 +1226,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.answerTimes++;
     this.totalSubmitCount++;
     Util.setting.user.idiomCache.setTotalSubmitCount(this.totalSubmitCount);
-    IdiomTag IdiomTag = (IdiomTag)lblAnswer.getTag();
-    String content = IdiomTag.getContent();
+    IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
+    String content = idiomTag.getContent();
     if (optionText.equals(content)) {
       this.totalRightCount++;
       Util.setting.user.idiomCache.setTotalRightCount(this.totalRightCount);
@@ -1350,6 +1350,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         for (BaseLabel lblCell : lblList) {
           lblCell.setBackground(Color.GREEN);
         }
+      } else {
+        lblAnswer.setBackground(Color.GREEN);
       }
       lblAnswer.setFocusable(false);
     }
