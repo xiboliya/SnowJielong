@@ -330,3 +330,10 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 3.当闯关超时、超过答题次数、闯关成功、从头开始时，清除当前关卡标签的属性为空，并且设置不可以获得焦点。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-06-16
+1.解决某些关卡中成语错误的问题。
+res/idiom/level1.txt
+res/idiom/level2.txt
+res/idiom/level3.txt
+res/idiom/level4.txt
