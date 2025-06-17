@@ -144,7 +144,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private ButtonGroup bgpScale = new ButtonGroup();
   private EtchedBorder etchedBorder = new EtchedBorder();
   private MouseAdapter mouseAdapter = null;
-  private SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
+  private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
   // 仓库对话框
   private DepositoryDialog depositoryDialog = null;
   // 游戏规则对话框
@@ -442,6 +442,24 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.energyCount = idiomCache.getEnergyCount();
     this.energy = idiomCache.getEnergy();
     this.startTimeMillis = idiomCache.getStartTimeMillis();
+    this.initEnergy();
+  }
+
+  /**
+   * 初始化体力值
+   */
+  private void initEnergy() {
+    if (this.startTimeMillis <= 0) {
+      return;
+    }
+    long currentTimeMillis = System.currentTimeMillis();
+    String dateCurrent = this.simpleDateFormat.format(new Date(currentTimeMillis));
+    String dateStart = this.simpleDateFormat.format(new Date(this.startTimeMillis));
+    if (!dateCurrent.equals(dateStart)) {
+      // 不是同一天，体力恢复为100
+      this.energy = 100;
+      Util.setting.user.idiomCache.setEnergy(this.energy);
+    }
   }
 
   /**
@@ -460,7 +478,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    */
   private void init() {
     this.setTitle("成语接龙");
-    this.simpleDateFormat.applyPattern("yyyy-MM-dd");
     this.initPanel();
     this.initMenuBar();
     this.setMenuDefaultInit();
@@ -760,11 +777,9 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       String dateCurrent = this.simpleDateFormat.format(new Date(currentTimeMillis));
       String dateStart = this.simpleDateFormat.format(new Date(this.startTimeMillis));
       if (!dateCurrent.equals(dateStart)) {
-        // 不是同一天，重新记录时间戳，体力恢复为100
+        // 不是同一天，重新记录时间戳
         this.startTimeMillis = currentTimeMillis;
         Util.setting.user.idiomCache.setStartTimeMillis(this.startTimeMillis);
-        this.energy = 100;
-        Util.setting.user.idiomCache.setEnergy(this.energy);
       }
     }
     if (this.energy <= 0) {
