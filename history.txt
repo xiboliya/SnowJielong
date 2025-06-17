@@ -337,3 +337,7 @@ res/idiom/level1.txt
 res/idiom/level2.txt
 res/idiom/level3.txt
 res/idiom/level4.txt
+
+2025-06-17
+1.打开主页面时及时恢复体力值，而不是在开始闯关时恢复。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
