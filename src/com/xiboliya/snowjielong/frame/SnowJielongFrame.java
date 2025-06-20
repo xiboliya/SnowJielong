@@ -22,8 +22,6 @@ import java.awt.GridLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -76,15 +74,8 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  * 成语接龙
  * 
  * @author 冰原
- * 天星：北斗、十一曜、天罡、地煞。
- * 北斗：天枢、天璇、天玑、天权、玉衡、开阳、摇光。
- * 十一曜：太阳、太阴、荧惑、辰星、岁星、太白、镇星、罗睺、计都、紫炁、月孛。
- * 百宝箱：砗磲、珍珠、珊瑚、琥珀、水晶、玛瑙、翡翠、猫眼、欧泊、钻石、红宝石、蓝宝石、祖母绿、碧玺、
- * 和田玉、独山玉、岫岩玉、蓝田玉、田黄石、寿山石、孔雀石、绿松石、石榴石、雨花石、鸡血石、橄榄石、青金石、黑曜石、月光石、日光石、玉髓、夜明珠、避尘珠、雮尘珠。
- * 添加积分兑换商城。
- * 添加成语的解释，存放在单独的文件里。在每关通过之后，可以点击查看。
  */
-public class SnowJielongFrame extends JFrame implements ActionListener, FocusListener {
+public class SnowJielongFrame extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
   // 难度等级名称数组
   private static final String[] TOPIC_LEVEL_NAME = new String[] { "初级", "中级", "高级", "特级", "顶级" };
@@ -749,7 +740,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     lblElement.setOpaque(true); // 设置标签可以绘制背景
     lblElement.setBorder(this.etchedBorder);
     lblElement.setFocusable(false); // 设置标签不可以获得焦点
-    lblElement.addFocusListener(this);
     lblElement.addMouseListener(this.mouseAdapter);
     return lblElement;
   }
@@ -1104,12 +1094,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
         lblElement.setBackground(Color.LIGHT_GRAY);
       }
     }
-    size = this.answerCellList.size();
-    for (int i = 0; i < size; i++) {
-      this.answerCellList.get(i).setFocusable(true); // 设置标签可以获得焦点
-    }
     BaseLabel lblFirstAnswer = this.answerCellList.get(0);
-    lblFirstAnswer.requestFocus(); // 第一个空格子获得焦点
     lblFirstAnswer.setBackground(Color.PINK);
     IdiomTag idiomTag = (IdiomTag)lblFirstAnswer.getTag();
     idiomTag.setFocused(true);
@@ -1181,7 +1166,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     this.mouseAdapter = new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         BaseLabel lblElement = (BaseLabel) e.getSource();
-        lblElement.requestFocus(); // 当鼠标单击时，获得焦点
         if (answerCellList.contains(lblElement)) {
           cancelAnswer(lblElement);
         } else if (charOptionCellList.contains(lblElement)) {
@@ -1202,11 +1186,25 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
    * @param lblAnswer 当前获得焦点的答题区的格子
    */
   private void cancelAnswer(BaseLabel lblAnswer) {
-    if (this.countdown <= 0 || this.isCurrentBarrierPassed) {
+    if (this.countdown <= 0 || this.isCurrentBarrierPassed || Color.GREEN.equals(lblAnswer.getBackground())) {
       return;
     }
     String text = lblAnswer.getText();
-    if (Util.isTextEmpty(text) || Color.GREEN.equals(lblAnswer.getBackground())) {
+    if (Util.isTextEmpty(text)) {
+      IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
+      if (!idiomTag.isFocused()) {
+        // 如果点击的非当前选中的格子，则更新点击的格子和当前选中的格子背景色
+        for (BaseLabel lblElement : this.answerCellList) {
+          IdiomTag tag = (IdiomTag)lblElement.getTag();
+          if (tag.isFocused()) {
+            tag.setFocused(false);
+            lblElement.setBackground(Color.WHITE);
+            break;
+          }
+        }
+        idiomTag.setFocused(true);
+        lblAnswer.setBackground(Color.PINK);
+      }
       return;
     }
     for (BaseLabel lblOption : this.charOptionCellList) {
@@ -1370,9 +1368,23 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
       } else {
         lblAnswer.setBackground(Color.GREEN);
       }
-      lblAnswer.setFocusable(false);
       IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
       idiomTag.setFocused(false);
+    }
+    this.refreshNextElementBackground();
+  }
+
+  /**
+   * 自动更新下一个未答对格子的背景色
+   */
+  private void refreshNextElementBackground() {
+    for (BaseLabel lblAnswer : this.answerCellList) {
+      IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
+      if (!lblAnswer.getText().equals(idiomTag.getContent())) {
+        idiomTag.setFocused(true);
+        lblAnswer.setBackground(Color.PINK);
+        break;
+      }
     }
   }
 
@@ -1738,7 +1750,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
   private void clearAnswerCellsTag() {
     for (BaseLabel lblElement : this.answerCellList) {
       lblElement.setTag(null);
-      lblElement.setFocusable(false); // 设置标签不可以获得焦点
     }
   }
 
@@ -1927,35 +1938,5 @@ public class SnowJielongFrame extends JFrame implements ActionListener, FocusLis
     } else if (this.itemAbout.equals(source)) {
       this.showAbout();
     }
-  }
-
-  /**
-   * 当文本标签获得焦点时，将触发此事件
-   */
-  @Override
-  public void focusGained(FocusEvent e) {
-    BaseLabel lblElement = (BaseLabel) e.getSource();
-    if (this.answerCellList.contains(lblElement) && !this.isCurrentBarrierPassed) {
-      for (BaseLabel lblAnswer : this.answerCellList) {
-        IdiomTag idiomTag = (IdiomTag)lblAnswer.getTag();
-        if (lblAnswer.equals(lblElement)) {
-          idiomTag.setFocused(true);
-          lblAnswer.setBackground(Color.PINK);
-        } else {
-          idiomTag.setFocused(false);
-          if (!lblAnswer.getText().equals(idiomTag.getContent())) {
-            lblAnswer.setBackground(Color.WHITE);
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * 当文本标签失去焦点时，将触发此事件
-   */
-  @Override
-  public void focusLost(FocusEvent e) {
-
   }
 }
