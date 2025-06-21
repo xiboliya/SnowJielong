@@ -345,3 +345,7 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2025-06-20
 1.改为使用代码实现题目区选中格子的切换，而不依赖焦点的移动，解决偶现的当前选中格子错乱的问题。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-06-21
+1.在点击题目区和选项区中格子时，恢复提示过的选项格子背景颜色。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
