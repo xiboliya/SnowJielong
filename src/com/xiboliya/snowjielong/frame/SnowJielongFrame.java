@@ -1171,6 +1171,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
         } else if (charOptionCellList.contains(lblElement)) {
           checkAnswer(lblElement);
         }
+        refreshOptionCellBackground();
       }
     };
     // 为窗口添加事件监听器
@@ -1424,6 +1425,18 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.lblRankLevel.setText("头衔：" + rankLevelName);
     if (this.currentRankLevel > oldRankLevel) {
       JOptionPane.showMessageDialog(this, "恭喜头衔升级为：" + rankLevelName + "！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
+    }
+  }
+
+  /**
+   * 恢复提示过的选项格子背景颜色
+   */
+  private void refreshOptionCellBackground() {
+    for (BaseLabel lblOption : this.charOptionCellList) {
+      if (Color.PINK.equals(lblOption.getBackground())) {
+        lblOption.setBackground(Color.WHITE);
+        break;
+      }
     }
   }
 
