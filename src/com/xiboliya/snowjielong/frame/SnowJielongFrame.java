@@ -65,6 +65,7 @@ import com.xiboliya.snowjielong.common.BarrierOrder;
 import com.xiboliya.snowjielong.common.IdiomCache;
 import com.xiboliya.snowjielong.common.IdiomTag;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
+import com.xiboliya.snowjielong.dialog.ChangePasswordDialog;
 import com.xiboliya.snowjielong.dialog.DepositoryDialog;
 import com.xiboliya.snowjielong.dialog.RulesDialog;
 import com.xiboliya.snowjielong.util.Util;
@@ -104,6 +105,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private JRadioButtonMenuItem itemScale30 = new JRadioButtonMenuItem("放大30%(D)");
   private JRadioButtonMenuItem itemScale40 = new JRadioButtonMenuItem("放大40%(E)");
   private JRadioButtonMenuItem itemScale50 = new JRadioButtonMenuItem("放大50%(F)");
+  private JMenu menuUser = new JMenu("账号管理(U)");
+  private JMenuItem itemChangePassword = new JMenuItem("修改密码(P)", 'P');
   private JMenu menuHelp = new JMenu("帮助(H)");
   private JMenuItem itemHelp = new JMenuItem("游戏规则(H)", 'H');
   private JMenuItem itemAbout = new JMenuItem("关于(A)", 'A');
@@ -140,6 +143,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private DepositoryDialog depositoryDialog = null;
   // 游戏规则对话框
   private RulesDialog rulesDialog = null;
+  // 修改密码对话框
+  private ChangePasswordDialog changePasswordDialog = null;
   // 关于对话框
   private AboutDialog aboutDialog = null;
   // 所有格子的集合
@@ -575,6 +580,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.menuScale.add(this.itemScale30);
     this.menuScale.add(this.itemScale40);
     this.menuScale.add(this.itemScale50);
+    this.menuSetting.add(this.menuUser);
+    this.menuUser.add(this.itemChangePassword);
     this.menuBar.add(this.menuHelp);
     this.menuHelp.add(this.itemHelp);
     this.menuHelp.add(this.itemAbout);
@@ -620,6 +627,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.itemScale50.setMnemonic('F');
     this.menuScale.setMnemonic('C');
     this.menuHelp.setMnemonic('H');
+    this.menuUser.setMnemonic('U');
   }
 
   /**
@@ -629,6 +637,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.itemRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
     this.itemDepository.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
     this.itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
+    this.itemChangePassword.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
     this.itemHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
     this.itemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
   }
@@ -1161,6 +1170,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.itemScale30.addActionListener(this);
     this.itemScale40.addActionListener(this);
     this.itemScale50.addActionListener(this);
+    this.itemChangePassword.addActionListener(this);
     this.itemHelp.addActionListener(this);
     this.itemAbout.addActionListener(this);
     this.mouseAdapter = new MouseAdapter() {
@@ -1911,6 +1921,17 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
+   * 打开修改密码对话框
+   */
+  private void openChangePasswordDialog() {
+    if (this.changePasswordDialog == null) {
+      this.changePasswordDialog = new ChangePasswordDialog(this, true);
+    } else {
+      this.changePasswordDialog.setVisible(true);
+    }
+  }
+
+  /**
    * 为各组件添加事件的处理方法
    */
   @Override
@@ -1946,6 +1967,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.zoom(Util.SCALE_40);
     } else if (this.itemScale50.equals(source)) {
       this.zoom(Util.SCALE_50);
+    } else if (this.itemChangePassword.equals(source)) {
+      this.openChangePasswordDialog();
     } else if (this.itemHelp.equals(source)) {
       this.openIdiomRulesDialog();
     } else if (this.itemAbout.equals(source)) {

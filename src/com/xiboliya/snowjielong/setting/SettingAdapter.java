@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import com.xiboliya.snowjielong.common.BarrierOrder;
+import com.xiboliya.snowjielong.common.ChangePasswordResult;
 import com.xiboliya.snowjielong.common.Global;
 import com.xiboliya.snowjielong.common.LoginResult;
 import com.xiboliya.snowjielong.common.RegisterResult;
@@ -371,8 +372,7 @@ public final class SettingAdapter {
     }
     User user = new User(userName, password);
     this.setting.userList.add(user);
-    String content = this.getContents();
-    this.toSaveFile(content);
+    this.save();
     return RegisterResult.REGISTER_SUCCESS;
   }
 
@@ -400,6 +400,47 @@ public final class SettingAdapter {
       return LoginResult.LOGIN_SUCCESS;
     }
     return LoginResult.PASSWORD_WRONG;
+  }
+
+  /**
+   * 修改密码
+   * @param aarPasswordOld 原密码
+   * @param aarPassword 新密码
+   * @param aarPasswordAgain 确认新密码
+   * @return 修改密码结果
+   */
+  public ChangePasswordResult changePassword(char[] aarPasswordOld, char[] aarPassword, char[] aarPasswordAgain) {
+    if (aarPasswordOld == null || aarPasswordOld.length == 0) {
+      return ChangePasswordResult.OLD_PASSWORD_EMPTY;
+    }
+    if (aarPassword == null || aarPassword.length == 0) {
+      return ChangePasswordResult.PASSWORD_EMPTY;
+    }
+    if (aarPasswordAgain == null || aarPasswordAgain.length == 0) {
+      return ChangePasswordResult.PASSWORD_AGAIN_EMPTY;
+    }
+    if (aarPassword.length > 20 || aarPasswordAgain.length > 20) {
+      return ChangePasswordResult.PASSWORD_MORE_THAN_20_CHARS;
+    }
+    String password = new String(aarPassword);
+    if (password.matches(".*[ \t\r\n].*")) {
+      return ChangePasswordResult.PASSWORD_HAS_SPECIAL_CHAR;
+    }
+    String passwordAgain = new String(aarPasswordAgain);
+    if (!password.equals(passwordAgain)) {
+      return ChangePasswordResult.PASSWORD_AND_PASSWORD_AGAIN_DIFFERENT;
+    }
+    String passwordOld = new String(aarPasswordOld);
+    String strPassword = this.setting.user.getPassword();
+    if (!passwordOld.equals(strPassword)) {
+      return ChangePasswordResult.OLD_PASSWORD_WRONG;
+    }
+    if (password.equals(passwordOld)) {
+      return ChangePasswordResult.PASSWORD_AND_OLD_PASSWORD_SAME;
+    }
+    this.setting.user.setPassword(password);
+    this.save();
+    return ChangePasswordResult.SUCCESS;
   }
 
   /**
