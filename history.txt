@@ -349,3 +349,10 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2025-06-21
 1.在点击题目区和选项区中格子时，恢复提示过的选项格子背景颜色。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-06-22
+1.在设置->账号管理菜单下添加：修改密码功能，可以修改当前账号的密码。
+src/com/xiboliya/snowjielong/common/ChangePasswordResult.java（添加）
+src/com/xiboliya/snowjielong/dialog/ChangePasswordDialog.java（添加）
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
