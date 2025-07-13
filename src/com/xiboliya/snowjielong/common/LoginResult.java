@@ -43,7 +43,7 @@ public enum LoginResult {
   /**
    * 登录成功
    */
-  LOGIN_SUCCESS;
+  SUCCESS;
 
   /**
    * 重写父类的方法
@@ -58,7 +58,7 @@ public enum LoginResult {
       return "账号未注册！";
     case PASSWORD_WRONG:
       return "密码错误！";
-    case LOGIN_SUCCESS:
+    case SUCCESS:
       return "登录成功！";
     default:
       return "";
@@ -71,7 +71,7 @@ public enum LoginResult {
    */
   public boolean isSuccess() {
     switch (this) {
-    case LOGIN_SUCCESS:
+    case SUCCESS:
       return true;
     default:
       return false;

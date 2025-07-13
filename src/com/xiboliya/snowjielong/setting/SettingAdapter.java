@@ -219,6 +219,10 @@ public final class SettingAdapter {
         user.setUserName(value);
       } else if (key.equals("password") && !Util.isTextEmpty(value)) {
         user.setPassword(value);
+      } else if (key.equals("retrievePasswordQuestion") && !Util.isTextEmpty(value)) {
+        user.setRetrievePasswordQuestion(value);
+      } else if (key.equals("retrievePasswordAnswer") && !Util.isTextEmpty(value)) {
+        user.setRetrievePasswordAnswer(value);
       } else if (key.equals("currentTopicLevel") && !Util.isTextEmpty(value)) {
         user.idiomCache.setCurrentTopicLevel(this.getNumber(value));
       } else if (key.equals("currentBarrierOrder") && !Util.isTextEmpty(value)) {
@@ -341,9 +345,12 @@ public final class SettingAdapter {
    * @param userName 账号
    * @param aarPassword 密码
    * @param aarPasswordAgain 确认密码
+   * @param retrievePasswordQuestion 找回密码问题
+   * @param retrievePasswordAnswer 找回密码答案
    * @return 注册结果
    */
-  public RegisterResult register(String userName, char[] aarPassword, char[] aarPasswordAgain) {
+  public RegisterResult register(String userName, char[] aarPassword, char[] aarPasswordAgain,
+    String retrievePasswordQuestion, String retrievePasswordAnswer) {
     if (Util.isTextEmpty(userName)) {
       return RegisterResult.USER_NAME_EMPTY;
     }
@@ -370,10 +377,16 @@ public final class SettingAdapter {
     if (this.isUserExist(userName)) {
       return RegisterResult.USER_NAME_ALREADY_EXIST;
     }
-    User user = new User(userName, password);
+    if (Util.isTextEmpty(retrievePasswordQuestion) && !Util.isTextEmpty(retrievePasswordAnswer)) {
+      return RegisterResult.RETRIEVE_PASSWORD_QUESTION_EMPTY;
+    }
+    if (!Util.isTextEmpty(retrievePasswordQuestion) && Util.isTextEmpty(retrievePasswordAnswer)) {
+      return RegisterResult.RETRIEVE_PASSWORD_ANSWER_EMPTY;
+    }
+    User user = new User(userName, password, retrievePasswordQuestion, retrievePasswordAnswer);
     this.setting.userList.add(user);
     this.save();
-    return RegisterResult.REGISTER_SUCCESS;
+    return RegisterResult.SUCCESS;
   }
 
   /**
@@ -397,7 +410,7 @@ public final class SettingAdapter {
     String strPassword = user.getPassword();
     if (password.equals(strPassword)) {
       this.setting.user = user;
-      return LoginResult.LOGIN_SUCCESS;
+      return LoginResult.SUCCESS;
     }
     return LoginResult.PASSWORD_WRONG;
   }
@@ -444,11 +457,46 @@ public final class SettingAdapter {
   }
 
   /**
+   * 修改密码
+   * @param userName 账号
+   * @param aarPassword 新密码
+   * @param aarPasswordAgain 确认新密码
+   * @return 修改密码结果
+   */
+  public ChangePasswordResult changePassword(String userName, char[] aarPassword, char[] aarPasswordAgain) {
+    if (aarPassword == null || aarPassword.length == 0) {
+      return ChangePasswordResult.PASSWORD_EMPTY;
+    }
+    if (aarPasswordAgain == null || aarPasswordAgain.length == 0) {
+      return ChangePasswordResult.PASSWORD_AGAIN_EMPTY;
+    }
+    if (aarPassword.length > 20 || aarPasswordAgain.length > 20) {
+      return ChangePasswordResult.PASSWORD_MORE_THAN_20_CHARS;
+    }
+    String password = new String(aarPassword);
+    if (password.matches(".*[ \t\r\n].*")) {
+      return ChangePasswordResult.PASSWORD_HAS_SPECIAL_CHAR;
+    }
+    String passwordAgain = new String(aarPasswordAgain);
+    if (!password.equals(passwordAgain)) {
+      return ChangePasswordResult.PASSWORD_AND_PASSWORD_AGAIN_DIFFERENT;
+    }
+    for (User user : this.setting.userList) {
+      if (userName.equals(user.getUserName())) {
+        user.setPassword(password);
+        break;
+      }
+    }
+    this.save();
+    return ChangePasswordResult.SUCCESS;
+  }
+
+  /**
    * 账号是否已存在
    * @param userName 账号
    * @return 账号是否已存在，true表示账号已存在，false反之
    */
-  private boolean isUserExist(String userName) {
+  public boolean isUserExist(String userName) {
     if (this.setting.userList.isEmpty()) {
       return false;
     }
@@ -458,6 +506,44 @@ public final class SettingAdapter {
       }
     }
     return false;
+  }
+
+  /**
+   * 获取找回密码问题
+   * @param userName 账号
+   * @return 找回密码问题
+   */
+  public String getRetrievePasswordQuestion(String userName) {
+    String retrievePasswordQuestion = "";
+    if (Util.isTextEmpty(userName)) {
+      return retrievePasswordQuestion;
+    }
+    for (User user : this.setting.userList) {
+      if (userName.equals(user.getUserName())) {
+        retrievePasswordQuestion = user.getRetrievePasswordQuestion();
+        break;
+      }
+    }
+    return retrievePasswordQuestion;
+  }
+
+  /**
+   * 获取找回密码答案
+   * @param userName 账号
+   * @return 找回密码答案
+   */
+  public String getRetrievePasswordAnswer(String userName) {
+    String retrievePasswordAnswer = "";
+    if (Util.isTextEmpty(userName)) {
+      return retrievePasswordAnswer;
+    }
+    for (User user : this.setting.userList) {
+      if (userName.equals(user.getUserName())) {
+        retrievePasswordAnswer = user.getRetrievePasswordAnswer();
+        break;
+      }
+    }
+    return retrievePasswordAnswer;
   }
 
   /**
@@ -496,6 +582,8 @@ public final class SettingAdapter {
     stbResult.append("[User]\n");
     stbResult.append("userName=" + user.getUserName() + "\n");
     stbResult.append("password=" + user.getPassword() + "\n");
+    stbResult.append("retrievePasswordQuestion=" + user.getRetrievePasswordQuestion() + "\n");
+    stbResult.append("retrievePasswordAnswer=" + user.getRetrievePasswordAnswer() + "\n");
     stbResult.append("currentTopicLevel=" + user.idiomCache.getCurrentTopicLevel() + "\n");
     stbResult.append("currentBarrierOrder=" + user.idiomCache.getCurrentBarrierOrder() + "\n");
     stbResult.append("currentBarrier=" + user.idiomCache.getCurrentBarrier() + "\n");

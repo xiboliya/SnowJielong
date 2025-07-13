@@ -28,6 +28,10 @@ public class User {
   private String userName;
   // 密码
   private String password;
+  // 找回密码问题
+  private String retrievePasswordQuestion = "";
+  // 找回密码答案
+  private String retrievePasswordAnswer = "";
   // 进度存档
   public IdiomCache idiomCache = new IdiomCache();
 
@@ -49,6 +53,21 @@ public class User {
   }
 
   /**
+   * 构造方法
+   * 
+   * @param userName 账号
+   * @param password 密码
+   * @param retrievePasswordQuestion 找回密码问题
+   * @param retrievePasswordAnswer 找回密码答案
+   */
+  public User(String userName, String password, String retrievePasswordQuestion, String retrievePasswordAnswer) {
+    this.setUserName(userName);
+    this.setPassword(password);
+    this.setRetrievePasswordQuestion(retrievePasswordQuestion);
+    this.setRetrievePasswordAnswer(retrievePasswordAnswer);
+  }
+
+  /**
    * 获取账号
    * 
    * @return 账号
@@ -67,6 +86,24 @@ public class User {
   }
 
   /**
+   * 获取找回密码问题
+   * 
+   * @return 找回密码问题
+   */
+  public String getRetrievePasswordQuestion() {
+    return this.retrievePasswordQuestion;
+  }
+
+  /**
+   * 获取找回密码答案
+   * 
+   * @return 找回密码答案
+   */
+  public String getRetrievePasswordAnswer() {
+    return this.retrievePasswordAnswer;
+  }
+
+  /**
    * 设置账号
    * 
    * @param userName 账号
@@ -82,5 +119,23 @@ public class User {
    */
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  /**
+   * 设置找回密码问题
+   * 
+   * @param retrievePasswordQuestion 找回密码问题
+   */
+  public void setRetrievePasswordQuestion(String retrievePasswordQuestion) {
+    this.retrievePasswordQuestion = retrievePasswordQuestion;
+  }
+
+  /**
+   * 设置找回密码答案
+   * 
+   * @param retrievePasswordAnswer 找回密码答案
+   */
+  public void setRetrievePasswordAnswer(String retrievePasswordAnswer) {
+    this.retrievePasswordAnswer = retrievePasswordAnswer;
   }
 }

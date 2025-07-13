@@ -57,9 +57,17 @@ public enum RegisterResult {
    */
   USER_NAME_ALREADY_EXIST,
   /**
+   * 找回密码问题为空
+   */
+  RETRIEVE_PASSWORD_QUESTION_EMPTY,
+  /**
+   * 找回密码答案为空
+   */
+  RETRIEVE_PASSWORD_ANSWER_EMPTY,
+  /**
    * 注册成功
    */
-  REGISTER_SUCCESS;
+  SUCCESS;
 
   /**
    * 重写父类的方法
@@ -82,7 +90,11 @@ public enum RegisterResult {
       return "确认密码与密码必须相同！";
     case USER_NAME_ALREADY_EXIST:
       return "账号已存在！";
-    case REGISTER_SUCCESS:
+    case RETRIEVE_PASSWORD_QUESTION_EMPTY:
+      return "找回密码问题不能为空！";
+    case RETRIEVE_PASSWORD_ANSWER_EMPTY:
+      return "找回密码答案不能为空！";
+    case SUCCESS:
       return "注册成功！";
     default:
       return "";
@@ -95,7 +107,7 @@ public enum RegisterResult {
    */
   public boolean isSuccess() {
     switch (this) {
-    case REGISTER_SUCCESS:
+    case SUCCESS:
       return true;
     default:
       return false;

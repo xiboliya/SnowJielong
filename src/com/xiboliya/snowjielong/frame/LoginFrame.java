@@ -33,8 +33,8 @@ import com.xiboliya.snowjielong.base.BaseButton;
 import com.xiboliya.snowjielong.base.BaseTextField;
 import com.xiboliya.snowjielong.common.LoginResult;
 import com.xiboliya.snowjielong.dialog.RegisterDialog;
+import com.xiboliya.snowjielong.dialog.RetrievePasswordDialog;
 import com.xiboliya.snowjielong.util.Util;
-import com.xiboliya.snowjielong.window.TipsWindow;
 
 /**
  * 成语接龙登录界面
@@ -49,8 +49,9 @@ public class LoginFrame extends JFrame implements ActionListener {
   private JLabel lblPassword = new JLabel("密码：");
   private JPasswordField psdPassword = new JPasswordField();
   private BaseButton btnLogin = new BaseButton("登录");
+  private BaseButton btnRetrievePassword = new BaseButton("找回密码");
   private BaseButton btnRegister = new BaseButton("注册");
-  private BaseButton btnQuit = new BaseButton("退出");
+  private RetrievePasswordDialog retrievePasswordDialog = null;
   private RegisterDialog registerDialog = null;
   private KeyAdapter keyAdapter = null;
 
@@ -97,15 +98,15 @@ public class LoginFrame extends JFrame implements ActionListener {
     this.lblPassword.setBounds(Util.getSize(20), Util.getSize(55), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
     this.psdPassword.setBounds(Util.getSize(90), Util.getSize(55), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
     this.btnLogin.setBounds(Util.getSize(100), Util.getSize(110), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
-    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(150), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
-    this.btnQuit.setBounds(Util.getSize(100), Util.getSize(190), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.btnRetrievePassword.setBounds(Util.getSize(100), Util.getSize(150), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(190), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
     this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.txtUserName);
     this.pnlMain.add(this.lblPassword);
     this.pnlMain.add(this.psdPassword);
     this.pnlMain.add(this.btnLogin);
+    this.pnlMain.add(this.btnRetrievePassword);
     this.pnlMain.add(this.btnRegister);
-    this.pnlMain.add(this.btnQuit);
   }
 
   /**
@@ -123,8 +124,8 @@ public class LoginFrame extends JFrame implements ActionListener {
     this.txtUserName.addKeyListener(this.keyAdapter);
     this.psdPassword.addKeyListener(this.keyAdapter);
     this.btnLogin.addActionListener(this);
+    this.btnRetrievePassword.addActionListener(this);
     this.btnRegister.addActionListener(this);
-    this.btnQuit.addActionListener(this);
     // 为窗口添加事件监听器
     this.addWindowListener(new WindowAdapter() {
       @Override
@@ -146,6 +147,17 @@ public class LoginFrame extends JFrame implements ActionListener {
       this.dispose();
     } else {
       JOptionPane.showMessageDialog(this, loginResult.toString(), Util.SOFTWARE, JOptionPane.ERROR_MESSAGE);
+    }
+  }
+
+  /**
+   * 打开找回密码对话框
+   */
+  private void openRetrievePasswordDialog() {
+    if (this.retrievePasswordDialog == null) {
+      this.retrievePasswordDialog = new RetrievePasswordDialog(this, true);
+    } else {
+      this.retrievePasswordDialog.setVisible(true);
     }
   }
 
@@ -175,10 +187,10 @@ public class LoginFrame extends JFrame implements ActionListener {
     Object source = e.getSource();
     if (this.btnLogin.equals(source)) {
       this.login();
+    } else if (this.btnRetrievePassword.equals(source)) {
+      this.openRetrievePasswordDialog();
     } else if (this.btnRegister.equals(source)) {
       this.openRegisterDialog();
-    } else if (this.btnQuit.equals(source)) {
-      this.exit();
     }
   }
 }

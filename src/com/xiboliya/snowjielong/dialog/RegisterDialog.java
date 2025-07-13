@@ -31,7 +31,6 @@ import com.xiboliya.snowjielong.base.BaseKeyAdapter;
 import com.xiboliya.snowjielong.base.BaseTextField;
 import com.xiboliya.snowjielong.common.RegisterResult;
 import com.xiboliya.snowjielong.util.Util;
-import com.xiboliya.snowjielong.window.TipsWindow;
 
 /**
  * "注册"对话框
@@ -47,6 +46,11 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
   private JPasswordField psdPassword = new JPasswordField();
   private JLabel lblPasswordAgain = new JLabel("确认密码：");
   private JPasswordField psdPasswordAgain = new JPasswordField();
+  private JLabel lblInfo = new JLabel("【选填】找回密码：");
+  private JLabel lblRetrievePasswordQuestion = new JLabel("问题：");
+  private BaseTextField txtRetrievePasswordQuestion = new BaseTextField(true, ".{0,20}"); // 限制用户输入的字符数量不能超过20个
+  private JLabel lblRetrievePasswordAnswer = new JLabel("答案：");
+  private BaseTextField txtRetrievePasswordAnswer = new BaseTextField(true, ".{0,20}"); // 限制用户输入的字符数量不能超过20个
   private BaseButton btnRegister = new BaseButton("立即注册");
   private BaseKeyAdapter keyAdapter = new BaseKeyAdapter(this);
   private BaseKeyAdapter buttonKeyAdapter = new BaseKeyAdapter(this, false);
@@ -75,6 +79,8 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
     this.txtUserName.setText("");
     this.psdPassword.setText("");
     this.psdPasswordAgain.setText("");
+    this.txtRetrievePasswordQuestion.setText("");
+    this.txtRetrievePasswordAnswer.setText("");
     super.setVisible(visible);
   }
 
@@ -90,13 +96,23 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
     this.psdPassword.setBounds(Util.getSize(90), Util.getSize(55), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
     this.lblPasswordAgain.setBounds(Util.getSize(20), Util.getSize(90), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
     this.psdPasswordAgain.setBounds(Util.getSize(90), Util.getSize(90), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
-    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(150), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
+    this.lblInfo.setBounds(Util.getSize(20), Util.getSize(125), Util.getSize(200), Util.getSize(Util.VIEW_HEIGHT));
+    this.lblRetrievePasswordQuestion.setBounds(Util.getSize(20), Util.getSize(160), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.txtRetrievePasswordQuestion.setBounds(Util.getSize(90), Util.getSize(160), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.lblRetrievePasswordAnswer.setBounds(Util.getSize(20), Util.getSize(195), Util.getSize(70), Util.getSize(Util.VIEW_HEIGHT));
+    this.txtRetrievePasswordAnswer.setBounds(Util.getSize(90), Util.getSize(195), Util.getSize(170), Util.getSize(Util.INPUT_HEIGHT));
+    this.btnRegister.setBounds(Util.getSize(100), Util.getSize(230), Util.getSize(100), Util.getSize(Util.BUTTON_HEIGHT));
     this.pnlMain.add(this.lblUserName);
     this.pnlMain.add(this.txtUserName);
     this.pnlMain.add(this.lblPassword);
     this.pnlMain.add(this.psdPassword);
     this.pnlMain.add(this.lblPasswordAgain);
     this.pnlMain.add(this.psdPasswordAgain);
+    this.pnlMain.add(this.lblInfo);
+    this.pnlMain.add(this.lblRetrievePasswordQuestion);
+    this.pnlMain.add(this.txtRetrievePasswordQuestion);
+    this.pnlMain.add(this.lblRetrievePasswordAnswer);
+    this.pnlMain.add(this.txtRetrievePasswordAnswer);
     this.pnlMain.add(this.btnRegister);
   }
 
@@ -107,6 +123,8 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
     this.txtUserName.addKeyListener(this.keyAdapter);
     this.psdPassword.addKeyListener(this.keyAdapter);
     this.psdPasswordAgain.addKeyListener(this.keyAdapter);
+    this.txtRetrievePasswordQuestion.addKeyListener(this.keyAdapter);
+    this.txtRetrievePasswordAnswer.addKeyListener(this.keyAdapter);
     this.btnRegister.addActionListener(this);
     this.btnRegister.addKeyListener(this.buttonKeyAdapter);
   }
@@ -118,7 +136,9 @@ public class RegisterDialog extends BaseDialog implements ActionListener {
     String strUserName = this.txtUserName.getText();
     char[] aarPassword = this.psdPassword.getPassword();
     char[] aarPasswordAgain = this.psdPasswordAgain.getPassword();
-    RegisterResult registerResult = Util.settingAdapter.register(strUserName, aarPassword, aarPasswordAgain);
+    String retrievePasswordQuestion = this.txtRetrievePasswordQuestion.getText();
+    String retrievePasswordAnswer = this.txtRetrievePasswordAnswer.getText();
+    RegisterResult registerResult = Util.settingAdapter.register(strUserName, aarPassword, aarPasswordAgain, retrievePasswordQuestion, retrievePasswordAnswer);
     if (registerResult.isSuccess()) {
       JOptionPane.showMessageDialog(this, registerResult.toString(), Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
       this.onCancel();
