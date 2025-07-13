@@ -540,10 +540,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.btnPause.setEnabled(false);
     this.btnDelay.setEnabled(false);
     this.btnEnergy.setEnabled(this.energyCount > 0);
-    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
-    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
-    this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
-    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
   }
 
   /**
@@ -561,6 +557,10 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
     this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
     this.lblEnergy.setText("体力：" + this.energy);
+    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
+    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
+    this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
+    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
   }
 
   /**
@@ -797,12 +797,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.isCurrentBarrierPassed = false;
     Util.setting.user.idiomCache.setCurrentBarrierPassed(this.isCurrentBarrierPassed);
     this.clearElementsText();
-    this.charCellIndexList.clear();
-    this.answerCellIndexList.clear();
-    this.charCellList.clear();
-    this.answerCellList.clear();
-    this.charOptionCellList.clear();
-    this.idiomCellsList.clear();
+    this.clearCurrentBarrierList();
     this.answerTimes = 0;
     this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + idiomCount + "关");
     String item = this.idiomList.get(this.currentBarrier);
@@ -1077,7 +1072,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 清除答题区格子的文字
+   * 清除答题区和选项区格子的文字
    */
   private void clearElementsText() {
     for (BaseLabel lblElement : this.charCellList) {
@@ -1086,6 +1081,21 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     for (BaseLabel lblElement : this.answerCellList) {
       lblElement.setText("");
     }
+    for (BaseLabel lblElement : this.optionCellList) {
+      lblElement.setText("");
+    }
+  }
+
+  /**
+   * 清空当前关卡的题目数据
+   */
+  private void clearCurrentBarrierList() {
+    this.charCellIndexList.clear();
+    this.answerCellIndexList.clear();
+    this.charCellList.clear();
+    this.answerCellList.clear();
+    this.charOptionCellList.clear();
+    this.idiomCellsList.clear();
   }
 
   /**
@@ -1103,10 +1113,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
         lblElement.setBackground(Color.LIGHT_GRAY);
       }
     }
-    BaseLabel lblFirstAnswer = this.answerCellList.get(0);
-    lblFirstAnswer.setBackground(Color.PINK);
-    IdiomTag idiomTag = (IdiomTag)lblFirstAnswer.getTag();
-    idiomTag.setFocused(true);
+    if (!this.answerCellList.isEmpty()) {
+      BaseLabel lblFirstAnswer = this.answerCellList.get(0);
+      lblFirstAnswer.setBackground(Color.PINK);
+      IdiomTag idiomTag = (IdiomTag)lblFirstAnswer.getTag();
+      idiomTag.setFocused(true);
+    }
   }
 
   /**
@@ -1121,8 +1133,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
         lblElement.setBackground(Color.WHITE);
       } else {
         lblElement.setBackground(Color.LIGHT_GRAY);
-        lblElement.setText("");
-        lblElement.setTag(null);
       }
     }
   }
@@ -1280,7 +1290,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.btnDelay.setEnabled(false);
       TipsWindow.show(this, "回答正确，加" + currentScore + "分！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.SMALL);
       this.refreshRankLevel();
-      this.clearAnswerCellsTag();
+      this.clearAnswerAndOptionCellsTag();
       if (this.isPassedAllBarrier()) {
         if (this.hasNextTopicLevel()) {
           JOptionPane.showMessageDialog(this, "恭喜通关！你可以进入下一等级了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
@@ -1309,7 +1319,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
         this.btnPause.setEnabled(false);
         this.btnDelay.setEnabled(false);
         this.setCellsVisible(false);
-        this.clearAnswerCellsTag();
+        this.clearAnswerAndOptionCellsTag();
       } else {
         TipsWindow.show(this, "回答错误！", TipsWindow.Background.PINK, TipsWindow.TimerLength.DEFAULT, TipsWindow.WindowSize.SMALLER);
       }
@@ -1461,7 +1471,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.btnPause.setEnabled(false);
     this.btnDelay.setEnabled(false);
     this.setCellsVisible(false);
-    this.clearAnswerCellsTag();
+    this.clearAnswerAndOptionCellsTag();
   }
 
   /**
@@ -1605,40 +1615,19 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       return;
     }
     this.stopTimer();
-    this.currentRankLevel = 0;
-    this.answerTimes = 0;
+    this.countdown = 0;
+    this.btnStart.setText("开始闯关");
+    this.btnStart.setEnabled(true);
     Util.setting.user.idiomCache = new IdiomCache();
-    this.currentTopicLevel = Util.setting.user.idiomCache.getCurrentTopicLevel();
-    this.currentBarrierOrder = Util.setting.user.idiomCache.getCurrentBarrierOrder();
-    this.currentBarrier = Util.setting.user.idiomCache.getCurrentBarrier();
-    this.currentBarrierFailTimes = Util.setting.user.idiomCache.getCurrentBarrierFailTimes();
-    this.isCurrentBarrierPassed = Util.setting.user.idiomCache.isCurrentBarrierPassed();
-    this.totalScore = Util.setting.user.idiomCache.getTotalScore();
-    this.usedTime = Util.setting.user.idiomCache.getUsedTime();
-    this.passedBarrierCount = Util.setting.user.idiomCache.getPassedBarrierCount();
-    this.totalSubmitCount = Util.setting.user.idiomCache.getTotalSubmitCount();
-    this.totalRightCount = Util.setting.user.idiomCache.getTotalRightCount();
-    this.hintCount = Util.setting.user.idiomCache.getHintCount();
-    this.pauseCount = Util.setting.user.idiomCache.getPauseCount();
-    this.delayCount = Util.setting.user.idiomCache.getDelayCount();
-    this.energyCount = Util.setting.user.idiomCache.getEnergyCount();
-    this.energy = Util.setting.user.idiomCache.getEnergy();
-    this.startTimeMillis = Util.setting.user.idiomCache.getStartTimeMillis();
-    this.countdown = TOPIC_LEVEL_TIME[this.currentTopicLevel];
+    this.loadIdiomCache();
     this.initIdiomList();
-    this.refreshElements();
-    this.clearAnswerCellsTag();
-    this.btnEnergy.setEnabled(this.energyCount > 0);
-    this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
-    this.lblScore.setText("累计分数：" + this.totalScore + "分");
-    this.lblTime.setText("累计用时：" + this.usedTime + "秒");
-    this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
-    this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
-    this.lblEnergy.setText("体力：" + this.energy);
-    this.btnHint.setToolTipText("剩余提示卡：" + this.hintCount);
-    this.btnPause.setToolTipText("剩余暂停卡：" + this.pauseCount);
-    this.btnDelay.setToolTipText("剩余延时卡：" + this.delayCount);
-    this.btnEnergy.setToolTipText("剩余体力卡：" + this.energyCount);
+    this.initView();
+    this.refreshToolCount();
+    this.clearElementsText();
+    this.clearCurrentBarrierList();
+    this.clearAnswerAndOptionCellsTag();
+    this.refreshElementsBackground();
+    this.refreshOptionElementsBackground();
   }
 
   /**
@@ -1768,10 +1757,13 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 清除空格子的属性
+   * 清除答题区和选项区格子的属性
    */
-  private void clearAnswerCellsTag() {
+  private void clearAnswerAndOptionCellsTag() {
     for (BaseLabel lblElement : this.answerCellList) {
+      lblElement.setTag(null);
+    }
+    for (BaseLabel lblElement : this.optionCellList) {
       lblElement.setTag(null);
     }
   }
