@@ -368,3 +368,7 @@ src/com/xiboliya/snowjielong/frame/LoginFrame.java
 src/com/xiboliya/snowjielong/setting/SettingAdapter.java
 2.解决点击“从头开始”菜单后自动开始闯关，但是无法答题的问题。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+******************************
+git tag V1.1-20250718
+******************************
