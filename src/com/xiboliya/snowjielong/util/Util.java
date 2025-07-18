@@ -34,7 +34,7 @@ import com.xiboliya.snowjielong.setting.SettingAdapter;
  */
 public final class Util {
   public static final String SOFTWARE = "成语接龙"; // 软件名称
-  public static final String VERSION = "V1.0"; // 软件版本号
+  public static final String VERSION = "V1.1"; // 软件版本号
   public static final String OS_NAME = System.getProperty("os.name", "Windows"); // 当前操作系统的名称
   public static final String FILE_SEPARATOR = System.getProperty("file.separator", "/"); // 当前操作系统的文件分隔符
   public static final String SETTING_FILE_NAME = "snowjielong.cfg"; // 用来保存软件设置的配置文件名
