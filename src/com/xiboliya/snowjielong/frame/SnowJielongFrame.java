@@ -234,7 +234,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
    * 初始化当前难度等级的题目列表
    */
   private void initIdiomList() {
-    URL url = ClassLoader.getSystemResource("res/idiom/level" + this.currentTopicLevel + ".txt");
+    URL url = ClassLoader.getSystemResource("res/topic/level" + this.currentTopicLevel + ".txt");
     if (url == null) {
       return;
     }
