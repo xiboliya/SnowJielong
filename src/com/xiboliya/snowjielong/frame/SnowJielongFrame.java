@@ -106,7 +106,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private JRadioButtonMenuItem itemScale40 = new JRadioButtonMenuItem("放大40%(E)");
   private JRadioButtonMenuItem itemScale50 = new JRadioButtonMenuItem("放大50%(F)");
   private JMenu menuUser = new JMenu("账号管理(U)");
-  private JMenuItem itemChangePassword = new JMenuItem("修改密码(P)", 'P');
+  private JMenuItem itemChangePassword = new JMenuItem("修改密码(P)...", 'P');
+  private JMenuItem itemLogout = new JMenuItem("退出账号(O)...", 'O');
   private JMenu menuHelp = new JMenu("帮助(H)");
   private JMenuItem itemHelp = new JMenuItem("游戏规则(H)", 'H');
   private JMenuItem itemAbout = new JMenuItem("关于(A)", 'A');
@@ -582,6 +583,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.menuScale.add(this.itemScale50);
     this.menuSetting.add(this.menuUser);
     this.menuUser.add(this.itemChangePassword);
+    this.menuUser.add(this.itemLogout);
     this.menuBar.add(this.menuHelp);
     this.menuHelp.add(this.itemHelp);
     this.menuHelp.add(this.itemAbout);
@@ -638,6 +640,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.itemDepository.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
     this.itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
     this.itemChangePassword.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
+    this.itemLogout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
     this.itemHelp.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
     this.itemAbout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
   }
@@ -1181,6 +1184,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.itemScale40.addActionListener(this);
     this.itemScale50.addActionListener(this);
     this.itemChangePassword.addActionListener(this);
+    this.itemLogout.addActionListener(this);
     this.itemHelp.addActionListener(this);
     this.itemAbout.addActionListener(this);
     this.mouseAdapter = new MouseAdapter() {
@@ -1894,22 +1898,30 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
 
   /**
    * 缩放页面显示比例
+   * @param scale 缩放比例
    */
   private void zoom(float scale) {
     if (Util.setting.global.scale == scale) {
       return;
     }
     Util.setting.global.scale = scale;
-    Window[] windows = Window.getWindows();
-    for (Window window : windows) {
-      window.dispose();
-    }
+    this.closeAllWindows();
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
         Util.setDefaultFont();
         new SnowJielongFrame();
       }
     });
+  }
+
+  /**
+   * 关闭所有打开的窗口
+   */
+  private void closeAllWindows() {
+    Window[] windows = Window.getWindows();
+    for (Window window : windows) {
+      window.dispose();
+    }
   }
 
   /**
@@ -1921,6 +1933,25 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     } else {
       this.changePasswordDialog.setVisible(true);
     }
+  }
+
+  /**
+   * 打开退出账号对话框
+   */
+  private void openLogoutDialog() {
+    int result = JOptionPane.showConfirmDialog(this, "此操作将退出当前账号！\n是否继续？",
+        Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
+    if (result != JOptionPane.YES_OPTION) {
+      return;
+    }
+    Util.setting.user = null;
+    this.closeAllWindows();
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        Util.setDefaultFont();
+        new LoginFrame();
+      }
+    });
   }
 
   /**
@@ -1961,6 +1992,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.zoom(Util.SCALE_50);
     } else if (this.itemChangePassword.equals(source)) {
       this.openChangePasswordDialog();
+    } else if (this.itemLogout.equals(source)) {
+      this.openLogoutDialog();
     } else if (this.itemHelp.equals(source)) {
       this.openIdiomRulesDialog();
     } else if (this.itemAbout.equals(source)) {
