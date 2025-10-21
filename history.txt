@@ -372,3 +372,14 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 ******************************
 git tag V1.1-20250718
 ******************************
+
+2025-10-21
+1.修改所有成语题目文件的目录。
+res/idiom/level0.txt 重命名为： res/topic/level0.txt
+res/idiom/level1.txt 重命名为： res/topic/level1.txt
+res/idiom/level2.txt 重命名为： res/topic/level2.txt
+res/idiom/level3.txt 重命名为： res/topic/level3.txt
+res/idiom/level4.txt 重命名为： res/topic/level4.txt
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+2.“账户管理”菜单下添加：“退出账号”功能。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
