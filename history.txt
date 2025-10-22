@@ -383,3 +383,7 @@ res/idiom/level4.txt 重命名为： res/topic/level4.txt
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2.“账户管理”菜单下添加：“退出账号”功能。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-10-22
+1.修改退出账号功能提示信息，并解决正在闯关时退出账号后，出现空指针异常的问题。
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
