@@ -1939,11 +1939,17 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
    * 打开退出账号对话框
    */
   private void openLogoutDialog() {
-    int result = JOptionPane.showConfirmDialog(this, "此操作将退出当前账号！\n是否继续？",
-        Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
+    String info = "";
+    if (this.countdown > 0) {
+      info = "此操作将退出当前账号，当前正在闯关中，如果退出会导致本轮闯关失败。\n是否继续？";
+    } else {
+      info = "此操作将退出当前账号。\n是否继续？";
+    }
+    int result = JOptionPane.showConfirmDialog(this, info, Util.SOFTWARE, JOptionPane.YES_NO_OPTION);
     if (result != JOptionPane.YES_OPTION) {
       return;
     }
+    this.stopTimer();
     Util.setting.user = null;
     this.closeAllWindows();
     SwingUtilities.invokeLater(new Runnable() {
