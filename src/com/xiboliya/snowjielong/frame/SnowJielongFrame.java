@@ -67,6 +67,7 @@ import com.xiboliya.snowjielong.common.IdiomTag;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
 import com.xiboliya.snowjielong.dialog.ChangePasswordDialog;
 import com.xiboliya.snowjielong.dialog.DepositoryDialog;
+import com.xiboliya.snowjielong.dialog.RankingListDialog;
 import com.xiboliya.snowjielong.dialog.RulesDialog;
 import com.xiboliya.snowjielong.util.Util;
 import com.xiboliya.snowjielong.window.TipsWindow;
@@ -96,6 +97,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private JMenu menuGame = new JMenu("游戏(G)");
   private JMenuItem itemRestart = new JMenuItem("从头开始(R)", 'R');
   private JMenuItem itemDepository = new JMenuItem("仓库(D)...", 'D');
+  private JMenuItem itemRankingList = new JMenuItem("排行榜(L)...", 'L');
   private JMenuItem itemExit = new JMenuItem("退出(X)", 'X');
   private JMenu menuSetting = new JMenu("设置(S)");
   private JMenu menuScale = new JMenu("窗口缩放(C)");
@@ -142,6 +144,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
   // 仓库对话框
   private DepositoryDialog depositoryDialog = null;
+  // 排行榜对话框
+  private RankingListDialog rankingListDialog = null;
   // 游戏规则对话框
   private RulesDialog rulesDialog = null;
   // 修改密码对话框
@@ -572,6 +576,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.menuBar.add(this.menuGame);
     this.menuGame.add(this.itemRestart);
     this.menuGame.add(this.itemDepository);
+    this.menuGame.add(this.itemRankingList);
     this.menuGame.add(this.itemExit);
     this.menuBar.add(this.menuSetting);
     this.menuSetting.add(this.menuScale);
@@ -638,6 +643,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   public void setMenuAccelerator() {
     this.itemRestart.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
     this.itemDepository.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+    this.itemRankingList.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
     this.itemExit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
     this.itemChangePassword.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK));
     this.itemLogout.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
@@ -672,27 +678,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     if (this.usedTime <= 0 || this.passedBarrierCount <= 0) {
       return "--";
     }
-    this.speed = this.getSpeed();
+    this.speed = Util.getSpeed(Util.setting.user);
     if (this.speed > 0) {
       return String.valueOf(this.speed);
     }
     return "--";
-  }
-
-  /**
-   * 获取闯关速度
-   * @return 闯关速度
-   */
-  private float getSpeed() {
-    try {
-      BigDecimal number1 = new BigDecimal(this.usedTime);
-      BigDecimal number2 = new BigDecimal(this.passedBarrierCount);
-      BigDecimal number = number1.divide(number2, 1, RoundingMode.HALF_UP);
-      return number.floatValue();
-    } catch (Exception x) {
-      // x.printStackTrace();
-    }
-    return -1;
   }
 
   /**
@@ -703,27 +693,11 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     if (this.totalRightCount <= 0 || this.totalSubmitCount <= 0) {
       return "--";
     }
-    this.accuracy = this.getAccuracy();
+    this.accuracy = Util.getAccuracy(Util.setting.user);
     if (this.accuracy > 0) {
       return String.valueOf(this.accuracy);
     }
     return "--";
-  }
-
-  /**
-   * 获取正确率
-   * @return 正确率
-   */
-  private float getAccuracy() {
-    try {
-      BigDecimal number1 = new BigDecimal(this.totalRightCount * 100);
-      BigDecimal number2 = new BigDecimal(this.totalSubmitCount);
-      BigDecimal number = number1.divide(number2, 1, RoundingMode.HALF_UP);
-      return number.floatValue();
-    } catch (Exception x) {
-      // x.printStackTrace();
-    }
-    return -1;
   }
 
   /**
@@ -1176,6 +1150,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.btnCancel.addActionListener(this);
     this.itemRestart.addActionListener(this);
     this.itemDepository.addActionListener(this);
+    this.itemRankingList.addActionListener(this);
     this.itemExit.addActionListener(this);
     this.itemScaleDefault.addActionListener(this);
     this.itemScale10.addActionListener(this);
@@ -1647,6 +1622,17 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
+   * 打开排行榜对话框
+   */
+  private void openRankingListDialog() {
+    if (this.rankingListDialog == null) {
+      this.rankingListDialog = new RankingListDialog(this, true);
+    } else {
+      this.rankingListDialog.setVisible(true);
+    }
+  }
+
+  /**
    * 刷新功能卡数据和显示
    */
   private void refreshToolCount() {
@@ -1982,6 +1968,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.restart();
     } else if (this.itemDepository.equals(source)) {
       this.openDepositoryDialog();
+    } else if (this.itemRankingList.equals(source)) {
+      this.openRankingListDialog();
     } else if (this.itemExit.equals(source)) {
       this.exit();
     } else if (this.itemScaleDefault.equals(source)) {

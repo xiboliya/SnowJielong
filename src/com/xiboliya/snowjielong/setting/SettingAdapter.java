@@ -588,7 +588,7 @@ public final class SettingAdapter {
     stbResult.append("currentBarrierOrder=" + user.idiomCache.getCurrentBarrierOrder() + "\n");
     stbResult.append("currentBarrier=" + user.idiomCache.getCurrentBarrier() + "\n");
     stbResult.append("currentBarrierFailTimes=" + user.idiomCache.getCurrentBarrierFailTimes() + "\n");
-    stbResult.append("isCurrentBarrierPassed=" + String.valueOf(user.idiomCache.isCurrentBarrierPassed()) + "\n");
+    stbResult.append("isCurrentBarrierPassed=" + user.idiomCache.isCurrentBarrierPassed() + "\n");
     stbResult.append("totalScore=" + user.idiomCache.getTotalScore() + "\n");
     stbResult.append("usedTime=" + user.idiomCache.getUsedTime() + "\n");
     stbResult.append("passedBarrierCount=" + user.idiomCache.getPassedBarrierCount() + "\n");
@@ -599,7 +599,7 @@ public final class SettingAdapter {
     stbResult.append("delayCount=" + user.idiomCache.getDelayCount() + "\n");
     stbResult.append("energyCount=" + user.idiomCache.getEnergyCount() + "\n");
     stbResult.append("energy=" + user.idiomCache.getEnergy() + "\n");
-    stbResult.append("startTimeMillis=" + String.valueOf(user.idiomCache.getStartTimeMillis()) + "\n");
+    stbResult.append("startTimeMillis=" + user.idiomCache.getStartTimeMillis() + "\n");
     stbResult.append("starMap=" + this.getStarMapText(user.idiomCache.getStarMap()) + "\n");
     stbResult.append(Util.SETTING_USER_SEPARATOR);
     return stbResult.toString();

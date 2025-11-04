@@ -18,11 +18,14 @@
 package com.xiboliya.snowjielong.util;
 
 import java.awt.Font;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Enumeration;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.setting.Setting;
 import com.xiboliya.snowjielong.setting.SettingAdapter;
 
@@ -118,6 +121,40 @@ public final class Util {
    */
   public static int getSize(int size) {
     return (int)(size * setting.global.scale);
+  }
+
+  /**
+   * 获取闯关速度
+   * @param user 账号
+   * @return 闯关速度
+   */
+  public static float getSpeed(User user) {
+    try {
+      BigDecimal usedTime = new BigDecimal(user.idiomCache.getUsedTime());
+      BigDecimal passedBarrierCount = new BigDecimal(user.idiomCache.getPassedBarrierCount());
+      BigDecimal number = usedTime.divide(passedBarrierCount, 1, RoundingMode.HALF_UP);
+      return number.floatValue();
+    } catch (Exception x) {
+      // x.printStackTrace();
+    }
+    return -1;
+  }
+
+  /**
+   * 获取正确率
+   * @param user 账号
+   * @return 正确率
+   */
+  public static float getAccuracy(User user) {
+    try {
+      BigDecimal totalRightCount = new BigDecimal(user.idiomCache.getTotalRightCount() * 100);
+      BigDecimal totalSubmitCount = new BigDecimal(user.idiomCache.getTotalSubmitCount());
+      BigDecimal number = totalRightCount.divide(totalSubmitCount, 1, RoundingMode.HALF_UP);
+      return number.floatValue();
+    } catch (Exception x) {
+      // x.printStackTrace();
+    }
+    return -1;
   }
 
 }
