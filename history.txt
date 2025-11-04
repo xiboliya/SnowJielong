@@ -387,3 +387,12 @@ src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
 2025-10-22
 1.修改退出账号功能提示信息，并解决正在闯关时退出账号后，出现空指针异常的问题。
 src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+
+2025-11-04
+1.“游戏”菜单下添加：“排行榜”功能，共有：得分榜、闯关榜、神速榜、精准榜、财富榜。
+src/com/xiboliya/snowjielong/common/LabelAlignment.java（添加）
+src/com/xiboliya/snowjielong/dialog/RankingListDialog.java（添加）
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/panel/HorizontalLabelPanel.java（添加）
+src/com/xiboliya/snowjielong/setting/SettingAdapter.java
+src/com/xiboliya/snowjielong/util/Util.java
