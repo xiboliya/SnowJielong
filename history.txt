@@ -404,3 +404,10 @@ res/topic/level1.txt
 src/com/xiboliya/snowjielong/common/BarrierOrder.java
 src/com/xiboliya/snowjielong/common/IdiomCache.java
 src/com/xiboliya/snowjielong/dialog/RankingListDialog.java
+3.闯关成功后，取消原先的TipsWindow提示，改为通过关卡弹窗页面。页面中包含：通过当前的关卡数、得分、头衔升级、随机奖励，还有当前关卡的所有成语，点击成语可以查看成语解释。并且添加初级、中级的成语解释文件。
+res/idiom/level0.txt（添加）
+res/idiom/level1.txt（添加）
+src/com/xiboliya/snowjielong/common/Reward.java（添加）
+src/com/xiboliya/snowjielong/dialog/PassBarrierDialog.java（添加）
+src/com/xiboliya/snowjielong/frame/SnowJielongFrame.java
+src/com/xiboliya/snowjielong/util/Util.java
