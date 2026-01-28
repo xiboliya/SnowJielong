@@ -19,8 +19,6 @@ package com.xiboliya.snowjielong.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ import com.xiboliya.snowjielong.util.Util;
  * 
  * @author 冰原
  */
-public class RankingListDialog extends BaseDialog implements ActionListener, ChangeListener {
+public class RankingListDialog extends BaseDialog implements ChangeListener {
   private static final long serialVersionUID = 1L;
   // 各排行榜显示的最多条数，包括标题栏在内
   private static final int ROW_COUNT = 10;
@@ -352,15 +350,6 @@ public class RankingListDialog extends BaseDialog implements ActionListener, Cha
     this.pnlSpeed.addKeyListener(this.keyAdapter);
     this.pnlAccuracy.addKeyListener(this.keyAdapter);
     this.pnlWealth.addKeyListener(this.keyAdapter);
-  }
-
-  /**
-   * 为各组件添加事件的处理方法
-   */
-  @Override
-  public void actionPerformed(ActionEvent e) {
-    Object source = e.getSource();
-    
   }
 
   /**

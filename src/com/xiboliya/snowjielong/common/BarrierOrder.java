@@ -56,7 +56,7 @@ public enum BarrierOrder {
    * 整个字符串反转后的ASCII降序
    */
   WHOLE_STRING_REVERSE_DESCEND("whole_string_reverse_descend", 7),
-    /**
+  /**
    * 中间数字部分的ASCII升序
    */
   CENTER_NUMBER_ASCEND("center_number_ascend", 8),
@@ -64,7 +64,7 @@ public enum BarrierOrder {
    * 中间数字部分的ASCII降序
    */
   CENTER_NUMBER_DESCEND("center_number_descend", 9),
-    /**
+  /**
    * 中间数字部分反转后的ASCII升序
    */
   CENTER_NUMBER_REVERSE_ASCEND("center_number_reverse_ascend", 10),
@@ -72,11 +72,11 @@ public enum BarrierOrder {
    * 中间数字部分反转后的ASCII降序
    */
   CENTER_NUMBER_REVERSE_DESCEND("center_number_reverse_descend", 11);
-  
+
   // 枚举元素名称
-  private String name;
+  private final String name;
   // 枚举元素索引
-  private int index;
+  private final int index;
 
   /**
    * 构造方法

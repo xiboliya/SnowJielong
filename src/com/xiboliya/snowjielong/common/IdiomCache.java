@@ -235,7 +235,7 @@ public class IdiomCache {
   /**
    * 设置累计备选答对次数
    * 
-   * @param totalSubmitCount 累计备选答对次数
+   * @param totalRightCount 累计备选答对次数
    */
   public void setTotalRightCount(int totalRightCount) {
     this.totalRightCount = totalRightCount;
