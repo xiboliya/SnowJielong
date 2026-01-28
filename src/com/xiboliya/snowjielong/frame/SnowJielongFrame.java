@@ -64,9 +64,11 @@ import com.xiboliya.snowjielong.base.BaseLabel;
 import com.xiboliya.snowjielong.common.BarrierOrder;
 import com.xiboliya.snowjielong.common.IdiomCache;
 import com.xiboliya.snowjielong.common.IdiomTag;
+import com.xiboliya.snowjielong.common.Reward;
 import com.xiboliya.snowjielong.dialog.AboutDialog;
 import com.xiboliya.snowjielong.dialog.ChangePasswordDialog;
 import com.xiboliya.snowjielong.dialog.DepositoryDialog;
+import com.xiboliya.snowjielong.dialog.PassBarrierDialog;
 import com.xiboliya.snowjielong.dialog.RankingListDialog;
 import com.xiboliya.snowjielong.dialog.RulesDialog;
 import com.xiboliya.snowjielong.util.Util;
@@ -79,18 +81,12 @@ import com.xiboliya.snowjielong.window.TipsWindow;
  */
 public class SnowJielongFrame extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
-  // 难度等级名称数组
-  private static final String[] TOPIC_LEVEL_NAME = new String[] { "初级", "中级", "高级", "特级", "顶级" };
   // 各难度等级下每轮答题时间，单位：秒
   private static final int[] TOPIC_LEVEL_TIME = new int[] { 20, 30, 40, 50, 60 };
   // 各难度等级下每轮闯关速度，获得随机奖励的几率所需的参数，单位：秒/关
   private static final int[] TOPIC_LEVEL_SPEED = new int[] { 3, 4, 5, 6, 7 };
   // 各难度等级下每轮答题正确率，获得随机奖励的几率所需的参数，单位：%
   private static final int[] TOPIC_LEVEL_ACCURACY = new int[] { 90, 80, 70, 60, 50 };
-  // 头衔等级名称数组
-  private static final String[] RANK_LEVEL_NAME = new String[] { "童生", "秀才", "附生", "增生", "廪生", "举人", "解元", "贡士", "会元", "进士", "探花", "榜眼", "状元" };
-  // 头衔等级分数数组
-  private static final int[] RANK_LEVEL_SCORE = new int[] { 0, 60, 180, 360, 600, 900, 1260, 1680, 2160, 2700, 3300, 3960, 4680 };
   // 当前题目显示的默认起始索引数组
   private static final int[] START_INDEX = new int[] { 21, 22, 23, 24, 25, 31, 32, 33, 34, 35, 41, 42, 43, 44, 45, 51, 52, 53, 54, 55, 61, 62, 63, 64, 65, 71, 72, 73, 74, 75 };
   private JMenuBar menuBar = new JMenuBar();
@@ -152,6 +148,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private ChangePasswordDialog changePasswordDialog = null;
   // 关于对话框
   private AboutDialog aboutDialog = null;
+  // 通过关卡对话框
+  private PassBarrierDialog passBarrierDialog = null;
   // 所有格子的集合
   private ArrayList<BaseLabel> cellList = new ArrayList<BaseLabel>();
   // 显示字符的格子索引集合
@@ -266,11 +264,47 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
         // x.printStackTrace();
       }
     }
+    Util.currentTopicBarrierCount = this.idiomList.size();
     if (this.currentBarrierOrder == null) {
       this.refreshCurrentBarrierOrder();
     }
     Util.setting.user.idiomCache.setCurrentBarrierOrder(this.currentBarrierOrder);
     this.sortIdiomList();
+    this.initIdiomDefinitionMap();
+  }
+
+  /**
+   * 初始化当前难度等级的成语解释
+   */
+  private void initIdiomDefinitionMap() {
+    Util.currentTopicDefinitionMap.clear();
+    URL url = ClassLoader.getSystemResource("res/idiom/level" + this.currentTopicLevel + ".txt");
+    if (url == null) {
+      return;
+    }
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
+      String line = reader.readLine();
+      while (line != null) {
+        line = line.trim();
+        if (Util.isTextEmpty(line)) {
+          line = reader.readLine();
+          continue;
+        }
+        String[] array = line.split("#");
+        Util.currentTopicDefinitionMap.put(array[0], array[1]);
+        line = reader.readLine();
+      }
+    } catch (Exception x) {
+      // x.printStackTrace();
+    } finally {
+      try {
+        reader.close();
+      } catch (Exception x) {
+        // x.printStackTrace();
+      }
+    }
   }
 
   /**
@@ -284,7 +318,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 对当前难度等级的关卡进行顺序
+   * 对当前难度等级的关卡进行排序
    */
   private void sortIdiomList() {
     switch (this.currentBarrierOrder) {
@@ -552,13 +586,12 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
    */
   private void initView() {
     this.lblUserName.setText("账号：" + Util.setting.user.getUserName());
-    this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
-    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + this.idiomList.size() + "关");
+    this.lblTopicLevel.setText("难度：" + Util.TOPIC_LEVEL_NAME[this.currentTopicLevel]);
+    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + Util.currentTopicBarrierCount + "关");
     this.lblCountdown.setText("剩余时间：" + this.countdown + "秒");
     this.lblScore.setText("累计分数：" + this.totalScore + "分");
     this.lblTime.setText("累计用时：" + this.usedTime + "秒");
-    this.initRankLevel();
-    this.lblRankLevel.setText("头衔：" + RANK_LEVEL_NAME[this.currentRankLevel]);
+    this.lblRankLevel.setText("头衔：" + Util.RANK_LEVEL_NAME[Util.updateRankLevel()]);
     this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
     this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
     this.lblEnergy.setText("体力：" + this.energy);
@@ -652,25 +685,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 初始化头衔等级
-   */
-  private void initRankLevel() {
-    int size = RANK_LEVEL_SCORE.length;
-    if (this.totalScore <= 0) {
-      this.currentRankLevel = 0;
-    } else if (this.totalScore >= RANK_LEVEL_SCORE[size - 1]) {
-      this.currentRankLevel = size - 1;
-    } else {
-      for (int i = 0; i < size - 1; i++) {
-        if (this.totalScore >= RANK_LEVEL_SCORE[i] && this.totalScore < RANK_LEVEL_SCORE[i + 1]) {
-          this.currentRankLevel = i;
-          break;
-        }
-      }
-    }
-  }
-
-  /**
    * 获取闯关速度字符形式
    * @return 闯关速度字符形式
    */
@@ -734,8 +748,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
    * 刷新题目
    */
   private void refreshElements() {
-    int idiomCount = this.idiomList.size();
-    if (this.currentBarrierFailTimes < 0 && this.currentBarrier >= (idiomCount - 1)) {
+    if (this.currentBarrierFailTimes < 0 && this.currentBarrier >= (Util.currentTopicBarrierCount - 1)) {
       // 已通关
       this.btnStart.setEnabled(false);
       this.btnHint.setEnabled(false);
@@ -776,11 +789,13 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
     this.clearElementsText();
     this.clearCurrentBarrierList();
     this.answerTimes = 0;
-    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + idiomCount + "关");
+    this.lblBarrier.setText("关卡：第" + (this.currentBarrier + 1) + "/" + Util.currentTopicBarrierCount + "关");
     String item = this.idiomList.get(this.currentBarrier);
     String[] itemSplit = item.split("#");
     // 成语数组
     String[] idiomArray = itemSplit[0].split("，");
+    Util.currentIdiomList.clear();
+    Collections.addAll(Util.currentIdiomList, idiomArray);
     // 规则数组
     String[] ruleArray = itemSplit[1].split("，");
     boolean isStartVertical = this.getRandomIsStartVertical();
@@ -1251,6 +1266,7 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       }
       this.stopTimer();
       int currentScore = this.getCurrentScore();
+      Util.currentScore = currentScore;
       this.totalScore += currentScore;
       Util.setting.user.idiomCache.setTotalScore(this.totalScore);
       this.isCurrentBarrierPassed = true;
@@ -1263,24 +1279,19 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.lblScore.setText("累计分数：" + this.totalScore + "分");
       this.lblTime.setText("累计用时：" + this.usedTime + "秒");
       this.lblSpeed.setText("闯关速度：" + this.getSpeedText() + "秒/关");
+      this.lblRankLevel.setText("头衔：" + Util.RANK_LEVEL_NAME[Util.updateRankLevel()]);
       this.btnStart.setEnabled(true);
       this.btnHint.setEnabled(false);
       this.btnPause.setEnabled(false);
       this.btnDelay.setEnabled(false);
-      TipsWindow.show(this, "回答正确，加" + currentScore + "分！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.LONG, TipsWindow.WindowSize.SMALL);
-      this.refreshRankLevel();
       this.clearAnswerAndOptionCellsTag();
-      if (this.isPassedAllBarrier()) {
-        if (this.hasNextTopicLevel()) {
-          JOptionPane.showMessageDialog(this, "恭喜通关！你可以进入下一等级了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
-        } else {
-          this.currentBarrierFailTimes = -1;
-          this.btnStart.setEnabled(false);
-          JOptionPane.showMessageDialog(this, "恭喜通关！已没有更多成语可以挑战了！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
-        }
+      this.reward();
+      if (Util.isPassedAllBarrier() && !Util.hasNextTopicLevel()) {
+        this.currentBarrierFailTimes = -1;
+        this.btnStart.setEnabled(false);
       }
       Util.setting.user.idiomCache.setCurrentBarrierFailTimes(this.currentBarrierFailTimes);
-      this.reward();
+      this.openPassBarrierDialog();
     } else {
       this.lblAccuracy.setText("正确率：" + this.getAccuracyText() + "%");
       if (this.answerTimes >= this.answerCellList.size() * 2) {
@@ -1403,31 +1414,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 刷新头衔等级显示
-   */
-  private void refreshRankLevel() {
-    int oldRankLevel = this.currentRankLevel;
-    int size = RANK_LEVEL_SCORE.length;
-    if (this.totalScore <= 0) {
-      this.currentRankLevel = 0;
-    } else if (this.totalScore >= RANK_LEVEL_SCORE[size - 1]) {
-      this.currentRankLevel = size - 1;
-    } else {
-      for (int i = 0; i < size - 1; i++) {
-        if (this.totalScore >= RANK_LEVEL_SCORE[i] && this.totalScore < RANK_LEVEL_SCORE[i + 1]) {
-          this.currentRankLevel = i;
-          break;
-        }
-      }
-    }
-    String rankLevelName = RANK_LEVEL_NAME[this.currentRankLevel];
-    this.lblRankLevel.setText("头衔：" + rankLevelName);
-    if (this.currentRankLevel > oldRankLevel) {
-      JOptionPane.showMessageDialog(this, "恭喜头衔升级为：" + rankLevelName + "！", Util.SOFTWARE, JOptionPane.CANCEL_OPTION);
-    }
-  }
-
-  /**
    * 恢复提示过的选项格子背景颜色
    */
   private void refreshOptionCellBackground() {
@@ -1454,23 +1440,6 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   }
 
   /**
-   * 是否通过当前难度等级的所有关卡
-   * @return 是否通过当前难度等级的所有关卡
-   */
-  private boolean isPassedAllBarrier() {
-    return (this.currentBarrier + 1) >= this.idiomList.size();
-  }
-
-  /**
-   * 是否存在下一难度等级的关卡
-   * @return 是否存在下一难度等级的关卡
-   */
-  private boolean hasNextTopicLevel() {
-    URL url = ClassLoader.getSystemResource("res/idiom/level" + (this.currentTopicLevel + 1) + ".txt");
-    return url != null;
-  }
-
-  /**
    * 获得随机奖励
    */
   private void reward() {
@@ -1482,23 +1451,28 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       // 获得每类奖励的概率均为1/10
       if (strRandomNumber.endsWith("1")) {
         this.obtainReward();
+        return;
       }
     } else if (this.speed <= levelSpeed * 2 || this.accuracy >= LevelAccuracy - 10) {
       // 获得每类奖励的概率均为1/50
       if (strRandomNumber.endsWith("01") || strRandomNumber.endsWith("02")) {
         this.obtainReward();
+        return;
       }
     } else if (this.speed <= levelSpeed * 3 || this.accuracy >= LevelAccuracy - 20) {
       // 获得每类奖励的概率均为1/100
       if (strRandomNumber.endsWith("01")) {
         this.obtainReward();
+        return;
       }
     } else {
       // 获得每类奖励的概率均为1/500
       if (strRandomNumber.endsWith("001") || strRandomNumber.endsWith("002")) {
         this.obtainReward();
+        return;
       }
     }
+    Util.currentReward = null;
   }
 
   /**
@@ -1534,8 +1508,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private void obtainHint() {
     this.hintCount++;
     Util.setting.user.idiomCache.setHintCount(this.hintCount);
+    Util.currentReward = Reward.HINT;
     this.refreshHint();
-    TipsWindow.show(this, "恭喜：获得1张提示卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1544,8 +1518,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private void obtainPause() {
     this.pauseCount++;
     Util.setting.user.idiomCache.setPauseCount(this.pauseCount);
+    Util.currentReward = Reward.PAUSE;
     this.refreshPause();
-    TipsWindow.show(this, "恭喜：获得1张暂停卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1554,8 +1528,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private void obtainDelay() {
     this.delayCount++;
     Util.setting.user.idiomCache.setDelayCount(this.delayCount);
+    Util.currentReward = Reward.DELAY;
     this.refreshDelay();
-    TipsWindow.show(this, "恭喜：获得1张延时卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1564,8 +1538,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   private void obtainEnergy() {
     this.energyCount++;
     Util.setting.user.idiomCache.setEnergyCount(this.energyCount);
+    Util.currentReward = Reward.ENERGY;
     this.refreshEnergy();
-    TipsWindow.show(this, "恭喜：获得1张体力卡！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
   }
 
   /**
@@ -1581,7 +1555,8 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       count = 0;
     }
     starMap.put(name, count + 1);
-    TipsWindow.show(this, "恭喜：获得1颗" + name + "！", TipsWindow.Background.GREEN, TipsWindow.TimerLength.SHORT, TipsWindow.WindowSize.DEFAULT);
+    Util.currentReward = Reward.STAR;
+    Util.currentReward.setName(name);
   }
 
   /**
@@ -1666,6 +1641,17 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
       this.aboutDialog.pack(); // 自动调整窗口大小，以适应各组件
     }
     this.aboutDialog.setVisible(true);
+  }
+
+  /**
+   * 通过关卡
+   */
+  private void openPassBarrierDialog() {
+    if (this.passBarrierDialog == null) {
+      this.passBarrierDialog = new PassBarrierDialog(this, true);
+    } else {
+      this.passBarrierDialog.setVisible(true);
+    }
   }
 
   /**
@@ -1839,15 +1825,15 @@ public class SnowJielongFrame extends JFrame implements ActionListener {
   /**
    * 开始闯关
    */
-  private void start() {
+  public void start() {
     if (this.isCurrentBarrierPassed) {
-      if (this.isPassedAllBarrier()) {
-        if (this.hasNextTopicLevel()) {
+      if (Util.isPassedAllBarrier()) {
+        if (Util.hasNextTopicLevel()) {
           this.currentTopicLevel++;
           Util.setting.user.idiomCache.setCurrentTopicLevel(this.currentTopicLevel);
           this.currentBarrierOrder = null;
           this.initIdiomList();
-          this.lblTopicLevel.setText("难度：" + TOPIC_LEVEL_NAME[this.currentTopicLevel]);
+          this.lblTopicLevel.setText("难度：" + Util.TOPIC_LEVEL_NAME[this.currentTopicLevel]);
           this.currentBarrier = 0;
           Util.setting.user.idiomCache.setCurrentBarrier(this.currentBarrier);
           this.refreshElements();

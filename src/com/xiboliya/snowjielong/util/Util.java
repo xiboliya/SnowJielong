@@ -20,11 +20,15 @@ package com.xiboliya.snowjielong.util;
 import java.awt.Font;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.plaf.FontUIResource;
 
+import com.xiboliya.snowjielong.common.Reward;
 import com.xiboliya.snowjielong.common.User;
 import com.xiboliya.snowjielong.setting.Setting;
 import com.xiboliya.snowjielong.setting.SettingAdapter;
@@ -50,7 +54,7 @@ public final class Util {
   public static final int BUTTON_HEIGHT = 23; // 按钮的高度
   public static final int ICON_BUTTON_HEIGHT = 30; // 图标按钮的高度
   public static final int BUFFER_LENGTH = 1024; // 缓冲区的大小
-  public static final int MSG_LINE_SIZE = 60; // 提示框中每行字符串显示的最大字数
+  public static final int MSG_LINE_SIZE = 30; // 提示框中每行字符串显示的最大字数
   public static final float SCALE_DEFAULT = 1.0f; // 窗口缩放比例：原始比例
   public static final float SCALE_10 = 1.1f; // 窗口缩放比例：放大10%
   public static final float SCALE_20 = 1.2f; // 窗口缩放比例：放大20%
@@ -68,6 +72,12 @@ public final class Util {
   public static final ImageIcon ICON_PAUSE_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/pause_small.png")); // 暂停卡小图标
   public static final ImageIcon ICON_DELAY_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/delay_small.png")); // 延时卡小图标
   public static final ImageIcon ICON_ENERGY_SMALL = new ImageIcon(ClassLoader.getSystemResource("res/energy_small.png")); // 体力卡小图标
+  // 难度等级名称数组
+  public static final String[] TOPIC_LEVEL_NAME = new String[] { "初级", "中级", "高级", "特级", "顶级" };
+  // 头衔等级名称数组
+  public static final String[] RANK_LEVEL_NAME = new String[] { "童生", "秀才", "附生", "增生", "廪生", "举人", "解元", "贡士", "会元", "进士", "探花", "榜眼", "状元" };
+  // 头衔等级分数数组
+  public static final int[] RANK_LEVEL_SCORE = new int[] { 0, 60, 180, 360, 600, 900, 1260, 1680, 2160, 2700, 3300, 3960, 4680 };
   // 群星名称，即三十六天罡、七十二地煞
   public static final String[] STAR_NAMES = new String[] {
     "天魁星", "天罡星", "天机星", "天闲星", "天勇星", "天雄星", "天猛星", "天威星", "天英星", "天贵星", "天富星", "天满星",
@@ -82,6 +92,19 @@ public final class Util {
 
   public static Setting setting = new Setting(); // 软件参数配置类
   public static SettingAdapter settingAdapter = new SettingAdapter(setting); // 用于解析和保存软件配置文件的工具类
+
+  // 当前难度等级的所有成语的解释
+  public static HashMap<String, String> currentTopicDefinitionMap = new HashMap<String, String>();
+  // 当前难度等级的所有关卡数量
+  public static int currentTopicBarrierCount = 0;
+  // 当前头衔等级
+  public static int currentRankLevel = 0;
+  // 当前关卡的成语列表
+  public static ArrayList<String> currentIdiomList = new ArrayList<String>();
+  // 当前关卡获得的分数
+  public static int currentScore = 0;
+  // 当前关卡获得的奖励
+  public static Reward currentReward = null;
 
   /**
    * 由于此类为工具类，故将构造方法私有化
@@ -155,6 +178,86 @@ public final class Util {
       // x.printStackTrace();
     }
     return -1;
+  }
+
+  /**
+   * 是否通过当前难度等级的所有关卡
+   * @return 是否通过当前难度等级的所有关卡
+   */
+  public static boolean isPassedAllBarrier() {
+    return (setting.user.idiomCache.getCurrentBarrier() + 1) >= currentTopicBarrierCount;
+  }
+
+  /**
+   * 是否存在下一难度等级的关卡
+   * @return 是否存在下一难度等级的关卡
+   */
+  public static boolean hasNextTopicLevel() {
+    URL url = ClassLoader.getSystemResource("res/topic/level" + (setting.user.idiomCache.getCurrentTopicLevel() + 1) + ".txt");
+    return url != null;
+  }
+
+  /**
+   * 刷新头衔等级
+   * @return 头衔等级
+   */
+  public static int updateRankLevel() {
+    int totalScore = setting.user.idiomCache.getTotalScore();
+    currentRankLevel = getRankLevel(totalScore);
+    return currentRankLevel;
+  }
+
+  /**
+   * 获取头衔等级
+   * @param score 得分
+   * @return 头衔等级
+   */
+  public static int getRankLevel(int score) {
+    int size = RANK_LEVEL_SCORE.length;
+    int rankLevel = 0;
+    if (score <= 0) {
+      rankLevel = 0;
+    } else if (score >= RANK_LEVEL_SCORE[size - 1]) {
+      rankLevel = size - 1;
+    } else {
+      for (int i = 0; i < size - 1; i++) {
+        if (score >= RANK_LEVEL_SCORE[i] && score < RANK_LEVEL_SCORE[i + 1]) {
+          rankLevel = i;
+          break;
+        }
+      }
+    }
+    return rankLevel;
+  }
+
+  /**
+   * 将给定字符串重新分行，以适应对话框的显示
+   * 
+   * @param str 待处理的字符串
+   * @return 处理过的字符串
+   */
+  public static String convertToMsg(String str) {
+    String[] arrContents = str.split("\n", -1);
+    StringBuilder stbContent = new StringBuilder(); // 用于存放处理后的文本
+    for (int n = 0; n < arrContents.length; n++) {
+      String content = "";
+      if (arrContents[n].length() > MSG_LINE_SIZE) {
+        int lines = arrContents[n].length() / MSG_LINE_SIZE;
+        int remain = arrContents[n].length() % MSG_LINE_SIZE;
+        for (int i = 0; i < lines; i++) {
+          content = content + arrContents[n].substring(MSG_LINE_SIZE * i, MSG_LINE_SIZE * (i + 1)) + "\n";
+        }
+        if (remain > 0) {
+          content += arrContents[n].substring(MSG_LINE_SIZE * lines);
+        } else {
+          content = content.substring(0, content.length() - 1);
+        }
+      } else {
+        content = arrContents[n];
+      }
+      stbContent.append(content + "\n");
+    }
+    return stbContent.toString();
   }
 
 }
