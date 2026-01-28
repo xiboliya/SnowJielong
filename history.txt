@@ -400,4 +400,7 @@ src/com/xiboliya/snowjielong/util/Util.java
 2026-01-28
 1.修改中级的错误成语。
 res/topic/level1.txt
-
+2.代码优化。
+src/com/xiboliya/snowjielong/common/BarrierOrder.java
+src/com/xiboliya/snowjielong/common/IdiomCache.java
+src/com/xiboliya/snowjielong/dialog/RankingListDialog.java
