@@ -230,8 +230,14 @@ public class PassBarrierDialog extends BaseDialog implements ActionListener {
   private void showDefinition(String idiom) {
     String definition = Util.currentTopicDefinitionMap.get(idiom);
     if (Util.isTextEmpty(definition)) {
-      JOptionPane.showMessageDialog(this, "成语：" + idiom + "\n解释：暂缺！", Util.SOFTWARE, JOptionPane.QUESTION_MESSAGE);
+      JOptionPane.showMessageDialog(this, "成语：" + idiom + "\n解释：暂缺！\n出处：暂缺！", Util.SOFTWARE, JOptionPane.QUESTION_MESSAGE);
     } else {
+      int index = definition.indexOf("出自");
+      if (index >= 0) {
+        definition = definition.replaceFirst("出自", "\n出处：");
+      } else {
+        definition += "\n出处：暂缺！";
+      }
       JOptionPane.showMessageDialog(this, "成语：" + idiom + "\n" + Util.convertToMsg("解释：" + definition), Util.SOFTWARE, JOptionPane.QUESTION_MESSAGE);
     }
   }
